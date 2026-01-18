@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>About Server | Ordo Draconis</title>
+  <link rel="stylesheet" href="../css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+<div class="layout">
+
+  <!-- LEVÁ STRANA -->
+  <div class="hero-bg hero-server"></div>
+
+  <!-- PRAVÁ STRANA -->
+  <aside class="right">
+
+    <div class="side-header">
+      <div class="side-logo">Ordo Draconis</div>
+
+      <div class="top-actions">
+        <div class="auth">
+          <a href="#" class="btn">Register</a>
+          <a href="#" class="btn">Login</a>
+        </div>
+         <div class="lang">
+  <a href="server.html">CS</a> |
+  <a href="server-en.html" class="active">EN</a>
+
+  <div class="server-status online">
+    <span class="dot"></span>
+    Online
+    <span class="divider">·</span>
+    <span class="players">214 players</span>
+  </div>
+</div>
+      </div>
+    </div>
+
+    <nav class="side-nav">
+      <a href="../index-en.html">Home</a>
+      <a href="server-en.html" class="active">About server</a>
+      <a href="start-en.html">How to start</a>
+      <a href="world-en.html">World</a>
+      <a href="donate-en.html">Donate</a>
+    </nav>
+
+    <div class="content-box">
+      <button id="musicBtn" class="music-toggle">
+  <span class="icon">▶</span> Open Chronicle
+</button>
+
+  <div class="credits-window">
+    <div class="credits-content">
+
+    <h3>Introductory speech of the Ordo Draconis clan</h3>
+
+<p>
+Once, the world of MMORPGs was more than just a game to us. It was a second home.
+</p>
+<p>
+Sometime around 2004–2005, we discovered the power and beauty
+of an online world that was able to unite people from different
+parts of the country — and the world — into one whole. It was
+back then that friendships, rivalries, alliances… and clans
+with a soul were formed.
+One of them was <strong>Ordo Draconis.</strong>
+</p>
+
+<p>
+We lived through the era of <strong>C4, C5, C6.</strong> Long nights, endless farming,
+our first raid bosses, the tension of PvP, the joy of victory
+and the bitterness of defeat. We did not play alone — allies
+stood by our side in alliances, people with whom we shared
+raid bosses, wars, and ordinary moments in cities.
+</p>
+
+<p>
+We started on the IceOnline server.
+And then came a moment that is never forgotten.
+</p>
+
+<p>
+An unannounced wipe. A decision made by a single admin that
+instantly erased weeks and months of effort. It left a scar
+on the entire community — one many of us still carry to this day.
+Not because of lost characters — but because something truly
+special was destroyed without warning.
+</p>
+
+<p>
+This server was created as a tribute to those times.<br>
+A tribute to everyone who was part of Ordo Draconis.<br>
+A tribute to those who stood with us in alliances.<br>
+A tribute to those who raided with us, fought by our side — or against us.
+</p>
+
+<p>
+This is not a return in time.<br>
+It is a chance to remember.<br>
+</p>
+
+<p>
+The server is set up to be enjoyable to play, to respect the
+players’ time, and to allow the atmosphere of the old good
+days to be experienced once more — without unnecessary pressure,
+without frustration, with a strong focus on community.
+</p>
+
+<p>
+If you played here…<br>
+If you remember those names, those moments, those nights…<br>
+Then this world is for you as well.
+</p>
+
+<p>
+And below, these are no ordinary credits.<br>
+<strong>These are memories.</strong>
+</p>
+
+<p>Ashe — shillien elder</p>
+<p>Atham — paladin</p>
+<p>Azaghal — warsmith</p>
+<p>Craftie — warsmith</p>
+<p>Ecallir — gladiator</p>
+<p>Feisar — bladedancer</p>
+<p>Flaminius — spellhowler</p>
+<p>Georgus — warlord</p>
+<p>Grunt — overlord</p>
+<p>Neoras — shillien elder</p>
+<p>Paulie — sword singer</p>
+<p>Shangalar — necromancer</p>
+<p>Ultimo — warcryer</p>
+<p>Vlad — spoiler</p>
+
+<p>And</p>
+<p>Organizer</p>
+<p>Commander</p>
+<p>Psychologist</p>
+<p>Leader</p>
+<p><strong>Shardalhar</strong></p>
+<p>—</p>
+
+<p>And</p>
+<p>To everyone who was part of it.</p>
+
+<p></p>
+
+<p>Cheeroke — a friend from the city</p>
+<p>Erutan</p>
+<p>Johan — IceOnline admin</p>
+<p>Lauriel</p>
+<p>xxlamaxx — annoying player, later a GM</p>
+
+<p></p>
+
+<p>And many others I can no longer remember.</p>
+<p>This dedication is for all teammates and rivals alike.</p>
+<p>If you are here, enjoy the game.</p>
+<p>The Korean random must not go unmentioned.</p>
+<p>Bugged geodata.</p>
+    </div>
+    </div>
+    </div>
+<div class="credits-source">
+  Source: 
+  <a href="https://www.youtube.com/watch?v=umwVbUjsj94&list=RDumwVbUjsj94&index=1" target="_blank" rel="noopener">
+    A Stranger in a Familiar Land – YouTube
+  </a>
+</div>
+  </aside>
+</div>
+<audio id="bgMusic">
+  <source src="../audio/ordo-theme.mp3" type="audio/mpeg">
+</audio>
+<script>
+const music = document.getElementById("bgMusic");
+const btn = document.getElementById("musicBtn");
+const credits = document.querySelector(".credits-content");
+
+let playing = false;
+
+btn.addEventListener("click", () => {
+  if (!playing) {
+    music.play();
+    credits.style.animationPlayState = "running";
+    btn.innerHTML = '<span class="icon">⏹</span> Close Chronicle';
+  } else {
+    music.pause();
+    credits.style.animationPlayState = "paused";
+    btn.innerHTML = '<span class="icon">▶</span> Open Chronicle';
+  }
+  playing = !playing;
+});
+</script>
+</body>
+</html>
