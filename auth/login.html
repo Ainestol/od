@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <title>Přihlášení | Ordo Draconis</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/auth.css">
+</head>
+
+<body class="auth-page">
+
+    <!-- HEADER -->
+    <header class="main-header">
+    <div class="logo">
+        <a href="/">Ordo Draconis</a>
+    </div>
+
+    <div class="auth">
+        <a href="/auth/register.html" class="btn active">Registrace</a>
+        <a href="/auth/login.html" class="btn">Přihlášení</a>
+    </div>
+
+    <div class="lang">
+        <a href="/auth/register.html" class="active">CS</a>
+        <a href="/auth/register-en.html">EN</a>
+    </div>
+</header>
+
+    <!-- CONTENT -->
+    <main class="auth-container">
+        <h1>Přihlášení</h1>
+        <p class="auth-subtitle">
+            Přihlas se ke svému webovému účtu Ordo Draconis.
+        </p>
+
+        <form class="auth-form" action="#" method="post">
+
+            <div class="form-group">
+                <label for="email">E-mailová adresa</label>
+                <input 
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="tvuj@email.cz"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="password">Heslo</label>
+                <input 
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="********"
+                    required
+                >
+            </div>
+
+            <!-- chyba – zatím jen text -->
+            <div class="form-error">
+                Nesprávná e-mailová adresa nebo heslo.
+            </div>
+
+            <button type="submit" class="btn-primary">
+                Přihlásit se
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            <p>
+                Nemáš ještě účet?
+                <a href="/auth/register.html">Vytvoř si ho</a>
+            </p>
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <p>© Ordo Draconis</p>
+    </footer>
+
+</body>
+</html>

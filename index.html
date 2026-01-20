@@ -20,9 +20,9 @@
     <div class="side-logo">Ordo Draconis</div>
       <div class="top-actions">
         <div class="auth">
-          <a href="#" class="btn">Register</a>
-          <a href="#" class="btn">Login</a>
-            </div>
+    <a href="/auth/register.html" class="btn">Register</a>
+    <a href="/auth/login.html" class="btn">Login</a>
+</div>
           <div class="lang">
           <a href="index.html" class="active">CS</a> | 
           <a href="index-en.html">EN</a>
@@ -38,12 +38,12 @@
     </div>
 
     <nav class="side-nav">
-      <a href="index.html">Domů</a>
+      <a href="/">Domů</a>
       <a href="pages/server.html">O serveru</a>
       <a href="pages/start.html">Začít hrát</a>
       <a href="pages/world.html">Svět</a>
       <a href="pages/donate.html">Donate</a>
-    </nav>
+      </nav>
 
     <div class="content-box">
 
@@ -123,7 +123,7 @@ async function updateServerStatus() {
 
     if (data.online) {
       dot.style.background = '#2ecc71';
-      players.textContent = data.players + ' hráčů';
+      players.textContent = data.players + ' Hráčů';
     } else {
       dot.style.background = '#e74c3c';
       players.textContent = 'Offline';

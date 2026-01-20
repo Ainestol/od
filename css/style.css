@@ -172,6 +172,8 @@ nav a:hover {
   width: 900px;
   padding: 40px 40px;
   position: relative; /* DŮLEŽITÉ */
+  display: flex;
+  flex-direction: column;
 }
 .side-nav {
   display: flex;
@@ -240,6 +242,213 @@ nav a:hover {
   gap: 12px;
   justify-content: flex-end;
   margin-bottom: 8px;
+}
+/* ============================
+   AUTH PAGE – BACKGROUND EMBLEM
+   ============================ */
+
+.auth-page {
+    position: relative;
+    min-height: 100vh;
+    background-color: #000;
+    overflow: hidden;
+}
+
+.auth-page::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    background-image: url("/img/clan-emblem.png");
+    background-repeat: no-repeat;
+    background-position: center 35%;
+    background-size: 70%;
+
+    opacity: 0.12;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.auth-page .main-header,
+.auth-page .top-bar {
+    position: relative;
+    z-index: 3;
+}
+.auth-page .logo a,
+.auth-page .side-logo a,
+.auth-page .main-header .logo a {
+    color: #d4af37 !important;
+    text-decoration: none;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 7px;
+    text-transform: uppercase;
+
+    text-shadow:
+        0 0 4px rgba(212,175,55,0.35),
+        0 0 10px rgba(212,175,55,0.25),
+        0 0 20px rgba(212,175,55,0.15);
+
+    position: relative;
+    z-index: 3; /* NAD tlačítky */
+}
+.auth-page .logo a:visited,
+.auth-page .side-logo a:visited {
+    color: #d4af37;
+}
+.auth-container {
+    background: rgba(0, 0, 0, 0.55);
+    padding: 40px;
+    border-radius: 6px;
+}
+.auth-page .auth-container {
+    max-width: 520px;
+    margin-top: 40px;
+
+    background: linear-gradient(
+        to bottom,
+        rgba(15, 15, 15, 0.85),
+        rgba(5, 5, 5, 0.85)
+    );
+
+    border: 1px solid rgba(212,175,55,0.25);
+    box-shadow:
+        0 0 20px rgba(0,0,0,0.9),
+        0 0 40px rgba(212,175,55,0.08);
+
+    padding: 44px;
+}
+.auth-page::after {
+    content: "";
+    position: absolute;
+
+    left: 0;
+    right: 0;
+    top: 140px;            /* PEVNÁ VÝŠKA – tady si ji doladíš */
+
+    height: 1px;
+    background: rgba(212, 175, 55, 0.6); /* zlatá, jemná */
+
+    pointer-events: none;
+    z-index: 2;
+}
+.auth-page input[type="email"],
+.auth-page input[type="password"] {
+    width: 100%;
+    background: #0e0d0d;
+    border: 1px solid #554827;
+
+    color: #e6d8a3;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-family: inherit;
+
+    transition:
+        border-color 0.3s,
+        box-shadow 0.3s,
+        background 0.3s;
+}
+.auth-page input:focus {
+    outline: none;
+    background: #0f0e0e;
+
+    border-color: #d4af37;
+    box-shadow:
+        0 0 0 1px rgba(129, 110, 45, 0.35),
+        0 0 10px rgba(212,175,55,0.15);
+}
+.auth-page .btn-primary {
+    width: 100%;
+    margin-top: 18px;
+
+    background: linear-gradient(
+        to bottom,
+        #1a1a1a,
+        #0d0d0d
+    );
+
+    border: 1px solid #3a3322;
+    color: #d4af37;
+
+    padding: 12px 0;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+
+    transition:
+        background 0.3s,
+        box-shadow 0.3s,
+        border-color 0.3s;
+}
+.auth-page .btn-primary:hover {
+    background: linear-gradient(
+        to bottom,
+        #2a2a2a,
+        #141414
+    );
+
+    border-color: #d4af37;
+    box-shadow:
+        0 0 12px rgba(212,175,55,0.25);
+}
+.auth-page .form-error {
+    margin-top: 10px;
+    color: #d4af37;
+    font-size: 13px;
+    opacity: 0.85;
+}
+.auth-page h1 {
+    font-size: 44px;
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+
+    text-shadow:
+        0 0 8px rgba(212,175,55,0.25);
+}
+.auth-page .auth-footer a {
+    color: #9f9f9f;
+    text-decoration: none;
+    transition: color 0.3s, text-shadow 0.3s;
+}
+.auth-page .auth-footer a:hover {
+    color: #d4af37;
+    text-shadow: 0 0 6px rgba(212,175,55,0.35);
+}
+
+.auth-page .auth .btn,
+.auth-page .top-actions .btn {
+    background: linear-gradient(to bottom, #111, #0b0b0b);
+    border: 1px solid #3a3322;
+    color: #d4af37;
+
+    padding: 10px 18px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-size: 13px;
+
+    box-shadow:
+        0 0 10px rgba(0,0,0,0.8),
+        inset 0 0 0 rgba(212,175,55,0);
+
+    transition:
+        border-color 0.3s,
+        box-shadow 0.3s,
+        background 0.3s;
+}
+.auth-page .auth .btn {
+    min-height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-family: 'Cinzel', serif;
+}
+.auth-page .auth .btn:hover,
+.auth-page .top-actions .btn:hover {
+    border-color: #d4af37;
+    background: linear-gradient(to bottom, #1a1a1a, #111);
+
+    box-shadow:
+        0 0 14px rgba(212,175,55,0.25),
+        inset 0 0 12px rgba(212,175,55,0.08);
 }
 
 .top-actions .btn {
@@ -468,7 +677,7 @@ nav a:hover {
   transform: translateY(0);
 }
 .credits-source {
-  margin-top: 200px;
+  margin-top: 40px;
   padding-top: 10px;
   font-size: 12px;
   color: #6f6a58;

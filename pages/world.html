@@ -20,19 +20,19 @@
       <div class="side-logo">Ordo Draconis</div>
       <div class="top-actions">
         <div class="auth">
-          <a href="#" class="btn">Register</a>
-          <a href="#" class="btn">Login</a>
-          </div>
+  <a href="/auth/register.html" class="btn">Register</a>
+  <a href="/auth/login.html" class="btn">Login</a>
+</div>
         <div class="lang">
   <a href="world.html" class="active">CS</a> |
   <a href="world-en.html">EN</a>
 
   <div class="server-status online">
-    <span class="dot"></span>
-    Online
-    <span class="divider">·</span>
-    <span class="players">214 hráčů</span>
-  </div>
+  <span class="dot"></span>
+  Online
+  <span class="divider">·</span>
+  <span class="players"></span>
+</div>
 </div>
 
       </div>
@@ -54,5 +54,32 @@
 
   </aside>
 </div>
+<script>
+async function updateServerStatus() {
+  try {
+    const res = await fetch('/api/status.php');
+    const data = await res.json();
+
+    const dot = document.querySelector('.server-status .dot');
+    const players = document.querySelector('.server-status .players');
+
+    if (!dot || !players) return;
+
+    if (data.online) {
+      dot.style.background = '#2ecc71';
+      players.textContent = data.players + ' hráčů';
+    } else {
+      dot.style.background = '#e74c3c';
+      players.textContent = 'Offline';
+    }
+  } catch (e) {
+    console.error('Status error', e);
+  }
+}
+
+updateServerStatus();
+setInterval(updateServerStatus, 10000);
+</script>
+
 </body>
 </html>

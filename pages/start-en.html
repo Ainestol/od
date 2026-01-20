@@ -21,19 +21,19 @@
 
       <div class="top-actions">
         <div class="auth">
-          <a href="#" class="btn">Register</a>
-          <a href="#" class="btn">Login</a>
-        </div>
+  <a href="/auth/register-en.html" class="btn">Register</a>
+  <a href="/auth/login-en.html" class="btn">Login</a>
+</div>
         <div class="lang">
   <a href="start.html">CS</a> |
   <a href="start-en.html" class="active">EN</a>
 
   <div class="server-status online">
-    <span class="dot"></span>
-    Online
-    <span class="divider">·</span>
-    <span class="players">214 players</span>
-  </div>
+  <span class="dot"></span>
+  Online
+  <span class="divider">·</span>
+  <span class="players"></span>
+</div>
 </div>
       </div>
     </div>
@@ -75,5 +75,33 @@ follow the steps below to begin your journey.
     Run the <strong>l2.exe</strong> file in the system folder.<br>
     For now, the game is available for testing only.
   </p>
-
 </div>
+<script>
+async function updateServerStatus() {
+  try {
+    const res = await fetch('/api/status.php');
+    const data = await res.json();
+
+    const dot = document.querySelector('.server-status .dot');
+    const players = document.querySelector('.server-status .players');
+
+    if (!dot || !players) return;
+
+    if (data.online) {
+      dot.style.background = '#2ecc71';
+      players.textContent = data.players + ' hráčů';
+    } else {
+      dot.style.background = '#e74c3c';
+      players.textContent = 'Offline';
+    }
+  } catch (e) {
+    console.error('Status error', e);
+  }
+}
+
+updateServerStatus();
+setInterval(updateServerStatus, 10000);
+</script>
+
+</body>
+</html>

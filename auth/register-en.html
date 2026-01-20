@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <title>Register | Ordo Draconis</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- sdílené styly webu -->
+    <link rel="stylesheet" href="/css/style.css">
+
+    <!-- případně auth specifické styly -->
+    <link rel="stylesheet" href="/css/auth.css">
+</head>
+
+<body class="auth-page">
+
+    <!-- HEADER (stejný jako na indexu) -->
+    <header class="main-header">
+    <div class="logo">
+        <a href="/index-en.html">Ordo Draconis</a>
+    </div>
+
+    <div class="auth">
+        <a href="/auth/register-en.html" class="btn active">Register</a>
+        <a href="/auth/login-en.html" class="btn">Login</a>
+    </div>
+
+    <div class="lang">
+        <a href="/auth/register.html">CS</a>
+        <a href="/auth/register-en.html" class="active">EN</a>
+    </div>
+</header>
+
+
+    <!-- HLAVNÍ OBSAH -->
+    <main class="auth-container">
+        <h1>Create Account</h1>
+        <p class="auth-subtitle">
+            Create your Ordo Draconis web account.<br>
+            This account will later be used for game accounts, vote and donate.
+        </p>
+
+        <form class="auth-form" action="#" method="post">
+            
+            <div class="form-group">
+                <label for="email">Email address</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email"
+                    placeholder="your@email.com"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password"
+                    placeholder="********"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="password_confirm">Confirm password</label>
+                <input 
+                    type="password" 
+                    id="password_confirm" 
+                    name="password_confirm"
+                    placeholder="********"
+                    required
+                >
+            </div>
+
+            <!-- chybová hláška – zatím jen statická -->
+            <div class="form-error">
+                Passwords do not match.
+            </div>
+
+            <button type="submit" class="btn-primary">
+                Create account
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            <p>
+                Already have an account?
+                <a href="/auth/login.html">Login here</a>
+            </p>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="main-footer">
+        <p>© Ordo Draconis</p>
+    </footer>
+
+</body>
+</html>
