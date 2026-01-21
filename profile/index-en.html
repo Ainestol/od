@@ -1,26 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="cs">
 <head>
   <meta charset="UTF-8">
-  <title>My profile | Ordo Draconis</title>
+  <title>Profile | Ordo Draconis</title>
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/profile.css">
 </head>
 
-<body class="profile-page">
+<body class="auth-page profile-page">
 
 <header class="main-header">
-  <div class="logo">
-    <a href="/">Ordo Draconis</a>
-  </div>
-
+  <div class="logo"><a href="/">Ordo Draconis</a></div>
   <div class="auth">
     <a href="/profile/" class="btn active">Profile</a>
     <a href="/api/logout.php" class="btn">Logout</a>
   </div>
 </header>
 
-<main class="profile-shell">
+<main class="auth-container profile-shell">
   <h1>My profile</h1>
 
   <div class="profile-tabs">
@@ -29,43 +26,38 @@
     <a class="tab" href="#donate">Donate</a>
   </div>
 
-  <div class="profile-grid">
-    <section id="accounts" class="profile-card">
-      <h2>Game accounts</h2>
-      <p class="muted">Create and manage your Lineage II accounts.</p>
+  <section id="accounts" class="profile-card">
+    <h2>Herní účty</h2>
+    <p class="muted">Create and manage your Lineage II accounts.</p>
 
-      <a class="btn btn-primary" href="#" style="max-width:320px;">Create account</a>
+    <a class="btn btn-primary" href="#" style="max-width:320px;">Vytvořit herní účet</a>
 
-      <div class="mini-list">
-        <div class="mini-row"><strong>Account:</strong> od_test1 <span class="tag">3 characters</span></div>
-        <div class="mini-row"><strong>Account:</strong> od_test2 <span class="tag">1 character</span></div>
-      </div>
-    </section>
+    <div class="mini-list">
+      <div class="mini-row"><strong>Účet:</strong> od_test1 <span class="tag">3 postavy</span></div>
+      <div class="mini-row"><strong>Účet:</strong> od_test2 <span class="tag">1 postava</span></div>
+    </div>
+  </section>
 
-    <section id="vote" class="profile-card">
-      <h2>Vote</h2>
-      <p class="muted">Vote links will appear here (4–5 sites).</p>
+  <section id="vote" class="profile-card">
+    <h2>Hlasování</h2>
+    <p class="muted">Vote links will appear here (4–5 sites).</p>
+    <div class="link-list">
+      <a href="#" class="link-item">Hlasování #1</a>
+      <a href="#" class="link-item">Hlasování #2</a>
+      <a href="#" class="link-item">Hlasování #3</a>
+      <a href="#" class="link-item">Hlasování #4</a>
+    </div>
+  </section>
 
-      <div class="link-list">
-        <a href="#" class="link-item">Vote site #1</a>
-        <a href="#" class="link-item">Vote site #2</a>
-        <a href="#" class="link-item">Vote site #3</a>
-        <a href="#" class="link-item">Vote site #4</a>
-      </div>
-    </section>
-
-    <section id="donate" class="profile-card">
-      <h2>Donate</h2>
-      <p class="muted">No pay-to-win. Tokens / account info will be here.</p>
-
-      <div class="donate-box">
-        <div><strong>IBAN:</strong> XXXX XXXX XXXX</div>
-        <div><strong>Message:</strong> your email / account</div>
-      </div>
-    </section>
-  </div>
+  <section id="donate" class="profile-card">
+    <h2>Podpora serveru</h2>
+    <p class="muted">Žádné pay-to-win. Zde budou informace k tokenům / platbě.</p>
+    <div class="donate-box">
+      <div><strong>IBAN:</strong> XXXX XXXX XXXX</div>
+      <div><strong>Zpráva pro příjemce:</strong> tvůj e-mail / účet</div>
+    </div>
+  </section>
 </main>
-
 
 </body>
 </html>
