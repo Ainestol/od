@@ -39,7 +39,7 @@
             Tento účet bude sloužit ke správě herních účtů, hlasování a podpoře serveru.
         </p>
 
-        <form class="auth-form" action="#" method="post">
+        <form id="registerForm" class="auth-form">
             
             <div class="form-group">
                 <label for="email">E-mailová adresa</label>
@@ -96,6 +96,33 @@
     <footer class="main-footer">
         <p>© Ordo Draconis</p>
     </footer>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('registerForm');
+  const errorBox = document.getElementById('registerError');
 
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    const res = await fetch('/api/register.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+
+    const data = await res.json();
+
+    if (data.status === 'ok') {
+      window.location.href = '/auth/login.html';
+    } else {
+      errorBox.textContent = data.error || 'Registration failed';
+      errorBox.style.display = 'block';
+    }
+  });
+});
+</script>
 </body>
 </html>
