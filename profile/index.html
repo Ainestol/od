@@ -1,9 +1,42 @@
-<h1>Můj profil</h1>
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <title>Profil | Ordo Draconis</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
 
-<p>
-  Vítej v profilu Ordo Draconis.
-</p>
+<body>
 
-<p class="profile-note">
-  Zde budeš moci spravovat herní účty, hlasování a podporu serveru.
-</p>
+<header class="main-header">
+  <div class="logo">
+    <a href="/">Ordo Draconis</a>
+  </div>
+
+  <div class="auth">
+    <a href="/profile/" class="btn active">Profil</a>
+    <a href="/api/logout.php" class="btn">Odhlásit se</a>
+  </div>
+</header>
+
+<main class="auth-container">
+  <h1>Můj profil</h1>
+
+  <p>
+    Vítej ve svém profilu.<br>
+    Zde budeš spravovat:
+  </p>
+
+  <ul>
+    <li>herní účty</li>
+    <li>vote</li>
+    <li>donate</li>
+  </ul>
+
+  <p style="opacity:.6;">
+    (zatím testovací verze)
+  </p>
+</main>
+
+</body>
+</html>
