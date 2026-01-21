@@ -21,68 +21,68 @@
   <h1>Můj profil</h1>
 
   <div class="profile-tabs">
-  <button class="tab active" data-tab="accounts">Herní účty</button>
-  <button class="tab" data-tab="vote">Hlasování pro server</button>
-  <button class="tab" data-tab="donate">Podpora serveru</button>
-  <button class="tab" data-tab="support">Hlášení bugů</button>
-</div>
-    <div class="profile-panels">
-  <section id="accounts" class="profile-card panel active"> ... </section>
-    <h2>Herní účty</h2>
-    <p class="muted">Zde si vytvoříš a spravuješ své účty pro Lineage II.</p>
-
-    <a class="btn btn-primary" href="#" style="max-width:320px;">Vytvořit herní účet</a>
-
-    <div class="mini-list">
-      <div class="mini-row"><strong>Účet:</strong> od_test1 <span class="tag">3 postavy</span></div>
-      <div class="mini-row"><strong>Účet:</strong> od_test2 <span class="tag">1 postava</span></div>
-    </div>
-  </section>
-
-  <section id="vote" class="profile-card panel"> ... </section>
-    <h2>Hlasování pro server</h2>
-    <p class="muted">Odkazy na hlasování budou zde (4–5 webů).</p>
-    <div class="link-list">
-      <a href="#" class="link-item">Hlasování #1</a>
-      <a href="#" class="link-item">Hlasování #2</a>
-      <a href="#" class="link-item">Hlasování #3</a>
-      <a href="#" class="link-item">Hlasování #4</a>
-    </div>
-  </section>
-  
-  <section id="donate" class="profile-card panel"> ... </section>
-    <h2>Podpora serveru</h2>
-    <p class="muted">Žádné pay-to-win. Zde budou informace k tokenům / platbě.</p>
-    <div class="donate-box">
-      <div><strong>IBAN:</strong> XXXX XXXX XXXX</div>
-      <div><strong>Zpráva pro příjemce:</strong> tvůj e-mail / účet</div>
-    </div>
-  </section>
-  <section id="support" class="profile-card panel"> ... </section>
-  <h2>Ticket / Bug report</h2>
-  <p class="muted">Něco nefunguje? Pošli nám ticket.</p>
-  <a class="btn btn-primary" href="/support/" style="max-width:320px;">Odeslat ticket</a>
-</section>
+    <button type="button" class="tab active" data-tab="accounts">Herní účty</button>
+    <button type="button" class="tab" data-tab="vote">Hlasování pro server</button>
+    <button type="button" class="tab" data-tab="donate">Podpora serveru</button>
+    <button type="button" class="tab" data-tab="support">Hlášení bugů</button>
   </div>
-</div>
+
+  <div class="profile-panels">
+    <section id="accounts" class="profile-card panel active">
+      <h2>Herní účty</h2>
+      <p class="muted">Zde si vytvoříš a spravuješ své účty pro Lineage II.</p>
+
+      <a class="btn btn-primary" href="#" style="max-width:320px;">Vytvořit herní účet</a>
+
+      <div class="mini-list">
+        <div class="mini-row"><strong>Účet:</strong> od_test1 <span class="tag">3 postavy</span></div>
+        <div class="mini-row"><strong>Účet:</strong> od_test2 <span class="tag">1 postava</span></div>
+      </div>
+    </section>
+
+    <section id="vote" class="profile-card panel">
+      <h2>Hlasování pro server</h2>
+      <p class="muted">Odkazy na hlasování budou zde (4–5 webů).</p>
+
+      <div class="link-list">
+        <a href="#" class="link-item">Hlasování #1</a>
+        <a href="#" class="link-item">Hlasování #2</a>
+        <a href="#" class="link-item">Hlasování #3</a>
+        <a href="#" class="link-item">Hlasování #4</a>
+      </div>
+    </section>
+
+    <section id="donate" class="profile-card panel">
+      <h2>Podpora serveru</h2>
+      <p class="muted">Žádné pay-to-win. Zde budou informace k tokenům / platbě.</p>
+
+      <div class="donate-box">
+        <div><strong>IBAN:</strong> XXXX XXXX XXXX</div>
+        <div><strong>Zpráva pro příjemce:</strong> tvůj e-mail / účet</div>
+      </div>
+    </section>
+
+    <section id="support" class="profile-card panel">
+      <h2>Ticket / Bug report</h2>
+      <p class="muted">Něco nefunguje? Pošli nám ticket.</p>
+
+      <a class="btn btn-primary" href="/support/" style="max-width:320px;">Odeslat ticket</a>
+    </section>
+  </div>
 </main>
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const tabs = document.querySelectorAll('.profile-tabs .tab');
-    const panels = document.querySelectorAll('.profile-panels .panel');
+document.addEventListener('DOMContentLoaded', () => {
+  const tabs = document.querySelectorAll('.profile-tabs .tab');
+  const panels = document.querySelectorAll('.profile-panels .panel');
 
-    const show = (key) => {
-      tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === key));
-      panels.forEach(p => p.classList.toggle('active', p.id === key));
-    };
-
-    tabs.forEach(t => t.addEventListener('click', () => show(t.dataset.tab)));
-    const first = document.querySelector('.profile-tabs .tab.active') || tabs[0];
-    if (first) show(first.dataset.tab);
-  });
-</script>
-
+  const show = (key) => {
+    tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === key));
+    panels.forEach(p => p.classList.toggle('active', p.id === key));
+  };
+  tabs.forEach(t => t.addEventListener('click', () => show(t.dataset.tab)));
+  const first = document.querySelector('.profile-tabs .tab.active') || tabs[0];
+  if (first) show(first.dataset.tab);
+});
 </script>
 </body>
-
 </html>
