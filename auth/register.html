@@ -75,9 +75,7 @@
             </div>
 
             <!-- chybová hláška – zatím jen statická -->
-            <div class="form-error">
-                Hesla se neshodují.
-            </div>
+            <div class="form-error" id="registerError" style="display:none;"></div>
 
             <button type="submit" class="btn-primary">
                 Vytvořit účet
@@ -101,8 +99,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('registerForm');
   const errorBox = document.getElementById('registerError');
 
+  if (!form || !errorBox) {
+    console.error('Register form or error box missing');
+    return;
+  }
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+
+    errorBox.style.display = 'none';
 
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
@@ -118,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (data.status === 'ok') {
       window.location.href = '/auth/login.html';
     } else {
-      errorBox.textContent = data.error || 'Registration failed';
+      errorBox.textContent = data.error || 'Registrace selhala';
       errorBox.style.display = 'block';
     }
   });
