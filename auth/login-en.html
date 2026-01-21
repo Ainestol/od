@@ -36,7 +36,7 @@
             Login to your Ordo Draconis web account.
         </p>
 
-        <form class="auth-form" action="#" method="post">
+        <form id="loginForm" class="auth-form">
 
             <div class="form-group">
                 <label for="email">Email address</label>
@@ -82,28 +82,38 @@
         <p>© Ordo Draconis</p>
     </footer>
 <script>
-document.getElementById('loginForm').addEventListener('submit', async function (e) {
-  e.preventDefault();
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('loginForm');
+  const errorBox = document.getElementById('loginError');
 
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
-
-  const res = await fetch('/api/login.php', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ email, password })
-  });
-
-  const data = await res.json();
-
-  if (data.status === 'ok' && data.redirect) {
-    window.location.href = data.redirect;
-  } else {
-    alert(data.error || 'Login failed');
+  if (!form) {
+    console.error('loginForm nenalezen');
+    return;
   }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorBox.style.display = 'none';
+
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    const res = await fetch('/api/login.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+
+    const data = await res.json();
+
+    if (data.status === 'ok' && data.redirect) {
+      window.location.href = data.redirect;
+    } else {
+      errorBox.style.display = 'block';
+    }
+  });
 });
 </script>
+
 </body>
 </html>
