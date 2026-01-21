@@ -21,11 +21,12 @@
   <h1>My profile</h1>
 
   <div class="profile-tabs">
-    <a class="tab active" href="#accounts">Accounts</a>
-    <a class="tab" href="#vote">Vote</a>
-    <a class="tab" href="#donate">Donate</a>
-  </div>
-  <div class="profile-grid">
+  <button class="tab active" data-tab="accounts">Accounts</button>
+  <button class="tab" data-tab="vote">Vote</button>
+  <button class="tab" data-tab="donate">Donate</button>
+  <button class="tab" data-tab="support">Bug report</button>
+</div>
+  <div class="profile-panels">
   <section id="accounts" class="profile-card">
     <h2>Game accounts</h2>
     <p class="muted">Create and manage your Lineage II accounts.</p>
@@ -63,7 +64,24 @@
   <a class="btn btn-primary" href="/support/" style="max-width:320px;">Submit ticket</a>
 </section>
 </div>
+</div>
 </main>
+<script>
+  const tabs = document.querySelectorAll('.profile-tabs .tab');
+  const panels = document.querySelectorAll('.profile-panels .panel');
 
+  tabs.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.tab;
+
+      tabs.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      panels.forEach(p => p.classList.remove('active'));
+      const target = document.getElementById(key);
+      if (target) target.classList.add('active');
+    });
+  });
+</script>
 </body>
 </html>

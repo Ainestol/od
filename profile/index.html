@@ -21,11 +21,12 @@
   <h1>Můj profil</h1>
 
   <div class="profile-tabs">
-    <a class="tab active" href="#accounts">Herní účty</a>
-    <a class="tab" href="#vote">Hlasování</a>
-    <a class="tab" href="#donate">Podpora</a>
-  </div>
-    <div class="profile-grid">
+  <button class="tab active" data-tab="accounts">Herní účty</button>
+  <button class="tab" data-tab="vote">Hlasování pro server</button>
+  <button class="tab" data-tab="donate">Podpora serveru</button>
+  <button class="tab" data-tab="support">Hlášení bugů</button>
+</div>
+    <div class="profile-panels">
   <section id="accounts" class="profile-card">
     <h2>Herní účty</h2>
     <p class="muted">Zde si vytvoříš a spravuješ své účty pro Lineage II.</p>
@@ -48,7 +49,7 @@
       <a href="#" class="link-item">Hlasování #4</a>
     </div>
   </section>
-
+  
   <section id="donate" class="profile-card">
     <h2>Podpora serveru</h2>
     <p class="muted">Žádné pay-to-win. Zde budou informace k tokenům / platbě.</p>
@@ -63,7 +64,25 @@
   <a class="btn btn-primary" href="/support/" style="max-width:320px;">Odeslat ticket</a>
 </section>
   </div>
+</div>
 </main>
+<script>
+  const tabs = document.querySelectorAll('.profile-tabs .tab');
+  const panels = document.querySelectorAll('.profile-panels .panel');
 
+  tabs.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.tab;
+
+      tabs.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      panels.forEach(p => p.classList.remove('active'));
+      const target = document.getElementById(key);
+      if (target) target.classList.add('active');
+    });
+  });
+</script>
 </body>
+
 </html>

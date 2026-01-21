@@ -19,14 +19,15 @@
   font-size: 13px;
   margin-top: 10px;
 }
+.profile-page .profile-panels { margin-top: 18px; }
+
+.profile-page .panel { display:none; }
+.profile-page .panel.active { display:block; }
+.profile-tabs .tab{ cursor:pointer; font-family: inherit; }
 
 
-.profile-page .profile-grid{
-  display: grid;
-  grid-template-columns: repeat(4, minmax(240px, 1fr));
-  gap: 18px;
-  align-items: stretch;
-}
+
+
 /* na menších obrazovkách 2 a pak 1 */
 @media (max-width: 1200px){
   .profile-page .profile-grid{ grid-template-columns: repeat(2, 1fr); }
@@ -93,10 +94,10 @@ body.auth-page.profile-page { overflow: auto; }
 /* tabs + karty */
 .profile-tabs{ display:flex; gap:14px; margin:18px 0 26px; flex-wrap:wrap; }
 .profile-tabs .tab{
-  padding:10px 14px; text-decoration:none; text-transform:uppercase; letter-spacing:2px;
-  font-size:12px; background: linear-gradient(to bottom,#111,#0b0b0b);
-  border:1px solid #3a3322; color:#d4af37;
+  cursor: pointer;
+  font-family: inherit;
 }
+
 .profile-tabs .tab:hover{ border-color:#d4af37; box-shadow:0 0 14px rgba(212,175,55,0.18); }
 .profile-tabs .tab.active{ color:#ffd36a; border-color:#d4af37; }
 
