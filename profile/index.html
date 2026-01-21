@@ -4,38 +4,59 @@
   <meta charset="UTF-8">
   <title>Profil | Ordo Draconis</title>
   <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/profile.css">
 </head>
 
-<body>
+<body class="auth-page profile-page">
 
 <header class="main-header">
-  <div class="logo">
-    <a href="/">Ordo Draconis</a>
-  </div>
-
+  <div class="logo"><a href="/">Ordo Draconis</a></div>
   <div class="auth">
     <a href="/profile/" class="btn active">Profil</a>
     <a href="/api/logout.php" class="btn">Odhlásit se</a>
   </div>
 </header>
 
-<main class="auth-container">
+<main class="auth-container profile-shell">
   <h1>Můj profil</h1>
 
-  <p>
-    Vítej ve svém profilu.<br>
-    Zde budeš spravovat:
-  </p>
+  <div class="profile-tabs">
+    <a class="tab active" href="#accounts">Herní účty</a>
+    <a class="tab" href="#vote">Hlasování</a>
+    <a class="tab" href="#donate">Podpora</a>
+  </div>
 
-  <ul>
-    <li>herní účty</li>
-    <li>vote</li>
-    <li>donate</li>
-  </ul>
+  <section id="accounts" class="profile-card">
+    <h2>Herní účty</h2>
+    <p class="muted">Zde si vytvoříš a spravuješ své účty pro Lineage II.</p>
 
-  <p style="opacity:.6;">
-    (zatím testovací verze)
-  </p>
+    <a class="btn btn-primary" href="#" style="max-width:320px;">Vytvořit herní účet</a>
+
+    <div class="mini-list">
+      <div class="mini-row"><strong>Účet:</strong> od_test1 <span class="tag">3 postavy</span></div>
+      <div class="mini-row"><strong>Účet:</strong> od_test2 <span class="tag">1 postava</span></div>
+    </div>
+  </section>
+
+  <section id="vote" class="profile-card">
+    <h2>Hlasování</h2>
+    <p class="muted">Odkazy na hlasování budou zde (4–5 webů).</p>
+    <div class="link-list">
+      <a href="#" class="link-item">Hlasování #1</a>
+      <a href="#" class="link-item">Hlasování #2</a>
+      <a href="#" class="link-item">Hlasování #3</a>
+      <a href="#" class="link-item">Hlasování #4</a>
+    </div>
+  </section>
+
+  <section id="donate" class="profile-card">
+    <h2>Podpora serveru</h2>
+    <p class="muted">Žádné pay-to-win. Zde budou informace k tokenům / platbě.</p>
+    <div class="donate-box">
+      <div><strong>IBAN:</strong> XXXX XXXX XXXX</div>
+      <div><strong>Zpráva pro příjemce:</strong> tvůj e-mail / účet</div>
+    </div>
+  </section>
 </main>
 
 </body>

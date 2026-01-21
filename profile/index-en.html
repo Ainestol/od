@@ -4,9 +4,10 @@
   <meta charset="UTF-8">
   <title>My profile | Ordo Draconis</title>
   <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/profile.css">
 </head>
 
-<body>
+<body class="profile-page">
 
 <header class="main-header">
   <div class="logo">
@@ -19,24 +20,52 @@
   </div>
 </header>
 
-<main class="auth-container">
+<main class="profile-shell">
   <h1>My profile</h1>
 
-  <p>
-    Welcome in your web profile.<br>
-    You may manage game accounts here:
-  </p>
+  <div class="profile-tabs">
+    <a class="tab active" href="#accounts">Accounts</a>
+    <a class="tab" href="#vote">Vote</a>
+    <a class="tab" href="#donate">Donate</a>
+  </div>
 
-  <ul>
-    <li>game accounts</li>
-    <li>vote</li>
-    <li>donate</li>
-  </ul>
+  <div class="profile-grid">
+    <section id="accounts" class="profile-card">
+      <h2>Game accounts</h2>
+      <p class="muted">Create and manage your Lineage II accounts.</p>
 
-  <p style="opacity:.6;">
-    (zatím testovací verze)
-  </p>
+      <a class="btn btn-primary" href="#" style="max-width:320px;">Create account</a>
+
+      <div class="mini-list">
+        <div class="mini-row"><strong>Account:</strong> od_test1 <span class="tag">3 characters</span></div>
+        <div class="mini-row"><strong>Account:</strong> od_test2 <span class="tag">1 character</span></div>
+      </div>
+    </section>
+
+    <section id="vote" class="profile-card">
+      <h2>Vote</h2>
+      <p class="muted">Vote links will appear here (4–5 sites).</p>
+
+      <div class="link-list">
+        <a href="#" class="link-item">Vote site #1</a>
+        <a href="#" class="link-item">Vote site #2</a>
+        <a href="#" class="link-item">Vote site #3</a>
+        <a href="#" class="link-item">Vote site #4</a>
+      </div>
+    </section>
+
+    <section id="donate" class="profile-card">
+      <h2>Donate</h2>
+      <p class="muted">No pay-to-win. Tokens / account info will be here.</p>
+
+      <div class="donate-box">
+        <div><strong>IBAN:</strong> XXXX XXXX XXXX</div>
+        <div><strong>Message:</strong> your email / account</div>
+      </div>
+    </section>
+  </div>
 </main>
+
 
 </body>
 </html>
