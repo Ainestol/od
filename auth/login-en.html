@@ -83,24 +83,20 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('loginForm');
-  const errorBox = document.getElementById('loginError');
 
   if (!form) {
-    console.error('loginForm nenalezen');
+    console.error('loginForm not found');
     return;
   }
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    errorBox.style.display = 'none';
 
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
+    const formData = new FormData(form);
 
     const res = await fetch('/api/login.php', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
+      body: formData
     });
 
     const data = await res.json();
@@ -108,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (data.status === 'ok' && data.redirect) {
       window.location.href = data.redirect;
     } else {
-      errorBox.style.display = 'block';
+      alert(data.error || 'Login failed');
     }
   });
 });
