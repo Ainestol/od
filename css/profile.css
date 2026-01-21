@@ -114,3 +114,29 @@ body.auth-page.profile-page { overflow: auto; }
 
 .donate-box{ margin-top:12px; padding:12px; border:1px solid rgba(212,175,55,0.2); background: rgba(0,0,0,0.25); color:#bfb8a0; }
 
+/* PANELS – show one card only */
+.profile-page .profile-panels { margin-top: 18px; }
+.profile-page .panel { display: none; }
+.profile-page .panel.active { display: block; }
+
+/* Tabs as buttons (same look as before) */
+.profile-page .profile-tabs { display:flex; gap:14px; margin:18px 0 26px; flex-wrap:wrap; }
+.profile-page .profile-tabs .tab{
+  cursor:pointer;
+  font-family: inherit;
+  padding:10px 14px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 12px;
+  background: linear-gradient(to bottom, #111, #0b0b0b);
+  border: 1px solid #3a3322;
+  color: #d4af37;
+}
+.profile-page .profile-tabs .tab:hover{
+  border-color:#d4af37;
+  box-shadow:0 0 14px rgba(212,175,55,0.18);
+}
+.profile-page .profile-tabs .tab.active{
+  color:#ffd36a;
+  border-color:#d4af37;
+}
