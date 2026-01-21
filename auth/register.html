@@ -59,6 +59,7 @@
                     id="password" 
                     name="password"
                     placeholder="********"
+                    minlength="6"
                     required
                 >
             </div>
@@ -70,12 +71,15 @@
                     id="password_confirm" 
                     name="password_confirm"
                     placeholder="********"
+                    minlength="6"
                     required
                 >
+                <div class="form-hint">
+                     Heslo musí mít alespoň 6 znaků.
+                </div>
             </div>
 
-            <!-- chybová hláška – zatím jen statická -->
-            <div class="form-error" id="registerError" style="display:none;"></div>
+           <div class="form-error" id="registerError" style="display:none;"></div>
 
             <button type="submit" class="btn-primary">
                 Vytvořit účet
@@ -98,7 +102,12 @@
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('registerForm');
   const errorBox = document.getElementById('registerError');
-
+  const errorMessages = {
+  EMAIL_EXISTS: 'Účet s touto e-mailovou adresou už existuje.',
+  INVALID_EMAIL: 'Zadej platnou e-mailovou adresu.',
+  PASSWORD_TOO_SHORT: 'Heslo musí mít alespoň 6 znaků.',
+  SERVER_ERROR: 'Došlo k chybě serveru. Zkus to prosím později.'
+};
   if (!form || !errorBox) {
     console.error('Register form or error box missing');
     return;
@@ -123,7 +132,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (data.status === 'ok') {
       window.location.href = '/auth/login.html';
     } else {
-      errorBox.textContent = data.error || 'Registrace selhala';
+      const message = errorMessages[data.error] || 'Registrace selhala';
+      errorBox.textContent = message;
       errorBox.style.display = 'block';
     }
   });

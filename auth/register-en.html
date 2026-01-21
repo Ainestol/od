@@ -60,6 +60,7 @@
                     id="password" 
                     name="password"
                     placeholder="********"
+                    minlength="6"
                     required
                 >
             </div>
@@ -71,8 +72,12 @@
                     id="password_confirm" 
                     name="password_confirm"
                     placeholder="********"
+                    minlength="6"
                     required
                 >
+                <div class="form-hint">
+                The password must be at least 6 characters long.
+                </div>
             </div>
 
             <!-- chybová hláška – zatím jen statická -->
@@ -99,7 +104,12 @@
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('registerForm');
   const errorBox = document.getElementById('registerError');
-
+  const errorMessages = {
+  EMAIL_EXISTS: 'An account with this email already exists.',
+  INVALID_EMAIL: 'Please enter a valid email address.',
+  PASSWORD_TOO_SHORT: 'Password must be at least 6 characters long.',
+  SERVER_ERROR: 'Server error. Please try again later.'
+};
   if (!form || !errorBox) {
     console.error('Register form or error box missing');
     return;
@@ -124,7 +134,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (data.status === 'ok') {
       window.location.href = '/auth/login.html';
     } else {
-      errorBox.textContent = data.error || 'Registrace selhala';
+      const message = errorMessages[data.error] || 'Registration has failed';
+      errorBox.textContent = message;
       errorBox.style.display = 'block';
     }
   });
