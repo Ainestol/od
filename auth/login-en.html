@@ -101,9 +101,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const data = await res.json();
 
-    if (data.status === 'ok' && data.redirect) {
-      window.location.href = data.redirect;
-    } else {
+    if (data.status === 'ok') {
+  window.location.href = '/profile/index-en.html';
+} else {
       alert(data.error || 'Login failed');
     }
   });
