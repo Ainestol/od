@@ -23,11 +23,17 @@
 
 .profile-page .profile-grid{
   display: grid;
-  grid-template-columns: 320px 1fr;
-  gap: 26px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
   align-items: start;
 }
-
+/* na menších obrazovkách 2 a pak 1 */
+@media (max-width: 980px){
+  .profile-page .profile-grid{ grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px){
+  .profile-page .profile-grid{ grid-template-columns: 1fr; }
+}
 .profile-page .profile-card{
   border: 1px solid #3a3322;
   background: rgba(11,11,11,0.9);
@@ -39,10 +45,6 @@
   letter-spacing: 2px;
   text-transform: uppercase;
   margin-bottom: 12px;
-}
-
-@media (max-width: 980px){
-  .profile-page .profile-grid{ grid-template-columns: 1fr; }
 }
 /* allow scroll on profile */
 body.profile-page { overflow: auto; position: relative; min-height: 100vh; background: #000; }
