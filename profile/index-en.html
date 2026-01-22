@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="cs">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Profile | Ordo Draconis</title>
@@ -38,26 +38,23 @@
     <h3>Create game account</h3>
 
     <label>Login</label>
-    <input id="accLogin" type="text" placeholder="4–16 znaků (A–Z, 0–9, _)">
+    <input id="accLogin" placeholder="4–16 characters (A–Z, 0–9, _)">
 
     <label>Password</label>
-    <input id="accPass" type="password" placeholder="min. 6 znaků">
+    <input id="accPass" placeholder="min. 6 characters">
 
-    <label>E-mail (Optionally)</label>
+    <label>E-mail (Optional)</label>
     <input id="accEmail" type="email" placeholder="email@example.com">
 
     <div class="modal-actions">
-      <button id="accCancel" class="btn">Storno</button>
+      <button id="accCancel" class="btn">Cancel</button>
       <button id="accSubmit" class="btn btn-primary">Create</button>
     </div>
 
     <div id="accMsg" class="form-error" style="display:none;"></div>
   </div>
 </div>
-      <div class="mini-list">
-        <div class="mini-row"><strong>Account:</strong> od_test1 <span class="tag">3 characters</span></div>
-        <div class="mini-row"><strong>Account:</strong> od_test2 <span class="tag">1 character</span></div>
-      </div>
+      <div id="gameAccountsList" class="mini-list"></div>
     </section>
 
     <section id="vote" class="profile-card panel">
@@ -146,13 +143,23 @@ document.addEventListener('DOMContentLoaded', () => {
       const data = await res.json().catch(()=> ({}));
 
       if (data.ok) {
+  msg.style.display = 'block';
+  msg.textContent = 'Done. Game account has been created.';
+
+  pass.value = '';
+  login.value = '';
+  email.value = '';
+
+  await loadGameAccounts();
+
+  // zavřít modal po chvilce
+  setTimeout(() => {
+    modal.classList.add('hidden');
+  }, 800);
+}
+          else {
         msg.style.display='block';
-        msg.textContent = 'Hotovo. Účet byl vytvořen.';
-        pass.value = '';
-        // tady pak doplníme refresh seznamu účtů
-      } else {
-        msg.style.display='block';
-        msg.textContent = data.error || 'Chyba.';
+        msg.textContent = data.error || 'Error.';
       }
     } finally {
       submitBtn.disabled = false;
@@ -160,6 +167,49 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 })();
 </script>
+<script>
+async function loadGameAccounts() {
+  const list = document.getElementById('gameAccountsList');
+  list.innerHTML = '<div class="muted">Loading game accounts…</div>';
 
+  let res;
+  try {
+    res = await fetch('/api/list_game_accounts.php');
+  } catch (e) {
+    list.innerHTML = '<div class="form-error">Server connection error.</div>';
+    return;
+  }
+
+  if (!res.ok) {
+    list.innerHTML = '<div class="form-error">Unable to load accounts.</div>';
+    return;
+  }
+
+  const data = await res.json();
+
+  list.innerHTML = '';
+
+  if (!data.ok || !data.accounts.length) {
+    list.innerHTML = '<div class="muted">You have no game accounts yet.</div>';
+    return;
+  }
+
+  data.accounts.forEach(acc => {
+    const row = document.createElement('div');
+    row.className = 'mini-row';
+    row.innerHTML = `
+      <strong>Účet:</strong> ${acc.login}
+      <span class="tag">${acc.created_at}</span>
+    `;
+    list.appendChild(row);
+  });
+}
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  loadGameAccounts();
+});
+</script>
 </body>
 </html>

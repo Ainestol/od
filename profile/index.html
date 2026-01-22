@@ -55,10 +55,7 @@
   </div>
 </div>
 
-      <div class="mini-list">
-        <div class="mini-row"><strong>Účet:</strong> od_test1 <span class="tag">3 postavy</span></div>
-        <div class="mini-row"><strong>Účet:</strong> od_test2 <span class="tag">1 postava</span></div>
-      </div>
+      <div id="gameAccountsList" class="mini-list"></div>
     </section>
 
     <section id="vote" class="profile-card panel">
@@ -144,11 +141,22 @@ document.addEventListener('DOMContentLoaded', () => {
       const data = await res.json().catch(()=> ({}));
 
       if (data.ok) {
-        msg.style.display='block';
-        msg.textContent = 'Hotovo. Účet byl vytvořen.';
-        pass.value = '';
-        // tady pak doplníme refresh seznamu účtů
-      } else {
+  msg.style.display = 'block';
+  msg.textContent = 'Hotovo. Účet byl vytvořen.';
+
+  pass.value = '';
+  login.value = '';
+  email.value = '';
+
+  await loadGameAccounts();
+
+  // zavřít modal po chvilce
+  setTimeout(() => {
+    modal.classList.add('hidden');
+  }, 800);
+}
+      
+      else {
         msg.style.display='block';
         msg.textContent = data.error || 'Chyba.';
       }
@@ -158,7 +166,50 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 })();
 </script>
+<script>
+async function loadGameAccounts() {
+  const list = document.getElementById('gameAccountsList');
+  list.innerHTML = '<div class="muted">Načítám herní účty…</div>';
 
+  let res;
+  try {
+    res = await fetch('/api/list_game_accounts.php');
+  } catch (e) {
+    list.innerHTML = '<div class="form-error">Chyba spojení se serverem.</div>';
+    return;
+  }
+
+  if (!res.ok) {
+    list.innerHTML = '<div class="form-error">Nelze načíst účty.</div>';
+    return;
+  }
+
+  const data = await res.json();
+
+  list.innerHTML = '';
+
+  if (!data.ok || !data.accounts.length) {
+    list.innerHTML = '<div class="muted">Zatím nemáš žádné herní účty.</div>';
+    return;
+  }
+
+  data.accounts.forEach(acc => {
+    const row = document.createElement('div');
+    row.className = 'mini-row';
+    row.innerHTML = `
+      <strong>Účet:</strong> ${acc.login}
+      <span class="tag">${acc.created_at}</span>
+    `;
+    list.appendChild(row);
+  });
+}
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  loadGameAccounts();
+});
+</script>
 </body>
 </html>
 
