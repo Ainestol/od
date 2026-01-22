@@ -140,3 +140,50 @@ body.auth-page.profile-page { overflow: auto; }
   color:#ffd36a;
   border-color:#d4af37;
 }
+.modal{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index: 50;
+}
+.modal.hidden{ display:none; }
+
+.modal-box{
+  width: min(520px, 92vw);
+  padding: 26px;
+  background: linear-gradient(to bottom, rgba(15,15,15,0.92), rgba(5,5,5,0.92));
+  border: 1px solid rgba(212,175,55,0.25);
+  box-shadow: 0 0 30px rgba(0,0,0,0.9), 0 0 40px rgba(212,175,55,0.10);
+}
+
+.modal-box h3{
+  margin-bottom: 14px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.modal-box label{
+  display:block;
+  margin: 10px 0 6px;
+  color:#bfb8a0;
+  font-size: 13px;
+}
+
+.modal-box input{
+  width: 100%;
+  background: #0e0d0d;
+  border: 1px solid #554827;
+  color: #e6d8a3;
+  padding: 10px 12px;
+  font-family: inherit;
+}
+
+.modal-actions{
+  display:flex;
+  gap:12px;
+  margin-top: 16px;
+}
+.modal-actions .btn{ flex:1; }

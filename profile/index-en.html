@@ -32,8 +32,28 @@
       <h2>Game accounts</h2>
       <p class="muted">Create and manage your Lineage II accounts.</p>
 
-      <a class="btn btn-primary" href="#" style="max-width:320px;">Create game account</a>
+      <a id="createAccBtn" class="btn btn-primary" href="#">Create game account</a>
+      <div id="accModal" class="modal hidden">
+  <div class="modal-box">
+    <h3>Create game account</h3>
 
+    <label>Login</label>
+    <input id="accLogin" type="text" placeholder="4–16 znaků (A–Z, 0–9, _)">
+
+    <label>Password</label>
+    <input id="accPass" type="password" placeholder="min. 6 znaků">
+
+    <label>E-mail (Optionally)</label>
+    <input id="accEmail" type="email" placeholder="email@example.com">
+
+    <div class="modal-actions">
+      <button id="accCancel" class="btn">Storno</button>
+      <button id="accSubmit" class="btn btn-primary">Create</button>
+    </div>
+
+    <div id="accMsg" class="form-error" style="display:none;"></div>
+  </div>
+</div>
       <div class="mini-list">
         <div class="mini-row"><strong>Account:</strong> od_test1 <span class="tag">3 characters</span></div>
         <div class="mini-row"><strong>Account:</strong> od_test2 <span class="tag">1 character</span></div>
@@ -87,6 +107,59 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
+<script>
+(() => {
+  const modal = document.getElementById('accModal');
+  const openBtn = document.getElementById('createAccBtn');
+  const cancelBtn = document.getElementById('accCancel');
+  const submitBtn = document.getElementById('accSubmit');
+  const msg = document.getElementById('accMsg');
+
+  const login = document.getElementById('accLogin');
+  const pass  = document.getElementById('accPass');
+  const email = document.getElementById('accEmail');
+
+  const open = () => { modal.classList.remove('hidden'); msg.style.display='none'; msg.textContent=''; };
+  const close = () => { modal.classList.add('hidden'); };
+
+  openBtn?.addEventListener('click', (e) => { e.preventDefault(); open(); });
+  cancelBtn?.addEventListener('click', (e) => { e.preventDefault(); close(); });
+  modal?.addEventListener('click', (e) => { if (e.target === modal) close(); });
+
+  submitBtn?.addEventListener('click', async (e) => {
+    e.preventDefault();
+    msg.style.display='none';
+
+    const payload = {
+      login: login.value.trim(),
+      password: pass.value,
+      email: email.value.trim()
+    };
+
+    submitBtn.disabled = true;
+    try {
+      const res = await fetch('/api/create_game_account.php', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json().catch(()=> ({}));
+
+      if (data.ok) {
+        msg.style.display='block';
+        msg.textContent = 'Hotovo. Účet byl vytvořen.';
+        pass.value = '';
+        // tady pak doplníme refresh seznamu účtů
+      } else {
+        msg.style.display='block';
+        msg.textContent = data.error || 'Chyba.';
+      }
+    } finally {
+      submitBtn.disabled = false;
+    }
+  });
+})();
+</script>
 
 </body>
 </html>
