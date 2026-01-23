@@ -103,11 +103,14 @@ async function checkSession() {
 document.addEventListener('DOMContentLoaded', async () => {
   const ok = await checkSession();
   if (!ok) {
-    const isEn = location.pathname.includes('index-en');
-    window.location.href = isEn ? '/login-en.html' : '/login.html';
+    const isEn = document.documentElement.lang === 'en';
+    window.location.href = isEn
+      ? '/auth/login-en.html'
+      : '/auth/login.html';
   }
 });
 </script>
+
 
 
 <script>
