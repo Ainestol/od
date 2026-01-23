@@ -87,6 +87,27 @@
     </section>
   </div>
 </main>
+<script>
+async function checkSession() {
+  try {
+    const res = await fetch('/api/me.php', { credentials: 'same-origin' });
+    if (!res.ok) return false;
+    const data = await res.json();
+    return data.ok === true;
+  } catch {
+    return false;
+  }
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const ok = await checkSession();
+  if (!ok) {
+    const isEn = location.pathname.includes('index-en');
+    window.location.href = isEn ? '/login-en.html' : '/login.html';
+  }
+});
+</script>
+
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
