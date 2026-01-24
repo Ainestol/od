@@ -29,7 +29,12 @@
 
   <div class="profile-panels">
     <section id="accounts" class="profile-card panel active">
-      <h2>Game accounts</h2>
+      <h2>
+  Game accounts
+  <span id="accountsCount" class="muted" style="font-size:14px;">
+    (0 / 10)
+  </span>
+</h2>
       <p class="muted">Create and manage your Lineage II accounts.</p>
 
       <a id="createAccBtn" class="btn btn-primary" href="#">Create game account</a>
@@ -243,6 +248,10 @@ async function loadGameAccounts() {
     list.innerHTML = '<div class="form-error">Server connection error.</div>';
     return;
   }
+const countEl = document.getElementById('accountsCount');
+if (countEl) {
+  countEl.textContent = `(${data.accounts.length} / 10)`;
+}
 
   if (!res.ok) {
     list.innerHTML = '<div class="form-error">Unable to load accounts.</div>';

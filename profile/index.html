@@ -29,7 +29,12 @@
 
   <div class="profile-panels">
     <section id="accounts" class="profile-card panel active">
-      <h2>Herní účty</h2>
+      <h2>
+  Herní účty
+  <span id="accountsCount" class="muted" style="font-size:14px;">
+    (0 / 10)
+  </span>
+</h2>
       <p class="muted">Zde si vytvoříš a spravuješ své účty pro Lineage II.</p>
 
       <a id="createAccBtn" class="btn btn-primary" href="#">Vytvořit herní účet</a>
@@ -232,27 +237,36 @@ document.addEventListener('DOMContentLoaded', () => {
 <script>
 async function loadGameAccounts() {
   const list = document.getElementById('gameAccountsList');
-  list.innerHTML = '<div class="muted">Načítám herní účty…</div>';
+  const countEl = document.getElementById('accountsCount');
+
+  list.innerHTML = '<div class="muted">Loading game accounts…</div>';
 
   let res;
   try {
     res = await fetch('/api/list_game_accounts.php');
   } catch (e) {
-    list.innerHTML = '<div class="form-error">Chyba spojení se serverem.</div>';
+    list.innerHTML = '<div class="form-error">Server connection error.</div>';
+    if (countEl) countEl.textContent = '(0 / 10)';
     return;
   }
 
   if (!res.ok) {
-    list.innerHTML = '<div class="form-error">Nelze načíst účty.</div>';
+    list.innerHTML = '<div class="form-error">Unable to load accounts.</div>';
+    if (countEl) countEl.textContent = '(0 / 10)';
     return;
   }
 
   const data = await res.json();
 
+  /* always update account count */
+  if (countEl) {
+    countEl.textContent = `(${data.accounts.length} / 10)`;
+  }
+
   list.innerHTML = '';
 
   if (!data.ok || !data.accounts.length) {
-    list.innerHTML = '<div class="muted">Zatím nemáš žádné herní účty.</div>';
+    list.innerHTML = '<div class="muted">You have no game accounts yet.</div>';
     return;
   }
 
@@ -260,23 +274,25 @@ async function loadGameAccounts() {
     const row = document.createElement('div');
     row.className = 'mini-row';
     row.innerHTML = `
-  <strong>Účet:</strong> ${acc.login}
-  <span class="tag">${acc.chars_count} postav</span>
-  <span class="tag">${acc.created_at}</span>
+      <strong>Account:</strong> ${acc.login}
+      <span class="tag">${acc.chars_count} characters</span>
+      <span class="tag">${acc.created_at}</span>
 
-  <div class="actions">
-    <button class="btn btn-small btn-danger" data-login="${acc.login}">
-      Smazat
-    </button>
-    <button class="btn btn-small" data-reset="${acc.login}">
-      Reset hesla
-    </button>
-  </div>
-`;
+      <div class="actions">
+        <button class="btn btn-small btn-danger" data-login="${acc.login}">
+          Delete
+        </button>
+        <button class="btn btn-small" data-reset="${acc.login}">
+          Reset password
+        </button>
+      </div>
+    `;
     list.appendChild(row);
   });
 }
 </script>
+
+
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
