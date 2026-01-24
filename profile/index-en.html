@@ -38,14 +38,12 @@
     <h3>Create game account</h3>
 
     <label>Login</label>
-    <input id="accLogin" placeholder="4–16 characters (A–Z, 0–9, _)">
+    <input id="accLogin" type="text" placeholder="4–16 characters (A–Z, 0–9, _)">
 
     <label>Password</label>
-    <input id="accPass" placeholder="min. 6 characters">
+    <input id="accPass" type="password" placeholder="min. 6 characters">
 
-    <label>E-mail (Optional)</label>
-    <input id="accEmail" type="email" placeholder="email@example.com">
-
+ 
     <div class="modal-actions">
       <button id="accCancel" class="btn">Cancel</button>
       <button id="accSubmit" class="btn btn-primary">Create</button>
@@ -138,7 +136,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const login = document.getElementById('accLogin');
   const pass  = document.getElementById('accPass');
-  const email = document.getElementById('accEmail');
 
   const open = () => { modal.classList.remove('hidden'); msg.style.display='none'; msg.textContent=''; };
   const close = () => { modal.classList.add('hidden'); };
@@ -151,12 +148,10 @@ document.addEventListener('DOMContentLoaded', () => {
     e.preventDefault();
     msg.style.display='none';
 
-    const payload = {
-      login: login.value.trim(),
-      password: pass.value,
-      email: email.value.trim()
-    };
-
+   const payload = {
+  login: login.value.trim(),
+  password: pass.value
+};
     submitBtn.disabled = true;
     try {
       const res = await fetch('/api/create_game_account.php', {
@@ -172,8 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   pass.value = '';
   login.value = '';
-  email.value = '';
-
+  
   await loadGameAccounts();
 
   // zavřít modal po chvilce
@@ -222,7 +216,8 @@ async function loadGameAccounts() {
     const row = document.createElement('div');
     row.className = 'mini-row';
     row.innerHTML = `
-      <strong>Účet:</strong> ${acc.login}
+      <strong>Account:</strong> ${acc.login}
+	<span class="tag">${acc.chars_count} characters</span>
       <span class="tag">${acc.created_at}</span>
     `;
     list.appendChild(row);

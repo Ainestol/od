@@ -12,7 +12,7 @@
 <header class="main-header">
   <div class="logo"><a href="/">Ordo Draconis</a></div>
   <div class="auth">
-    <a href="/profile/index.html" class="btn active">Profile</a>
+    <a href="/profile/index.html" class="btn active">Profil</a>
     <a href="/api/logout.php?lang=cs" class="btn">Odhlásit se</a>
   </div>
 </header>
@@ -33,27 +33,25 @@
       <p class="muted">Zde si vytvoříš a spravuješ své účty pro Lineage II.</p>
 
       <a id="createAccBtn" class="btn btn-primary" href="#">Vytvořit herní účet</a>
+
       <div id="accModal" class="modal hidden">
-  <div class="modal-box">
-    <h3>Vytvořit herní účet</h3>
+        <div class="modal-box">
+          <h3>Vytvořit herní účet</h3>
 
-    <label>Login</label>
-    <input id="accLogin" type="text" placeholder="4–16 znaků (A–Z, 0–9, _)">
+          <label>Login</label>
+          <input id="accLogin" type="text" placeholder="4–16 znaků (A–Z, 0–9, _)">
 
-    <label>Heslo</label>
-    <input id="accPass" type="password" placeholder="min. 6 znaků">
+          <label>Heslo</label>
+          <input id="accPass" type="password" placeholder="min. 6 znaků">
 
-    <label>E-mail (volitelné)</label>
-    <input id="accEmail" type="email" placeholder="email@example.com">
+          <div class="modal-actions">
+            <button id="accCancel" class="btn">Zrušit</button>
+            <button id="accSubmit" class="btn btn-primary">Vytvořit</button>
+          </div>
 
-    <div class="modal-actions">
-      <button id="accCancel" class="btn">Zrušit</button>
-      <button id="accSubmit" class="btn btn-primary">Vytvořit</button>
-    </div>
-
-    <div id="accMsg" class="form-error" style="display:none;"></div>
-  </div>
-</div>
+          <div id="accMsg" class="form-error" style="display:none;"></div>
+        </div>
+      </div>
 
       <div id="gameAccountsList" class="mini-list"></div>
     </section>
@@ -88,6 +86,7 @@
     </section>
   </div>
 </main>
+
 <script>
 async function checkSession() {
   try {
@@ -111,8 +110,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 </script>
 
-
-
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const tabs = document.querySelectorAll('.profile-tabs .tab');
@@ -127,6 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (first) show(first.dataset.tab);
 });
 </script>
+
 <script>
 (() => {
   const modal = document.getElementById('accModal');
@@ -137,7 +135,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const login = document.getElementById('accLogin');
   const pass  = document.getElementById('accPass');
-  const email = document.getElementById('accEmail');
 
   const open = () => { modal.classList.remove('hidden'); msg.style.display='none'; msg.textContent=''; };
   const close = () => { modal.classList.add('hidden'); };
@@ -152,8 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const payload = {
       login: login.value.trim(),
-      password: pass.value,
-      email: email.value.trim()
+      password: pass.value
     };
 
     submitBtn.disabled = true;
@@ -166,22 +162,18 @@ document.addEventListener('DOMContentLoaded', () => {
       const data = await res.json().catch(()=> ({}));
 
       if (data.ok) {
-  msg.style.display = 'block';
-  msg.textContent = 'Hotovo. Účet byl vytvořen.';
+        msg.style.display = 'block';
+        msg.textContent = 'Hotovo. Účet byl vytvořen.';
 
-  pass.value = '';
-  login.value = '';
-  email.value = '';
+        pass.value = '';
+        login.value = '';
 
-  await loadGameAccounts();
+        await loadGameAccounts();
 
-  // zavřít modal po chvilce
-  setTimeout(() => {
-    modal.classList.add('hidden');
-  }, 800);
-}
-      
-      else {
+        setTimeout(() => {
+          modal.classList.add('hidden');
+        }, 800);
+      } else {
         msg.style.display='block';
         msg.textContent = data.error || 'Chyba.';
       }
@@ -191,6 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 })();
 </script>
+
 <script>
 async function loadGameAccounts() {
   const list = document.getElementById('gameAccountsList');
@@ -223,6 +216,7 @@ async function loadGameAccounts() {
     row.className = 'mini-row';
     row.innerHTML = `
       <strong>Účet:</strong> ${acc.login}
+      <span class="tag">${acc.chars_count} postav</span>
       <span class="tag">${acc.created_at}</span>
     `;
     list.appendChild(row);
@@ -235,6 +229,6 @@ document.addEventListener('DOMContentLoaded', () => {
   loadGameAccounts();
 });
 </script>
+
 </body>
 </html>
-
