@@ -248,10 +248,6 @@ async function loadGameAccounts() {
     list.innerHTML = '<div class="form-error">Server connection error.</div>';
     return;
   }
-const countEl = document.getElementById('accountsCount');
-if (countEl) {
-  countEl.textContent = `(${data.accounts.length} / 10)`;
-}
 
   if (!res.ok) {
     list.innerHTML = '<div class="form-error">Unable to load accounts.</div>';
@@ -259,7 +255,10 @@ if (countEl) {
   }
 
   const data = await res.json();
-
+const countEl = document.getElementById('accountsCount');
+if (countEl) {
+  countEl.textContent = `(${data.accounts.length} / 10)`;
+}
   list.innerHTML = '';
 
   if (!data.ok || !data.accounts.length) {
