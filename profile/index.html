@@ -214,7 +214,7 @@ async function loadGameAccounts() {
   data.accounts.forEach(acc => {
     const row = document.createElement('div');
     row.className = 'mini-row';
-    rrow.innerHTML = `
+    row.innerHTML = `
   <strong>Účet:</strong> ${acc.login}
   <span class="tag">${acc.chars_count} postav</span>
   <span class="tag">${acc.created_at}</span>
