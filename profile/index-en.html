@@ -257,39 +257,7 @@ async function loadGameAccounts() {
   });
 }
 </script>
-<script>
-document.addEventListener('click', async (e) => {
-  const btn = e.target.closest('button[data-login]');
-  if (!btn) return;
 
-  const login = btn.dataset.login;
-  const keyword = 'delete';
-
-  const text = prompt(
-    `Type "${keyword}" to confirm deletion of account "${login}"`
-  );
-
-  if (text !== keyword) {
-    alert('Deletion cancelled.');
-    return;
-  }
-
-  const res = await fetch('/api/delete_game_account.php', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({ login })
-  });
-
-  const data = await res.json();
-
-  if (data.ok) {
-    alert('Account deleted.');
-    loadGameAccounts();
-  } else {
-    alert(data.error || 'Delete failed.');
-  }
-});
-</script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   loadGameAccounts();

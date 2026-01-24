@@ -255,40 +255,6 @@ async function loadGameAccounts() {
   });
 }
 </script>
-<script>
-document.addEventListener('click', async (e) => {
-  const btn = e.target.closest('button[data-login]');
-  if (!btn) return;
-
-  const login = btn.dataset.login;
-  const keyword = 'smazat';
-
-  const text = prompt(
-    `Pro potvrzení smazání účtu "${login}" napiš "${keyword}"`
-  );
-
-  if (text !== keyword) {
-    alert('Smazání zrušeno.');
-    return;
-  }
-
-  const res = await fetch('/api/delete_game_account.php', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({ login })
-  });
-
-  const data = await res.json();
-
-  if (data.ok) {
-    alert('Účet byl smazán.');
-    loadGameAccounts();
-  } else {
-    alert(data.error || 'Chyba při mazání účtu.');
-  }
-});
-</script>
-
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
