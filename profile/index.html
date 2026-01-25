@@ -72,7 +72,7 @@
     <div class="modal-actions">
       <button id="deleteCancel" class="btn">Zrušit</button>
       <button id="deleteConfirm" class="btn btn-danger" disabled>
-        Smazat účet
+       Smazat účet
       </button>
     </div>
 
@@ -285,11 +285,11 @@ async function loadGameAccounts() {
     acc.is_primary == 1
       ? '<span class="tag primary">Primary</span>'
       : `<button class="btn btn-small" data-primary="${acc.login}">
-           Set primary
+           Primární
          </button>`
   }
   <button class="btn btn-small btn-danger" data-login="${acc.login}">
-    Delete
+    Smazat účet
   </button>
   <button class="btn btn-small" data-reset="${acc.login}">
     Změna hesla
