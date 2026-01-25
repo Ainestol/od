@@ -292,7 +292,7 @@ async function loadGameAccounts() {
     Delete
   </button>
   <button class="btn btn-small" data-reset="${acc.login}">
-    Reset password
+    Změna hesla
   </button>
 </div>
     `;
@@ -467,10 +467,10 @@ document.addEventListener('click', async (e) => {
   const data = await res.json().catch(() => ({}));
 
   if (data.ok) {
-    notify('success', 'Primary account set');
+    notify('success', 'Primární účet nastaven');
     loadGameAccounts();
   } else {
-    notify('error', 'Failed to set primary account');
+    notify('error', 'Nastavení primárního účtu se nezdařilo');
   }
 });
 </script>
