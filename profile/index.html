@@ -311,7 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const cancelBtn = document.getElementById('deleteCancel');
 
   let currentLogin = null;
-  const keyword = document.documentElement.lang === 'en' ? 'delete' : 'smazat';
+  const keyword = 'delete';
 
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('button[data-login]');
@@ -336,32 +336,95 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   confirmBtn.addEventListener('click', async () => {
-  confirmBtn.disabled = true;
+    confirmBtn.disabled = true;
 
-  const res = await fetch('/api/reset_game_password.php', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      login: currentLogin,
-      password: pass1.value
-    })
+    const res = await fetch('/api/delete_game_account.php', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ login: currentLogin })
+    });
+
+    const data = await res.json().catch(() => ({}));
+
+    if (data.ok) {
+      modal.classList.add('hidden');
+      notify('success', 'Herní účet byl smazán');
+      await loadGameAccounts();
+      return;
+    }
+
+    if (data.error === 'ACCOUNT_HAS_ACTIVE_CHARACTERS') {
+      notify('error', 'Účet má aktivní postavy');
+    } else {
+      notify('error', 'Nepodařilo se smazat účet');
+    }
+
+    confirmBtn.disabled = false;
   });
-
-  const data = await res.json().catch(() => ({}));
-
-  if (data.ok) {
-    modal.classList.add('hidden');
-    notify('success', 'Heslo bylo úspěšně změněno');
-    return;
-  }
-
-  notify('error', data.error || 'Chyba při změně hesla');
-  confirmBtn.disabled = false;
-});
-
 })();
 </script>
 
+<script>
+(() => {
+  const modal = document.getElementById('resetModal');
+  const loginEl = document.getElementById('resetLogin');
+  const pass1 = document.getElementById('resetPass1');
+  const pass2 = document.getElementById('resetPass2');
+  const confirmBtn = document.getElementById('resetConfirm');
+  const cancelBtn = document.getElementById('resetCancel');
+
+  let currentLogin = null;
+
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-reset]');
+    if (!btn) return;
+
+    currentLogin = btn.dataset.reset;
+    loginEl.textContent = currentLogin;
+    pass1.value = '';
+    pass2.value = '';
+    confirmBtn.disabled = true;
+
+    modal.classList.remove('hidden');
+  });
+
+  const validate = () => {
+    confirmBtn.disabled =
+      pass1.value.length < 6 || pass1.value !== pass2.value;
+  };
+
+  pass1.addEventListener('input', validate);
+  pass2.addEventListener('input', validate);
+
+  cancelBtn.addEventListener('click', () => {
+    modal.classList.add('hidden');
+  });
+
+  confirmBtn.addEventListener('click', async () => {
+    confirmBtn.disabled = true;
+
+    const res = await fetch('/api/reset_game_password.php', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        login: currentLogin,
+        password: pass1.value
+      })
+    });
+
+    const data = await res.json().catch(() => ({}));
+
+    if (data.ok) {
+      modal.classList.add('hidden');
+      notify('success', 'Heslo bylo změněno');
+      return;
+    }
+
+    notify('error', data.error || 'Nepodařilo se resetovat heslo');
+    confirmBtn.disabled = false;
+  });
+})();
+</script>
 
 <script>
 function notify(type, message, timeout = 3000) {
