@@ -301,65 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadGameAccounts();
 });
 </script>
-<script>
-(() => {
-  const modal = document.getElementById('deleteModal');
-  const input = document.getElementById('deleteConfirmInput');
-  const confirmBtn = document.getElementById('deleteConfirm');
-  const cancelBtn = document.getElementById('deleteCancel');
-  const msg = document.getElementById('deleteMsg');
 
-  let currentLogin = null;
-  const keyword = document.documentElement.lang === 'en' ? 'delete' : 'smazat';
-
-  document.addEventListener('click', (e) => {
-    const btn = e.target.closest('button[data-login]');
-    if (!btn) return;
-
-    currentLogin = btn.dataset.login;
-
-    document.getElementById('deleteLogin').textContent = currentLogin;
-    document.getElementById('deleteKeyword').textContent = keyword;
-    input.value = '';
-    msg.style.display = 'none';
-    confirmBtn.disabled = true;
-
-    modal.classList.remove('hidden');
-  });
-
-  input.addEventListener('input', () => {
-    confirmBtn.disabled = input.value.trim() !== keyword;
-  });
-
-  cancelBtn.addEventListener('click', () => {
-    modal.classList.add('hidden');
-  });
-
-  confirmBtn.addEventListener('click', async () => {
-    confirmBtn.disabled = true;
-
-    const res = await fetch('/api/delete_game_account.php', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ login: currentLogin })
-    });
-
-    const data = await res.json().catch(() => ({}));
-
-    if (data.ok) {
-  modal.classList.add('hidden');
-  notify('success', 'Herní účet byl smazán');
-  await loadGameAccounts();
-} else if (data.error === 'ACCOUNT_HAS_ACTIVE_CHARACTERS') {
-  notify('error', 'Účet má aktivní postavy');
-  confirmBtn.disabled = false;
-} else {
-  notify('error', data.error || 'Chyba při mazání účtu');
-  confirmBtn.disabled = false;
-}
-  });
-})();
-</script>
 
 <script>
 (() => {
