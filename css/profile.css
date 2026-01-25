@@ -216,25 +216,24 @@ body.auth-page.profile-page { overflow: auto; }
   from { transform: translateX(30px); opacity: 0; }
   to   { transform: translateX(0); opacity: 1; }
 }
+/* === PRIMARY ACCOUNT HIGHLIGHT === */
 .mini-row.primary-account {
   background: linear-gradient(
     to right,
-    rgba(212,175,55,0.18),
-    rgba(212,175,55,0.05)
-  );
-  border: 1px solid rgba(212,175,55,0.6);
-  padding: 10px 12px;
-  border-radius: 6px;
-}
+    rgba(212, 175, 55, 0.18),
+    rgba(212, 175, 55, 0.05)
+  ) !important;
 
+  border-left: 4px solid #d4af37;
+}
 
 .mini-row.primary-account strong {
   font-weight: 700;
+  color: #ffd36a;
 }
 
-.tag.primary {
-  background: #d4af37;
-  color: #000;
-  font-weight: 700;
+.mini-row.primary-account .tag {
+  border-color: #ffd36a;
 }
+
 
