@@ -227,9 +227,8 @@ document.addEventListener('DOMContentLoaded', () => {
           modal.classList.add('hidden');
         }, 800);
       } else {
-        msg.style.display='block';
-        msg.textContent = data.error || 'Chyba.';
-      }
+  notify('error', data.error || 'Chyba při vytváření účtu');
+}
     } finally {
       submitBtn.disabled = false;
     }
