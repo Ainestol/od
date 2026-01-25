@@ -214,8 +214,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const data = await res.json().catch(()=> ({}));
 
       if (data.ok) {
-  msg.style.display = 'block';
-  msg.textContent = 'Done. Game account has been created.';
+  modal.classList.add('hidden');
+
+  notify('success', 'Game account has been created');
 
   pass.value = '';
   login.value = '';
@@ -226,10 +227,8 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
     modal.classList.add('hidden');
   }, 800);
-}
-          else {
-        msg.style.display='block';
-        msg.textContent = data.error || 'Error.';
+} else {
+  notify('error', data.error || 'Failed to create game account');
       }
     } finally {
       submitBtn.disabled = false;
