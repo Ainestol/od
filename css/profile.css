@@ -216,3 +216,17 @@ body.auth-page.profile-page { overflow: auto; }
   from { transform: translateX(30px); opacity: 0; }
   to   { transform: translateX(0); opacity: 1; }
 }
+.mini-row.primary-account {
+  background: rgba(255, 215, 0, 0.08);
+  border: 1px solid rgba(255, 215, 0, 0.35);
+}
+
+.mini-row.primary-account strong {
+  font-weight: 700;
+}
+
+.tag.primary {
+  background: #d4af37;
+  color: #000;
+  font-weight: 700;
+}
