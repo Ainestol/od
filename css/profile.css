@@ -216,24 +216,5 @@ body.auth-page.profile-page { overflow: auto; }
   from { transform: translateX(30px); opacity: 0; }
   to   { transform: translateX(0); opacity: 1; }
 }
-/* === PRIMARY ACCOUNT HIGHLIGHT === */
-.mini-row.primary-account {
-  background: linear-gradient(
-    to right,
-    rgba(212, 175, 55, 0.18),
-    rgba(212, 175, 55, 0.05)
-  ) !important;
-
-  border-left: 4px solid #d4af37;
-}
-
-.mini-row.primary-account strong {
-  font-weight: 700;
-  color: #ffd36a;
-}
-
-.mini-row.primary-account .tag {
-  border-color: #ffd36a;
-}
 
 

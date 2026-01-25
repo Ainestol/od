@@ -285,7 +285,11 @@ async function loadGameAccounts() {
     }
 
     row.innerHTML = `
-      <strong>Account:</strong> ${acc.login}
+      <strong>
+  ${acc.is_primary == 1 ? '⭐ ' : ''}
+  Account:
+</strong> ${acc.login}
+
       <span class="tag">${acc.chars_count} characters</span>
       <span class="tag">${acc.created_at}</span>
 
