@@ -217,8 +217,8 @@ body.auth-page.profile-page { overflow: auto; }
   to   { transform: translateX(0); opacity: 1; }
 }
 .mini-row.primary-account {
-  background: rgba(255, 215, 0, 0.08);
-  border: 1px solid rgba(255, 215, 0, 0.35);
+  background: rgba(212, 175, 55, 0.18);
+  border: 1px solid rgba(212, 175, 55, 0.6);
 }
 
 .mini-row.primary-account strong {
@@ -230,3 +230,4 @@ body.auth-page.profile-page { overflow: auto; }
   color: #000;
   font-weight: 700;
 }
+
