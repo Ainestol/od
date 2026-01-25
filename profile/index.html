@@ -336,31 +336,29 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   confirmBtn.addEventListener('click', async () => {
-    confirmBtn.disabled = true;
+  confirmBtn.disabled = true;
 
-    const res = await fetch('/api/delete_game_account.php', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ login: currentLogin })
-    });
-
-    const data = await res.json().catch(() => ({}));
-
-    if (data.ok) {
-      modal.classList.add('hidden');
-      notify('success', 'Účet byl úspěšně smazán');
-      await loadGameAccounts();
-      return;
-    }
-
-    if (data.error === 'ACCOUNT_HAS_ACTIVE_CHARACTERS') {
-      notify('error', 'Účet nelze smazat – má aktivní postavy');
-    } else {
-      notify('error', 'Chyba při mazání účtu');
-    }
-
-    confirmBtn.disabled = false;
+  const res = await fetch('/api/reset_game_password.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      login: currentLogin,
+      password: pass1.value
+    })
   });
+
+  const data = await res.json().catch(() => ({}));
+
+  if (data.ok) {
+    modal.classList.add('hidden');
+    notify('success', 'Heslo bylo úspěšně změněno');
+    return;
+  }
+
+  notify('error', data.error || 'Chyba při změně hesla');
+  confirmBtn.disabled = false;
+});
+
 })();
 </script>
 
