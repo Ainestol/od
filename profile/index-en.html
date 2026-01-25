@@ -294,6 +294,67 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
+<script>
+(() => {
+  const modal = document.getElementById('deleteModal');
+  const input = document.getElementById('deleteConfirmInput');
+  const confirmBtn = document.getElementById('deleteConfirm');
+  const cancelBtn = document.getElementById('deleteCancel');
+
+  let currentLogin = null;
+  const keyword = 'delete';
+
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-login]');
+    if (!btn) return;
+
+    currentLogin = btn.dataset.login;
+
+    document.getElementById('deleteLogin').textContent = currentLogin;
+    document.getElementById('deleteKeyword').textContent = keyword;
+    input.value = '';
+    confirmBtn.disabled = true;
+
+    modal.classList.remove('hidden');
+  });
+
+  input.addEventListener('input', () => {
+    confirmBtn.disabled = input.value.trim() !== keyword;
+  });
+
+  cancelBtn.addEventListener('click', () => {
+    modal.classList.add('hidden');
+  });
+
+  confirmBtn.addEventListener('click', async () => {
+    confirmBtn.disabled = true;
+
+    const res = await fetch('/api/delete_game_account.php', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ login: currentLogin })
+    });
+
+    const data = await res.json().catch(() => ({}));
+
+    if (data.ok) {
+      modal.classList.add('hidden');
+      notify('success', 'Game account deleted');
+      await loadGameAccounts();
+      return;
+    }
+
+    if (data.error === 'ACCOUNT_HAS_ACTIVE_CHARACTERS') {
+      notify('error', 'Account has active characters');
+    } else {
+      notify('error', 'Failed to delete account');
+    }
+
+    confirmBtn.disabled = false;
+  });
+})();
+</script>
+
 
 <script>
 (() => {
