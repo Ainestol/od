@@ -214,11 +214,12 @@ document.addEventListener('DOMContentLoaded', () => {
       const data = await res.json().catch(()=> ({}));
 
       if (data.ok) {
-        msg.style.display = 'block';
-        msg.textContent = 'Hotovo. Účet byl vytvořen.';
+  modal.classList.add('hidden');
 
-        pass.value = '';
-        login.value = '';
+  notify('success', 'Herní účet byl vytvořen');
+
+  pass.value = '';
+  login.value = '';
 
         await loadGameAccounts();
 
