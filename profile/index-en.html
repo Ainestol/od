@@ -328,28 +328,29 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   confirmBtn.addEventListener('click', async () => {
-    confirmBtn.disabled = true;
+  confirmBtn.disabled = true;
 
-    const res = await fetch('/api/delete_game_account.php', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ login: currentLogin })
-    });
-
-    const data = await res.json().catch(() => ({}));
-
-   if (data.ok) {
-  modal.classList.add('hidden');
-  notify('success', 'Game account deleted');
-  await loadGameAccounts();
-} else if (data.error === 'ACCOUNT_HAS_ACTIVE_CHARACTERS') {
-  notify('error', 'The account has active characters');
-  confirmBtn.disabled = false;
-} else {
-  notify('error', data.error || 'Error deleting account');
-  confirmBtn.disabled = false;
-}
+  const res = await fetch('/api/reset_game_password.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      login: currentLogin,
+      password: pass1.value
+    })
   });
+
+  const data = await res.json().catch(() => ({}));
+
+  if (data.ok) {
+    modal.classList.add('hidden');
+    notify('success', 'Password has been changed');
+    return;
+  }
+
+  notify('error', data.error || 'Failed to reset password');
+  confirmBtn.disabled = false;
+});
+
 })();
 </script>
 
@@ -361,8 +362,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const pass2 = document.getElementById('resetPass2');
   const confirmBtn = document.getElementById('resetConfirm');
   const cancelBtn = document.getElementById('resetCancel');
-  const msg = document.getElementById('resetMsg');
-
+  
   let currentLogin = null;
 
   document.addEventListener('click', (e) => {
@@ -409,8 +409,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (data.ok) {
       modal.classList.add('hidden');
     } else {
-      msg.style.display = 'block';
-      msg.textContent = data.error || 'Chyba.';
       confirmBtn.disabled = false;
     }
   });
