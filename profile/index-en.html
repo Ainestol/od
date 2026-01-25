@@ -161,6 +161,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
 
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const tabs = document.querySelectorAll('.profile-tabs .tab');
@@ -338,14 +339,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const data = await res.json().catch(() => ({}));
 
-    if (data.ok) {
-      modal.classList.add('hidden');
-      await loadGameAccounts();
-    } else {
-      msg.style.display = 'block';
-      msg.textContent = data.error || 'Chyba.';
-      confirmBtn.disabled = false;
-    }
+   if (data.ok) {
+  modal.classList.add('hidden');
+  notify('success', 'Game account deleted');
+  await loadGameAccounts();
+} else if (data.error === 'ACCOUNT_HAS_ACTIVE_CHARACTERS') {
+  notify('error', 'The account has active characters');
+  confirmBtn.disabled = false;
+} else {
+  notify('error', data.error || 'Error deleting account');
+  confirmBtn.disabled = false;
+}
   });
 })();
 </script>
@@ -413,6 +417,28 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 })();
 </script>
+
+<script>
+function notify(type, message, timeout = 3000) {
+  const box = document.getElementById('notifications');
+  if (!box) return;
+
+  const el = document.createElement('div');
+  el.className = `notify ${type}`;
+  el.textContent = message;
+
+  box.appendChild(el);
+
+  setTimeout(() => {
+    el.style.opacity = '0';
+    setTimeout(() => el.remove(), 300);
+  }, timeout);
+}
+</script>
+
+
+
+<div id="notifications"></div>
 
 
 </body>
