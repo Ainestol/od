@@ -363,38 +363,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <script>
 (() => {
-  const modal = document.getElementById('resetModal');
-  const loginEl = document.getElementById('resetLogin');
-  const pass1 = document.getElementById('resetPass1');
-  const pass2 = document.getElementById('resetPass2');
-  const confirmBtn = document.getElementById('resetConfirm');
-  const cancelBtn = document.getElementById('resetCancel');
-  const msg = document.getElementById('resetMsg');
+  const modal = document.getElementById('deleteModal');
+  const input = document.getElementById('deleteConfirmInput');
+  const confirmBtn = document.getElementById('deleteConfirm');
+  const cancelBtn = document.getElementById('deleteCancel');
 
   let currentLogin = null;
+  const keyword = document.documentElement.lang === 'en' ? 'delete' : 'smazat';
 
   document.addEventListener('click', (e) => {
-    const btn = e.target.closest('button[data-reset]');
+    const btn = e.target.closest('button[data-login]');
     if (!btn) return;
 
-    currentLogin = btn.dataset.reset;
+    currentLogin = btn.dataset.login;
 
-    loginEl.textContent = currentLogin;
-    pass1.value = '';
-    pass2.value = '';
-    msg.style.display = 'none';
+    document.getElementById('deleteLogin').textContent = currentLogin;
+    document.getElementById('deleteKeyword').textContent = keyword;
+    input.value = '';
     confirmBtn.disabled = true;
 
     modal.classList.remove('hidden');
   });
 
-  const validate = () => {
-    confirmBtn.disabled =
-      pass1.value.length < 6 || pass1.value !== pass2.value;
-  };
-
-  pass1.addEventListener('input', validate);
-  pass2.addEventListener('input', validate);
+  input.addEventListener('input', () => {
+    confirmBtn.disabled = input.value.trim() !== keyword;
+  });
 
   cancelBtn.addEventListener('click', () => {
     modal.classList.add('hidden');
@@ -403,27 +396,32 @@ document.addEventListener('DOMContentLoaded', () => {
   confirmBtn.addEventListener('click', async () => {
     confirmBtn.disabled = true;
 
-    const res = await fetch('/api/reset_game_password.php', {
+    const res = await fetch('/api/delete_game_account.php', {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        login: currentLogin,
-        password: pass1.value
-      })
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ login: currentLogin })
     });
 
     const data = await res.json().catch(() => ({}));
 
     if (data.ok) {
       modal.classList.add('hidden');
-    } else {
-      msg.style.display = 'block';
-      msg.textContent = data.error || 'Chyba.';
-      confirmBtn.disabled = false;
+      notify('success', 'Účet byl úspěšně smazán');
+      await loadGameAccounts();
+      return;
     }
+
+    if (data.error === 'ACCOUNT_HAS_ACTIVE_CHARACTERS') {
+      notify('error', 'Účet nelze smazat – má aktivní postavy');
+    } else {
+      notify('error', 'Chyba při mazání účtu');
+    }
+
+    confirmBtn.disabled = false;
   });
 })();
 </script>
+
 
 <script>
 function notify(type, message, timeout = 3000) {
