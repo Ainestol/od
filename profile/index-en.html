@@ -293,66 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadGameAccounts();
 });
 </script>
-<script>
-(() => {
-  const modal = document.getElementById('deleteModal');
-  const input = document.getElementById('deleteConfirmInput');
-  const confirmBtn = document.getElementById('deleteConfirm');
-  const cancelBtn = document.getElementById('deleteCancel');
-  const msg = document.getElementById('deleteMsg');
 
-  let currentLogin = null;
-  const keyword = document.documentElement.lang === 'en' ? 'delete' : 'smazat';
-
-  document.addEventListener('click', (e) => {
-    const btn = e.target.closest('button[data-login]');
-    if (!btn) return;
-
-    currentLogin = btn.dataset.login;
-
-    document.getElementById('deleteLogin').textContent = currentLogin;
-    document.getElementById('deleteKeyword').textContent = keyword;
-    input.value = '';
-    msg.style.display = 'none';
-    confirmBtn.disabled = true;
-
-    modal.classList.remove('hidden');
-  });
-
-  input.addEventListener('input', () => {
-    confirmBtn.disabled = input.value.trim() !== keyword;
-  });
-
-  cancelBtn.addEventListener('click', () => {
-    modal.classList.add('hidden');
-  });
-
-  confirmBtn.addEventListener('click', async () => {
-  confirmBtn.disabled = true;
-
-  const res = await fetch('/api/reset_game_password.php', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      login: currentLogin,
-      password: pass1.value
-    })
-  });
-
-  const data = await res.json().catch(() => ({}));
-
-  if (data.ok) {
-    modal.classList.add('hidden');
-    notify('success', 'Password has been changed');
-    return;
-  }
-
-  notify('error', data.error || 'Failed to reset password');
-  confirmBtn.disabled = false;
-});
-
-})();
-</script>
 
 <script>
 (() => {
@@ -362,7 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const pass2 = document.getElementById('resetPass2');
   const confirmBtn = document.getElementById('resetConfirm');
   const cancelBtn = document.getElementById('resetCancel');
-  
+
   let currentLogin = null;
 
   document.addEventListener('click', (e) => {
@@ -370,11 +311,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!btn) return;
 
     currentLogin = btn.dataset.reset;
-
     loginEl.textContent = currentLogin;
     pass1.value = '';
     pass2.value = '';
-    msg.style.display = 'none';
     confirmBtn.disabled = true;
 
     modal.classList.remove('hidden');
@@ -408,12 +347,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (data.ok) {
       modal.classList.add('hidden');
-    } else {
-      confirmBtn.disabled = false;
+      notify('success', 'Password has been changed');
+      return;
     }
+
+    notify('error', data.error || 'Failed to reset password');
+    confirmBtn.disabled = false;
   });
 })();
 </script>
+
 
 <script>
 function notify(type, message, timeout = 3000) {
