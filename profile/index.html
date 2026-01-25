@@ -281,13 +281,20 @@ async function loadGameAccounts() {
       <span class="tag">${acc.created_at}</span>
 
       <div class="actions">
-        <button class="btn btn-small btn-danger" data-login="${acc.login}">
-          Delete
-        </button>
-        <button class="btn btn-small" data-reset="${acc.login}">
-          Reset password
-        </button>
-      </div>
+  ${
+    acc.is_primary == 1
+      ? '<span class="tag primary">Primary</span>'
+      : `<button class="btn btn-small" data-primary="${acc.login}">
+           Set primary
+         </button>`
+  }
+  <button class="btn btn-small btn-danger" data-login="${acc.login}">
+    Delete
+  </button>
+  <button class="btn btn-small" data-reset="${acc.login}">
+    Reset password
+  </button>
+</div>
     `;
     list.appendChild(row);
   });
@@ -442,6 +449,30 @@ function notify(type, message, timeout = 3000) {
     setTimeout(() => el.remove(), 300);
   }, timeout);
 }
+</script>
+
+<script>
+document.addEventListener('click', async (e) => {
+  const btn = e.target.closest('button[data-primary]');
+  if (!btn) return;
+
+  const login = btn.dataset.primary;
+
+  const res = await fetch('/api/set_primary_account.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ login })
+  });
+
+  const data = await res.json().catch(() => ({}));
+
+  if (data.ok) {
+    notify('success', 'Primary account set');
+    loadGameAccounts();
+  } else {
+    notify('error', 'Failed to set primary account');
+  }
+});
 </script>
 
 
