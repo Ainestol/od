@@ -21,7 +21,7 @@
   <h1>My profile</h1>
 
   <div class="profile-tabs">
-    <button type="button" class="tab active" data-tab="accounts">Accounts</button>
+    <button type="button" class="tab active" data-tab="accounts">Game accounts</button>
     <button type="button" class="tab" data-tab="vote">Server vote</button>
     <button type="button" class="tab" data-tab="donate">Donate</button>
     <button type="button" class="tab" data-tab="support">Bug report</button>
@@ -30,112 +30,103 @@
   <div class="profile-panels">
     <section id="accounts" class="profile-card panel active">
       <h2>
-  Game accounts
-  <span id="accountsCount" class="muted" style="font-size:14px;">
-    (0 / 10)
-  </span>
-</h2>
+        Game accounts
+        <span id="accountsCount" class="muted" style="font-size:14px;">
+          (0 / 10)
+        </span>
+      </h2>
+
       <p class="muted">Create and manage your Lineage II accounts.</p>
 
       <a id="createAccBtn" class="btn btn-primary" href="#">Create game account</a>
+
+      <!-- CREATE ACCOUNT MODAL -->
       <div id="accModal" class="modal hidden">
-  <div class="modal-box">
-    <h3>Create game account</h3>
+        <div class="modal-box">
+          <h3>Create game account</h3>
 
-    <label>Login</label>
-    <input id="accLogin" type="text" placeholder="4–16 characters (A–Z, 0–9, _)">
+          <label>Login</label>
+          <input id="accLogin" type="text" placeholder="4–16 characters (A–Z, 0–9, _)">
 
-    <label>Password</label>
-    <input id="accPass" type="password" placeholder="min. 6 characters">
+          <label>Password</label>
+          <input id="accPass" type="password" placeholder="min. 6 characters">
 
- 
-    <div class="modal-actions">
-      <button id="accCancel" class="btn">Cancel</button>
-      <button id="accSubmit" class="btn btn-primary">Create</button>
-    </div>
+          <div class="modal-actions">
+            <button id="accCancel" class="btn">Cancel</button>
+            <button id="accSubmit" class="btn btn-primary">Create</button>
+          </div>
 
-    <div id="accMsg" class="form-error" style="display:none;"></div>
-  </div>
-</div>
+          <div id="accMsg" class="form-error" style="display:none;"></div>
+        </div>
+      </div>
 
-<div id="deleteModal" class="modal hidden">
-  <div class="modal-box">
-    <h3 id="deleteTitle">Delete account</h3>
+      <!-- DELETE MODAL -->
+      <div id="deleteModal" class="modal hidden">
+        <div class="modal-box">
+          <h3>Delete account</h3>
 
-    <p id="deleteText">
-      To confirm account deletion <strong id="deleteLogin"></strong>
-      type <strong id="deleteKeyword">delete</strong>.
-    </p>
+          <p>
+            To confirm deletion of <strong id="deleteLogin"></strong>,
+            type <strong id="deleteKeyword">delete</strong>.
+          </p>
 
-    <input id="deleteConfirmInput" type="text" placeholder="type delete">
+          <input id="deleteConfirmInput" type="text" placeholder="type delete">
 
-    <div class="modal-actions">
-      <button id="deleteCancel" class="btn">Cancel</button>
-      <button id="deleteConfirm" class="btn btn-danger" disabled>
-        Delete account
-      </button>
-    </div>
+          <div class="modal-actions">
+            <button id="deleteCancel" class="btn">Cancel</button>
+            <button id="deleteConfirm" class="btn btn-danger" disabled>
+              Delete account
+            </button>
+          </div>
 
-    <div id="deleteMsg" class="form-error" style="display:none;"></div>
-  </div>
-</div>
+          <div id="deleteMsg" class="form-error" style="display:none;"></div>
+        </div>
+      </div>
 
-<div id="resetModal" class="modal hidden">
-  <div class="modal-box">
-    <h3>Reset password</h3>
+      <!-- RESET MODAL -->
+      <div id="resetModal" class="modal hidden">
+        <div class="modal-box">
+          <h3>Reset password</h3>
 
-    <p>
-      Enter a new password for your account <strong id="resetLogin"></strong>.
-    </p>
+          <p>
+            Enter a new password for account <strong id="resetLogin"></strong>.
+          </p>
 
-    <input id="resetPass1" type="password" placeholder="New password (min. 6 characters)">
-    <input id="resetPass2" type="password" placeholder="Password confirmation">
+          <input id="resetPass1" type="password" placeholder="New password (min. 6 characters)">
+          <input id="resetPass2" type="password" placeholder="Confirm password">
 
-    <div class="modal-actions">
-      <button id="resetCancel" class="btn">Cancel</button>
-      <button id="resetConfirm" class="btn btn-primary" disabled>
-        Change password
-      </button>
-    </div>
+          <div class="modal-actions">
+            <button id="resetCancel" class="btn">Cancel</button>
+            <button id="resetConfirm" class="btn btn-primary" disabled>
+              Change password
+            </button>
+          </div>
 
-    <div id="resetMsg" class="form-error" style="display:none;"></div>
-  </div>
-</div>
-
+          <div id="resetMsg" class="form-error" style="display:none;"></div>
+        </div>
+      </div>
 
       <div id="gameAccountsList" class="mini-list"></div>
     </section>
 
     <section id="vote" class="profile-card panel">
       <h2>Server vote</h2>
-      <p class="muted">Vote links will appear here (4–5 sites).</p>
-
-      <div class="link-list">
-        <a href="#" class="link-item">Vote site #1</a>
-        <a href="#" class="link-item">Vote site #2</a>
-        <a href="#" class="link-item">Vote site #3</a>
-        <a href="#" class="link-item">Vote site #4</a>
-      </div>
+      <p class="muted">Vote links will be available here.</p>
     </section>
 
     <section id="donate" class="profile-card panel">
       <h2>Donate</h2>
-      <p class="muted">No pay-to-win. Token/payment info will be provided here.</p>
-
-      <div class="donate-box">
-        <div><strong>IBAN:</strong> XXXX XXXX XXXX</div>
-        <div><strong>Message for recipient:</strong> your e-mail / account</div>
-      </div>
+      <p class="muted">No pay-to-win. Donation info will be available here.</p>
     </section>
 
     <section id="support" class="profile-card panel">
-      <h2>Ticket / Bug report</h2>
+      <h2>Bug report</h2>
       <p class="muted">Something not working? Send us a ticket.</p>
-
-      <a class="btn btn-primary" href="/support/" style="max-width:320px;">Submit ticket</a>
+      <a class="btn btn-primary" href="/support/">Submit ticket</a>
     </section>
   </div>
 </main>
+
 <script>
 async function checkSession() {
   try {
@@ -151,16 +142,10 @@ async function checkSession() {
 document.addEventListener('DOMContentLoaded', async () => {
   const ok = await checkSession();
   if (!ok) {
-    const isEn = document.documentElement.lang === 'en';
-    window.location.href = isEn
-      ? '/auth/login-en.html'
-      : '/auth/login.html';
+    window.location.href = '/auth/login-en.html';
   }
 });
 </script>
-
-
-
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -173,92 +158,24 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   tabs.forEach(t => t.addEventListener('click', () => show(t.dataset.tab)));
-  const first = document.querySelector('.profile-tabs .tab.active') || tabs[0];
-  if (first) show(first.dataset.tab);
+  show(tabs[0].dataset.tab);
 });
 </script>
 
 <script>
-(() => {
-  const modal = document.getElementById('accModal');
-  const openBtn = document.getElementById('createAccBtn');
-  const cancelBtn = document.getElementById('accCancel');
-  const submitBtn = document.getElementById('accSubmit');
-  const msg = document.getElementById('accMsg');
-
-  const login = document.getElementById('accLogin');
-  const pass  = document.getElementById('accPass');
-
-  const open = () => { modal.classList.remove('hidden'); msg.style.display='none'; msg.textContent=''; };
-  const close = () => { modal.classList.add('hidden'); };
-
-  openBtn?.addEventListener('click', (e) => { e.preventDefault(); open(); });
-  cancelBtn?.addEventListener('click', (e) => { e.preventDefault(); close(); });
-  modal?.addEventListener('click', (e) => { if (e.target === modal) close(); });
-
-  submitBtn?.addEventListener('click', async (e) => {
-    e.preventDefault();
-    msg.style.display='none';
-
-   const payload = {
-  login: login.value.trim(),
-  password: pass.value
-};
-    submitBtn.disabled = true;
-    try {
-      const res = await fetch('/api/create_game_account.php', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify(payload)
-      });
-      const data = await res.json().catch(()=> ({}));
-
-      if (data.ok) {
-  modal.classList.add('hidden');
-
-  notify('success', 'Game account has been created');
-
-  pass.value = '';
-  login.value = '';
-  
-  await loadGameAccounts();
-
-  // zavřít modal po chvilce
-  setTimeout(() => {
-    modal.classList.add('hidden');
-  }, 800);
-} else {
-  notify('error', data.error || 'Failed to create game account');
-      }
-    } finally {
-      submitBtn.disabled = false;
-    }
-  });
-})();
-</script>
-<script>
 async function loadGameAccounts() {
   const list = document.getElementById('gameAccountsList');
+  const countEl = document.getElementById('accountsCount');
+
   list.innerHTML = '<div class="muted">Loading game accounts…</div>';
 
-  let res;
-  try {
-    res = await fetch('/api/list_game_accounts.php');
-  } catch (e) {
-    list.innerHTML = '<div class="form-error">Server connection error.</div>';
-    return;
-  }
-
-  if (!res.ok) {
-    list.innerHTML = '<div class="form-error">Unable to load accounts.</div>';
-    return;
-  }
-
+  const res = await fetch('/api/list_game_accounts.php');
   const data = await res.json();
-const countEl = document.getElementById('accountsCount');
-if (countEl) {
-  countEl.textContent = `(${data.accounts.length} / 10)`;
-}
+
+  if (countEl) {
+    countEl.textContent = `(${data.accounts.length} / 10)`;
+  }
+
   list.innerHTML = '';
 
   if (!data.ok || !data.accounts.length) {
@@ -269,179 +186,37 @@ if (countEl) {
   data.accounts.forEach(acc => {
     const row = document.createElement('div');
     row.className = 'mini-row';
-   row.innerHTML = `
-  <strong>Account:</strong> ${acc.login}
-  <span class="tag">${acc.chars_count} characters</span>
-  <span class="tag">${acc.created_at}</span>
 
-  <div class="actions">
-  ${
-    acc.is_primary == 1
-      ? '<span class="tag primary">Primary</span>'
-      : `<button class="btn btn-small" data-primary="${acc.login}">
-           Set primary
-         </button>`
-  }
-  <button class="btn btn-small btn-danger" data-login="${acc.login}">
-    Delete
-  </button>
-  <button class="btn btn-small" data-reset="${acc.login}">
-    Reset password
-  </button>
-</div>
-`;
+    const isPrimary = Number(acc.is_primary) === 1;
+    if (isPrimary) row.classList.add('primary-account');
+
+    row.innerHTML = `
+      <strong>${isPrimary ? '⭐ ' : ''}Account:</strong> ${acc.login}
+      <span class="tag">${acc.chars_count} characters</span>
+      <span class="tag">${acc.created_at}</span>
+
+      <div class="actions">
+        ${
+          isPrimary
+            ? '<span class="tag primary">PRIMARY</span>'
+            : `<button class="btn btn-small" data-primary="${acc.login}">
+                 Set primary
+               </button>`
+        }
+        <button class="btn btn-small btn-danger" data-login="${acc.login}">
+          Delete
+        </button>
+        <button class="btn btn-small" data-reset="${acc.login}">
+          Reset password
+        </button>
+      </div>
+    `;
+
     list.appendChild(row);
   });
 }
-</script>
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  loadGameAccounts();
-});
-</script>
-
-<script>
-(() => {
-  const modal = document.getElementById('deleteModal');
-  const input = document.getElementById('deleteConfirmInput');
-  const confirmBtn = document.getElementById('deleteConfirm');
-  const cancelBtn = document.getElementById('deleteCancel');
-
-  let currentLogin = null;
-  const keyword = 'delete';
-
-  document.addEventListener('click', (e) => {
-    const btn = e.target.closest('button[data-login]');
-    if (!btn) return;
-
-    currentLogin = btn.dataset.login;
-
-    document.getElementById('deleteLogin').textContent = currentLogin;
-    document.getElementById('deleteKeyword').textContent = keyword;
-    input.value = '';
-    confirmBtn.disabled = true;
-
-    modal.classList.remove('hidden');
-  });
-
-  input.addEventListener('input', () => {
-    confirmBtn.disabled = input.value.trim() !== keyword;
-  });
-
-  cancelBtn.addEventListener('click', () => {
-    modal.classList.add('hidden');
-  });
-
-  confirmBtn.addEventListener('click', async () => {
-    confirmBtn.disabled = true;
-
-    const res = await fetch('/api/delete_game_account.php', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ login: currentLogin })
-    });
-
-    const data = await res.json().catch(() => ({}));
-
-    if (data.ok) {
-      modal.classList.add('hidden');
-      notify('success', 'Game account deleted');
-      await loadGameAccounts();
-      return;
-    }
-
-    if (data.error === 'ACCOUNT_HAS_ACTIVE_CHARACTERS') {
-      notify('error', 'Account has active characters');
-    } else {
-      notify('error', 'Failed to delete account');
-    }
-
-    confirmBtn.disabled = false;
-  });
-})();
-</script>
-
-
-<script>
-(() => {
-  const modal = document.getElementById('resetModal');
-  const loginEl = document.getElementById('resetLogin');
-  const pass1 = document.getElementById('resetPass1');
-  const pass2 = document.getElementById('resetPass2');
-  const confirmBtn = document.getElementById('resetConfirm');
-  const cancelBtn = document.getElementById('resetCancel');
-
-  let currentLogin = null;
-
-  document.addEventListener('click', (e) => {
-    const btn = e.target.closest('button[data-reset]');
-    if (!btn) return;
-
-    currentLogin = btn.dataset.reset;
-    loginEl.textContent = currentLogin;
-    pass1.value = '';
-    pass2.value = '';
-    confirmBtn.disabled = true;
-
-    modal.classList.remove('hidden');
-  });
-
-  const validate = () => {
-    confirmBtn.disabled =
-      pass1.value.length < 6 || pass1.value !== pass2.value;
-  };
-
-  pass1.addEventListener('input', validate);
-  pass2.addEventListener('input', validate);
-
-  cancelBtn.addEventListener('click', () => {
-    modal.classList.add('hidden');
-  });
-
-  confirmBtn.addEventListener('click', async () => {
-    confirmBtn.disabled = true;
-
-    const res = await fetch('/api/reset_game_password.php', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        login: currentLogin,
-        password: pass1.value
-      })
-    });
-
-    const data = await res.json().catch(() => ({}));
-
-    if (data.ok) {
-      modal.classList.add('hidden');
-      notify('success', 'Password has been changed');
-      return;
-    }
-
-    notify('error', data.error || 'Failed to reset password');
-    confirmBtn.disabled = false;
-  });
-})();
-</script>
-
-
-<script>
-function notify(type, message, timeout = 3000) {
-  const box = document.getElementById('notifications');
-  if (!box) return;
-
-  const el = document.createElement('div');
-  el.className = `notify ${type}`;
-  el.textContent = message;
-
-  box.appendChild(el);
-
-  setTimeout(() => {
-    el.style.opacity = '0';
-    setTimeout(() => el.remove(), 300);
-  }, timeout);
-}
+document.addEventListener('DOMContentLoaded', loadGameAccounts);
 </script>
 
 <script>
@@ -449,16 +224,13 @@ document.addEventListener('click', async (e) => {
   const btn = e.target.closest('button[data-primary]');
   if (!btn) return;
 
-  const login = btn.dataset.primary;
-
   const res = await fetch('/api/set_primary_account.php', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ login })
+    body: JSON.stringify({ login: btn.dataset.primary })
   });
 
-  const data = await res.json().catch(() => ({}));
-
+  const data = await res.json();
   if (data.ok) {
     notify('success', 'Primary account set');
     loadGameAccounts();
@@ -468,9 +240,6 @@ document.addEventListener('click', async (e) => {
 });
 </script>
 
-
 <div id="notifications"></div>
-
-
 </body>
 </html>
