@@ -275,4 +275,8 @@ body.auth-page.profile-page { overflow: auto; }
   color: #c94a4a; /* červená */
 }
 
-
+.btn-admin {
+  background: linear-gradient(to bottom, #6e5a1a, #3d3210);
+  border: 1px solid #d4af37;
+  color: #ffd36a;
+}
