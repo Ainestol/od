@@ -118,22 +118,39 @@
       </div>
     </section>
 
-    <section id="donate" class="profile-card panel">
-      <h2>Podpora serveru</h2>
-      <p class="muted">Žádné pay-to-win. Zde budou informace k tokenům / platbě.</p>
-
-      <div class="donate-box">
-        <div><strong>IBAN:</strong> XXXX XXXX XXXX</div>
-        <div><strong>Zpráva pro příjemce:</strong> tvůj e-mail / účet</div>
-      </div>
-    </section>
-
     <section id="support" class="profile-card panel">
-      <h2>Ticket / Bug report</h2>
-      <p class="muted">Něco nefunguje? Pošli nám ticket.</p>
+  <h2>Hlášení bugů</h2>
+  <p class="muted">Něco nefunguje? Pošli nám detailní popis problému.</p>
 
-      <a class="btn btn-primary" href="/support/" style="max-width:320px;">Odeslat ticket</a>
-    </section>
+  <form id="bugForm">
+    <label>Herní účet (volitelné)</label>
+    <select id="bugAccount">
+      <option value="">— vyber účet —</option>
+    </select>
+
+    <label>Kategorie</label>
+    <select id="bugCategory" required>
+      <option value="">— vyber kategorii —</option>
+      <option value="quest">Quest</option>
+      <option value="npc">NPC / AI</option>
+      <option value="item">Item</option>
+      <option value="skill">Skill</option>
+      <option value="login">Přihlášení</option>
+      <option value="other">Jiné</option>
+    </select>
+
+    <label>Název problému</label>
+    <input id="bugTitle" type="text" maxlength="120" required>
+
+    <label>Popis problému</label>
+    <textarea id="bugMessage" rows="6" maxlength="2000" required></textarea>
+
+    <button class="btn btn-primary" type="submit">
+      Odeslat hlášení
+    </button>
+  </form>
+</section>
+
   </div>
 </main>
 
@@ -487,7 +504,54 @@ document.addEventListener('click', async (e) => {
 });
 </script>
 
-
 <div id="notifications"></div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const accountSelect = document.getElementById('bugAccount');
+  if (!accountSelect) return;
+
+  fetch('/api/list_game_accounts.php')
+    .then(r => r.json())
+    .then(data => {
+      if (!data.ok) return;
+      data.accounts.forEach(acc => {
+        const opt = document.createElement('option');
+        opt.value = acc.login;
+        opt.textContent = acc.login;
+        accountSelect.appendChild(opt);
+      });
+    });
+});
+
+document.getElementById('bugForm')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const payload = {
+    game_account: document.getElementById('bugAccount').value,
+    category: document.getElementById('bugCategory').value,
+    title: document.getElementById('bugTitle').value.trim(),
+    message: document.getElementById('bugMessage').value.trim()
+  };
+
+  const res = await fetch('/api/create_bug_report.php', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(payload)
+  });
+
+  const data = await res.json().catch(() => ({}));
+
+  if (data.ok) {
+    notify('success', 'Bug report odeslán');
+    e.target.reset();
+  } else {
+    notify('error', data.error || 'Chyba při odesílání');
+  }
+});
+</script>
+
+
+
 </body>
 </html>

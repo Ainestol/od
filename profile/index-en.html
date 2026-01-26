@@ -129,11 +129,38 @@
     </section>
 
     <section id="support" class="profile-card panel">
-      <h2>Ticket / Bug report</h2>
-      <p class="muted">Something not working? Send us a ticket.</p>
+  <h2>Bug report</h2>
+  <p class="muted">Something not working? Let us know.</p>
 
-      <a class="btn btn-primary" href="/support/" style="max-width:320px;">Submit ticket</a>
-    </section>
+  <form id="bugForm">
+    <label>Game account (optional)</label>
+    <select id="bugAccount">
+      <option value="">— select account —</option>
+    </select>
+
+    <label>Category</label>
+    <select id="bugCategory" required>
+      <option value="">— select category —</option>
+      <option value="quest">Quest</option>
+      <option value="npc">NPC / AI</option>
+      <option value="item">Item</option>
+      <option value="skill">Skill</option>
+      <option value="login">Login</option>
+      <option value="other">Other</option>
+    </select>
+
+    <label>Issue title</label>
+    <input id="bugTitle" type="text" maxlength="120" required>
+
+    <label>Issue description</label>
+    <textarea id="bugMessage" rows="6" maxlength="2000" required></textarea>
+
+    <button class="btn btn-primary" type="submit">
+      Submit report
+    </button>
+  </form>
+</section>
+
   </div>
 </main>
 <script>
@@ -483,6 +510,50 @@ document.addEventListener('click', async (e) => {
 
 <div id="notifications"></div>
 
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const accountSelect = document.getElementById('bugAccount');
+  if (!accountSelect) return;
+
+  fetch('/api/list_game_accounts.php')
+    .then(r => r.json())
+    .then(data => {
+      if (!data.ok) return;
+      data.accounts.forEach(acc => {
+        const opt = document.createElement('option');
+        opt.value = acc.login;
+        opt.textContent = acc.login;
+        accountSelect.appendChild(opt);
+      });
+    });
+});
+
+document.getElementById('bugForm')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const payload = {
+    game_account: document.getElementById('bugAccount').value,
+    category: document.getElementById('bugCategory').value,
+    title: document.getElementById('bugTitle').value.trim(),
+    message: document.getElementById('bugMessage').value.trim()
+  };
+
+  const res = await fetch('/api/create_bug_report.php', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(payload)
+  });
+
+  const data = await res.json().catch(() => ({}));
+
+  if (data.ok) {
+    notify('success', 'Bug report odeslán');
+    e.target.reset();
+  } else {
+    notify('error', data.error || 'Chyba při odesílání');
+  }
+});
+</script>
 
 </body>
 </html>
