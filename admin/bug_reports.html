@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin – Bug reports</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body class="auth-page profile-page">
+
+<header class="main-header">
+  <div class="logo"><a href="/">Ordo Draconis</a></div>
+  <div class="auth">
+    <a href="/profile/index.html" class="btn">Profil</a>
+    <a href="/api/logout.php" class="btn">Odhlásit</a>
+  </div>
+</header>
+
+<main class="auth-container profile-shell">
+  <h1>Bug reports – admin</h1>
+
+  <table class="admin-table" id="ticketsTable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>User</th>
+        <th>Account</th>
+        <th>Category</th>
+        <th>Title</th>
+        <th>Status</th>
+        <th>Created</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</main>
+
+<script>
+fetch('/admin/api/list_bug_reports.php')
+  .then(r => {
+    if (!r.ok) throw new Error();
+    return r.json();
+  })
+  .then(data => {
+    if (!data.ok) return;
+
+    const tbody = document.querySelector('#ticketsTable tbody');
+
+   data.tickets.forEach(t => {
+  const tr = document.createElement('tr');
+  tr.style.cursor = 'pointer';
+
+  tr.innerHTML = `
+    <td>${t.id}</td>
+    <td>${t.email}</td>
+    <td>${t.game_account ?? '-'}</td>
+    <td>${t.category}</td>
+    <td>${t.title}</td>
+    <td>${t.status}</td>
+    <td>${t.created_at}</td>
+  `;
+
+  tr.addEventListener('click', () => {
+    window.location.href = `/admin/bug_detail.html?id=${t.id}`;
+  });
+
+  tbody.appendChild(tr);
+});
+
+  });
+</script>
+
+</body>
+</html>

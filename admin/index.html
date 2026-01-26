@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin panel | Ordo Draconis</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body class="auth-page profile-page">
+
+    <script>
+fetch('/api/me.php')
+  .then(r => r.json())
+  .then(me => {
+    if (!me.ok || me.role !== 'admin') {
+      window.location.href = '/profile/index.html';
+    }
+  });
+</script>
+
+
+
+<header class="main-header">
+  <div class="logo"><a href="/">Ordo Draconis</a></div>
+  <div class="auth">
+    <a href="/profile/index.html" class="btn">Profil</a>
+    <a href="/api/logout.php" class="btn">Odhlásit</a>
+  </div>
+</header>
+
+<main class="auth-container profile-shell">
+  <h1>Admin panel</h1>
+
+  <div class="profile-grid">
+    <div class="profile-card">
+      <h3>Bug reports</h3>
+      <p class="muted">Přehled hlášených chyb od hráčů.</p>
+      <a href="/admin/bug_reports.html" class="btn btn-primary">
+        Otevřít
+      </a>
+    </div>
+
+    <!-- do budoucna -->
+    <div class="profile-card muted" style="opacity:.5;">
+      <h3>Users</h3>
+      <p>Správa uživatelů (brzy)</p>
+      <span class="btn">Coming soon</span>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

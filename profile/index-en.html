@@ -13,6 +13,12 @@
   <div class="logo"><a href="/">Ordo Draconis</a></div>
   <div class="auth">
     <a href="/profile/index-en.html" class="btn active">Profile</a>
+    <a href="/admin/index.html"
+   id="adminBtn"
+   class="btn btn-warning"
+   style="display:none;">
+  Admin panel
+</a>
     <a href="/api/logout.php?lang=en" class="btn">Logout</a>
   </div>
 </header>
@@ -150,7 +156,7 @@
     </select>
 
     <label>Issue title</label>
-    <input id="bugTitle" type="text" maxlength="20" required>
+    <input id="bugTitle" type="text" maxlength="40" required>
 
     <label>Issue description</label>
     <textarea id="bugMessage" rows="6" maxlength="1000" required></textarea>
@@ -583,6 +589,19 @@ if (len > 950) {
   textarea.addEventListener('input', update);
   update();
 })();
+</script>
+<script>
+fetch('/api/me.php', { credentials: 'same-origin' })
+  .then(res => res.json())
+  .then(data => {
+    if (data.ok && data.role === 'admin') {
+      const btn = document.getElementById('adminBtn');
+      if (btn) btn.style.display = 'inline-block';
+    }
+  })
+  .catch(() => {
+    // nic – když se nepovede, admin panel se prostě neukáže
+  });
 </script>
 
 
