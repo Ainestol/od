@@ -259,20 +259,20 @@ body.auth-page.profile-page { overflow: auto; }
   font-weight: bold;
 }
 /* character counter */
+/* character counter */
 .profile-page .char-counter {
   margin-top: 6px;
   font-size: 12px;
   text-align: right;
-  color: rgba(230,216,163,0.6);
+  color: #3fa56a; /* zelená = OK */
 }
 
-/* warning state */
 .profile-page .char-counter.warning {
-  color: #d4af37;
+  color: #d4af37; /* zlatá */
 }
 
-/* danger state */
 .profile-page .char-counter.danger {
-  color: #c94a4a;
+  color: #c94a4a; /* červená */
 }
+
 

@@ -150,7 +150,7 @@
     </select>
 
     <label>Issue title</label>
-    <input id="bugTitle" type="text" maxlength="120" required>
+    <input id="bugTitle" type="text" maxlength="20" required>
 
     <label>Issue description</label>
     <textarea id="bugMessage" rows="6" maxlength="1000" required></textarea>
@@ -572,12 +572,12 @@ if (payload.message.length > 1000) {
 
     counter.classList.remove('warning', 'danger');
 
-    if (len > 800) {
-      counter.classList.add('warning');
-    }
-    if (len > 950) {
-      counter.classList.add('danger');
-    }
+if (len > 950) {
+  counter.classList.add('danger');
+} else if (len > 800) {
+  counter.classList.add('warning');
+}
+
   };
 
   textarea.addEventListener('input', update);
