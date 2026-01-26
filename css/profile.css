@@ -280,3 +280,20 @@ body.auth-page.profile-page { overflow: auto; }
   border: 1px solid #d4af37;
   color: #ffd36a;
 }
+.main-header {
+  white-space: nowrap;
+}
+.auth .btn {
+  height: 36px;
+  line-height: 36px;
+}
+#bugForm {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 16px;
+}
+
+#bugForm textarea,
+#bugForm button {
+  grid-column: 1 / -1;
+}
