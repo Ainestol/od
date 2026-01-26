@@ -69,6 +69,35 @@ body.profile-page::before{
   z-index: 0;
 }
 
+/* INPUTS – fix black-on-black issue */
+.profile-page input,
+.profile-page textarea,
+.profile-page select {
+  background-color: #0e0d0d;
+  color: #e6d8a3;
+  border: 1px solid #554827;
+}
+
+/* FOCUS state */
+.profile-page input:focus,
+.profile-page textarea:focus,
+.profile-page select:focus {
+  outline: none;
+  background-color: #141212;
+  color: #fff;
+  border-color: #d4af37;
+  box-shadow: 0 0 8px rgba(212,175,55,0.35);
+}
+
+/* Placeholder color */
+.profile-page input::placeholder,
+.profile-page textarea::placeholder {
+  color: rgba(230,216,163,0.45);
+}
+
+
+
+
 /* gold line like auth */
 body.profile-page::after{
   content:"";
