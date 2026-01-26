@@ -78,6 +78,8 @@ body.profile-page::before{
   border: 1px solid #554827;
 }
 
+
+
 /* FOCUS state */
 .profile-page input:focus,
 .profile-page textarea:focus,
@@ -255,5 +257,22 @@ body.auth-page.profile-page { overflow: auto; }
   background: #d4af37;
   color: #000;
   font-weight: bold;
+}
+/* character counter */
+.profile-page .char-counter {
+  margin-top: 6px;
+  font-size: 12px;
+  text-align: right;
+  color: rgba(230,216,163,0.6);
+}
+
+/* warning state */
+.profile-page .char-counter.warning {
+  color: #d4af37;
+}
+
+/* danger state */
+.profile-page .char-counter.danger {
+  color: #c94a4a;
 }
 

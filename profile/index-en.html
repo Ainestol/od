@@ -153,8 +153,8 @@
     <input id="bugTitle" type="text" maxlength="120" required>
 
     <label>Issue description</label>
-    <textarea id="bugMessage" rows="6" maxlength="2000" required></textarea>
-
+    <textarea id="bugMessage" rows="6" maxlength="1000" required></textarea>
+    <div id="bugCounter" class="char-counter">0 / 1000</div>
     <button class="btn btn-primary" type="submit">
       Submit report
     </button>
@@ -537,7 +537,10 @@ document.getElementById('bugForm')?.addEventListener('submit', async (e) => {
     title: document.getElementById('bugTitle').value.trim(),
     message: document.getElementById('bugMessage').value.trim()
   };
-
+if (payload.message.length > 1000) {
+  notify('error', 'Message is too long (max 1000 characters)');
+  return;
+}
   const res = await fetch('/api/create_bug_report.php', {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
@@ -554,6 +557,35 @@ document.getElementById('bugForm')?.addEventListener('submit', async (e) => {
   }
 });
 </script>
+
+<script>
+(() => {
+  const textarea = document.getElementById('bugMessage');
+  const counter  = document.getElementById('bugCounter');
+  const max = 1000;
+
+  if (!textarea || !counter) return;
+
+  const update = () => {
+    const len = textarea.value.length;
+    counter.textContent = `${len} / ${max}`;
+
+    counter.classList.remove('warning', 'danger');
+
+    if (len > 800) {
+      counter.classList.add('warning');
+    }
+    if (len > 950) {
+      counter.classList.add('danger');
+    }
+  };
+
+  textarea.addEventListener('input', update);
+  update();
+})();
+</script>
+
+
 
 </body>
 </html>
