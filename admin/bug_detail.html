@@ -29,7 +29,9 @@
     <p><strong>User:</strong> <span id="bugUser"></span></p>
     <p><strong>Account:</strong> <span id="bugAccount"></span></p>
     <p><strong>Category:</strong> <span id="bugCategory"></span></p>
-
+<div id="statusBadge" class="status-badge status-new">
+  NEW
+</div>
     <label>Status</label>
     <select id="bugStatus">
       <option value="new">NEW</option>
@@ -59,6 +61,12 @@
 <script>
 const params = new URLSearchParams(window.location.search);
 const id = params.get('id');
+const badge = document.getElementById('statusBadge');
+
+function updateBadge(status) {
+  badge.className = 'status-badge status-' + status;
+  badge.textContent = status.replace('_', ' ').toUpperCase();
+}
 
 fetch(`/admin/api/get_bug_report.php?id=${id}`)
   .then(r => r.json())
@@ -72,6 +80,7 @@ fetch(`/admin/api/get_bug_report.php?id=${id}`)
     document.getElementById('bugAccount').textContent = b.game_account || '-';
     document.getElementById('bugCategory').textContent = b.category;
     document.getElementById('bugStatus').value = b.status;
+    updateBadge(b.status);
     document.getElementById('adminReply').value = b.admin_reply || '';
 
     const msg = document.getElementById('bugUserMessage');
@@ -100,6 +109,10 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
     alert('Chyba při ukládání');
   }
 });
+document.getElementById('bugStatus').addEventListener('change', (e) => {
+  updateBadge(e.target.value);
+});
+
 </script>
 
 </body>

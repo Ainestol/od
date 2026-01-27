@@ -486,6 +486,46 @@ nav a:hover {
   white-space: pre-wrap;
 }
 
+/* ===== BUG STATUS BADGES ===== */
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  font-size: 12px;
+  letter-spacing: 1px;
+  border-radius: 4px;
+  border: 1px solid #a88b2a;
+  background: rgba(0,0,0,0.6);
+  color: #d4af37;
+  text-transform: uppercase;
+}
+
+/* NEW – beze změny */
+.status-new {
+  opacity: 0.9;
+}
+
+/* IN PROGRESS – modro-zlatý nádech */
+.status-in_progress {
+  border-color: #3a6ea5;
+  color: #7fb6ff;
+}
+
+/* RESOLVED – zelená */
+.status-resolved {
+  border-color: #3fa96c;
+  color: #6fffa1;
+  box-shadow: 0 0 6px rgba(111,255,161,0.3);
+}
+
+/* CLOSED – utlumená */
+.status-closed {
+  border-color: #555;
+  color: #999;
+  opacity: 0.6;
+}
+
+
 
 .bug-message pre {
   margin: 0;
