@@ -876,3 +876,9 @@ a.btn:active {
   border-color: #caa24d;
   color: #caa24d;
 }
+.auth-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+}
