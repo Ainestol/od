@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin – Online players</title>
+  <link rel="stylesheet" href="/css/style.css">
+
+  <style>
+    .online-badge {
+      color: #3ddc97;
+      font-weight: bold;
+    }
+    .admin-table td {
+      text-align: center;
+    }
+    /* ===== GM ZVÝRAZNĚNÍ ===== */
+.gm-row {
+  background: rgba(61, 220, 151, 0.08);
+}
+
+.gm-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: bold;
+  border-radius: 6px;
+  background: #3ddc97;
+  color: #0f5132;
+  vertical-align: middle;
+}
+
+  </style>
+</head>
+
+<body class="auth-page profile-page">
+
+<header class="main-header">
+  <div class="logo"><a href="/">Ordo Draconis</a></div>
+  <div class="auth">
+    <a href="/admin/index.html" class="btn">Admin</a>
+    <a href="/api/logout.php" class="btn">Odhlásit</a>
+  </div>
+</header>
+
+<main class="auth-container profile-shell">
+  <h1>Online hráči</h1>
+
+  <p class="muted">
+    Aktuálně online: <span id="onlineCount" class="online-badge">0</span>
+  </p>
+    <div class="profile-card" style="margin-bottom:20px;">
+  <h3>Filtr</h3>
+
+  <input type="text" id="filterChar" placeholder="Postava">
+  <input type="text" id="filterAccount" placeholder="Účet">
+
+  <select id="filterGM">
+    <option value="">Všichni</option>
+    <option value="gm">GM</option>
+    <option value="player">Player</option>
+  </select>
+
+  <input type="number" id="filterLevel" placeholder="Min. level" min="1">
+
+  <button class="btn btn-secondary" id="resetFilter">
+    Reset
+  </button>
+</div>
+
+  <table class="admin-table" id="onlineTable">
+    <thead>
+      <tr>
+        <th>Postava</th>
+        <th>Level</th>
+        <th>Účet</th>
+        <th>Online</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</main>
+
+<script>
+let allPlayers = [];
+
+/* ===== NAČTENÍ DAT Z API ===== */
+async function loadOnlinePlayers() {
+  try {
+    const res = await fetch('/admin/api/list_online_players.php');
+    const data = await res.json();
+
+    if (!data.ok) return;
+
+    allPlayers = data.players;
+
+    const count = document.getElementById('onlineCount');
+    if (count) count.textContent = allPlayers.length;
+
+    applyFilter();
+  } catch (e) {
+    console.error('Chyba při načítání online hráčů', e);
+  }
+}
+
+/* ===== VYKRESLENÍ TABULKY ===== */
+function renderTable(players) {
+  const tbody = document.querySelector('#onlineTable tbody');
+  tbody.innerHTML = '';
+
+  players.forEach(p => {
+    const tr = document.createElement('tr');
+    tr.style.cursor = 'default';
+
+    if (p.is_gm == 1) {
+      tr.classList.add('gm-row');
+    }
+
+    tr.innerHTML = `
+      <td>
+        ${p.char_name}
+        ${p.is_gm == 1 ? '<span class="gm-badge">GM</span>' : ''}
+      </td>
+      <td>${p.level}</td>
+      <td>${p.account_name}</td>
+      <td>${formatTime(p.onlineTime)}</td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+}
+
+/* ===== FILTRACE (EXCEL STYLE) ===== */
+function applyFilter() {
+  const fChar = document.getElementById('filterChar')?.value.toLowerCase() || '';
+  const fAcc  = document.getElementById('filterAccount')?.value.toLowerCase() || '';
+  const fGM   = document.getElementById('filterGM')?.value || '';
+  const fLvl  = parseInt(document.getElementById('filterLevel')?.value || 0);
+
+  const filtered = allPlayers.filter(p => {
+    if (fChar && !p.char_name.toLowerCase().includes(fChar)) return false;
+    if (fAcc && !p.account_name.toLowerCase().includes(fAcc)) return false;
+    if (fGM === 'gm' && p.is_gm != 1) return false;
+    if (fGM === 'player' && p.is_gm == 1) return false;
+    if (fLvl && p.level < fLvl) return false;
+    return true;
+  });
+
+  renderTable(filtered);
+}
+
+/* ===== RESET FILTRŮ ===== */
+function resetFilters() {
+  document.getElementById('filterChar').value = '';
+  document.getElementById('filterAccount').value = '';
+  document.getElementById('filterGM').value = '';
+  document.getElementById('filterLevel').value = '';
+  renderTable(allPlayers);
+}
+
+/* ===== POMOCNÉ ===== */
+function formatTime(sec) {
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  return `${h}h ${m}m`;
+}
+
+/* ===== EVENTY FILTRŮ ===== */
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll(
+    '#filterChar, #filterAccount, #filterGM, #filterLevel'
+  ).forEach(el => {
+    el.addEventListener('input', applyFilter);
+  });
+
+  document.getElementById('resetFilter')
+    ?.addEventListener('click', resetFilters);
+
+  loadOnlinePlayers();
+  setInterval(loadOnlinePlayers, 30000);
+});
+</script>
+
+
+</body>
+</html>

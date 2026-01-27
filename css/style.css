@@ -854,3 +854,17 @@ a.btn:active {
   color: #999;
   border-radius: 4px;
 }
+.gm-row {
+  background: rgba(61, 220, 151, 0.08);
+}
+
+.gm-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: bold;
+  color: #0f5132;
+  background: #3ddc97;
+  margin-left: 6px;
+}
