@@ -14,8 +14,12 @@
   <div class="auth">
   <a href="/profile/index.html" class="btn active">Profil</a>
 
-  <!-- admin -->
-  <a href="/admin/index.html" class="btn btn-warning">Admin panel</a>
+  <a href="/admin/index.html"
+     class="btn btn-warning"
+     id="adminBtn"
+     style="display:none;">
+    Admin panel
+  </a>
 
   <a href="/api/logout.php" class="btn">Odhlásit se</a>
 </div>
@@ -605,6 +609,15 @@ fetch('/api/me.php', { credentials: 'same-origin' })
   })
   .catch(() => {
     // nic – když se nepovede, admin panel se prostě neukáže
+  });
+</script>
+<script>
+fetch('/api/me.php')
+  .then(r => r.json())
+  .then(me => {
+    if (me.ok && me.role === 'admin') {
+      document.getElementById('adminBtn').style.display = 'inline-block';
+    }
   });
 </script>
 
