@@ -74,9 +74,10 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
   });
 
   const data = await res.json();
-  if (data.ok) alert('Uloženo');
+ if (data.ok) alert('Uloženo');
 });
 </script>
 
+<div id="notifications"></div>
 
 </main>
