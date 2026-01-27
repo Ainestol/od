@@ -4,6 +4,48 @@
   <meta charset="UTF-8">
   <title>Admin – Bug reports</title>
   <link rel="stylesheet" href="/css/style.css">
+
+  <style>
+    /* ===== STATUS BADGES (ADMIN LIST) ===== */
+    .status-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: bold;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+    }
+
+    .status-new {
+      background: #333;
+      color: #ccc;
+      border: 1px solid #555;
+    }
+
+    .status-in_progress {
+      background: #2c3e50;
+      color: #f1c40f;
+      border: 1px solid #f1c40f;
+    }
+
+    .status-resolved {
+      background: #0f5132;
+      color: #3ddc97;
+      border: 1px solid #3ddc97;
+    }
+
+    .status-closed {
+      background: #1b1b1b;
+      color: #999;
+      border: 1px solid #444;
+    }
+
+    /* aby bylo jasné, že řádek je klikací */
+    .admin-table tbody tr:hover {
+      background: rgba(255, 215, 0, 0.05);
+    }
+  </style>
 </head>
 
 <body class="auth-page profile-page">
@@ -46,27 +88,32 @@ fetch('/admin/api/list_bug_reports.php')
 
     const tbody = document.querySelector('#ticketsTable tbody');
 
-   data.tickets.forEach(t => {
-  const tr = document.createElement('tr');
-  tr.style.cursor = 'pointer';
+    data.tickets.forEach(t => {
+      const tr = document.createElement('tr');
+      tr.style.cursor = 'pointer';
 
-  tr.innerHTML = `
-    <td>${t.id}</td>
-    <td>${t.email}</td>
-    <td>${t.game_account ?? '-'}</td>
-    <td>${t.category}</td>
-    <td>${t.title}</td>
-    <td>${t.status}</td>
-    <td>${t.created_at}</td>
-  `;
+      const statusClass = 'status-' + t.status;
 
-  tr.addEventListener('click', () => {
-    window.location.href = `/admin/bug_detail.html?id=${t.id}`;
-  });
+      tr.innerHTML = `
+  <td>${t.id}</td>
+  <td>${t.email}</td>
+  <td>${t.game_account ? t.game_account : '-'}</td>
+  <td>${t.category}</td>
+  <td>${t.title}</td>
+  <td>
+    <span class="status-badge ${statusClass}">
+      ${t.status.replace('_', ' ').toUpperCase()}
+    </span>
+  </td>
+  <td>${t.created_at}</td>
+`;
 
-  tbody.appendChild(tr);
+      tr.addEventListener('click', () => {
+  window.location.href = `/admin/bug_detail.html?id=${t.id}`;
 });
 
+      tbody.appendChild(tr);
+    });
   });
 </script>
 
