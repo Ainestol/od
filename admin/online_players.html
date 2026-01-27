@@ -74,7 +74,7 @@
         <th>Postava</th>
         <th>Level</th>
         <th>Účet</th>
-        <th>Online</th>
+        <th>Odehráno</th>title="Celkový odehraný čas postavy"
       </tr>
     </thead>
     <tbody></tbody>
@@ -160,11 +160,14 @@ function resetFilters() {
 
 /* ===== POMOCNÉ ===== */
 function formatTime(sec) {
+  sec = parseInt(sec) || 0;
+
   const h = Math.floor(sec / 3600);
   const m = Math.floor((sec % 3600) / 60);
-  return `${h}h ${m}m`;
-}
 
+  if (h > 0) return `${h}h ${m}m`;
+  return `${m}m`;
+}
 /* ===== EVENTY FILTRŮ ===== */
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll(
