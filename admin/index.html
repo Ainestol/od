@@ -31,23 +31,29 @@ fetch('/api/me.php')
 <main class="auth-container profile-shell">
   <h1>Admin panel</h1>
 
-  <div class="profile-grid">
-    <div class="profile-card">
+  <div class="admin-grid">
+
+    <div class="admin-card">
       <h3>Bug reports</h3>
-      <p class="muted">Přehled hlášených chyb od hráčů.</p>
-      <a href="/admin/bug_reports.html" class="btn btn-primary">
-        Otevřít
-      </a>
+      <p>Přehled hlášených chyb od hráčů.</p>
+      <a href="/admin/bug_reports.html" class="btn btn-primary">Otevřít</a>
     </div>
 
-    <!-- do budoucna -->
-    <div class="profile-card muted" style="opacity:.5;">
+    <div class="admin-card disabled">
       <h3>Users</h3>
-      <p>Správa uživatelů (brzy)</p>
-      <span class="btn">Coming soon</span>
+      <p>Správa uživatelů</p>
+      <span class="badge">Coming soon</span>
     </div>
+
+    <div class="admin-card disabled">
+      <h3>Online players</h3>
+      <p>Aktuálně přihlášení hráči</p>
+      <span class="badge">Coming soon</span>
+    </div>
+
   </div>
 </main>
+
 
 </body>
 </html>

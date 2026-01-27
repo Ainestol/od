@@ -804,3 +804,53 @@ a.btn:active {
     drop-shadow(0 0 20px rgba(212,175,55,0.15))
     drop-shadow(0 0 60px rgba(212,175,55,0.08));
 }
+
+/* ===== ADMIN DASHBOARD ===== */
+
+.admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 24px;
+  margin-top: 30px;
+}
+
+.admin-card {
+  background: rgba(0,0,0,0.6);
+  border: 1px solid #7a5c1e;
+  padding: 24px;
+  border-radius: 8px;
+  text-align: left;
+  transition: transform .2s, box-shadow .2s;
+}
+
+.admin-card h3 {
+  margin-top: 0;
+  color: #d4af37;
+}
+
+.admin-card p {
+  color: #bbb;
+  font-size: 14px;
+  min-height: 40px;
+}
+
+.admin-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0 15px rgba(212,175,55,0.15);
+}
+
+/* disabled karty */
+.admin-card.disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.badge {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 4px 8px;
+  font-size: 11px;
+  border: 1px solid #555;
+  color: #999;
+  border-radius: 4px;
+}
