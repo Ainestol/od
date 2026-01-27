@@ -882,3 +882,11 @@ a.btn:active {
   align-items: center;
   gap: 16px;
 }
+.admin-btn {
+  color: #f1c40f;
+  border-color: #f1c40f;
+}
+
+.admin-btn:hover {
+  background: rgba(241, 196, 15, 0.12);
+}
