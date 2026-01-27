@@ -283,10 +283,7 @@ body.auth-page.profile-page { overflow: auto; }
 .main-header {
   white-space: nowrap;
 }
-.auth .btn {
-  height: 36px;
-  line-height: 36px;
-}
+
 #bugForm {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -296,4 +293,18 @@ body.auth-page.profile-page { overflow: auto; }
 #bugForm textarea,
 #bugForm button {
   grid-column: 1 / -1;
+}
+.auth .btn,
+.auth-page .auth .btn {
+  min-height: 42px;
+  padding: 0 18px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
 }

@@ -601,27 +601,25 @@ if (len > 950) {
 })();
 </script>
 <script>
-fetch('/api/me.php', { credentials: 'same-origin' })
-  .then(res => res.json())
-  .then(data => {
-    if (data.ok && data.role === 'admin') {
-      const btn = document.getElementById('adminBtn');
-      if (btn) btn.style.display = 'inline-block';
-    }
-  })
-  .catch(() => {
-    // nic – když se nepovede, admin panel se prostě neukáže
-  });
-</script>
-<script>
-fetch('/api/me.php')
-  .then(r => r.json())
-  .then(me => {
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const res = await fetch('/api/me.php', {
+      credentials: 'same-origin'
+    });
+    const me = await res.json();
+
     if (me.ok && me.role === 'admin') {
-      document.getElementById('adminBtn').style.display = 'inline-block';
+      const btn = document.getElementById('adminBtn');
+      if (btn) {
+        btn.style.display = 'inline-flex';
+      }
     }
-  });
+  } catch (e) {
+    // když se nepovede, admin tlačítko zůstane skryté
+  }
+});
 </script>
+
 
 
 </body>
