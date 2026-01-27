@@ -389,6 +389,13 @@ nav a:hover {
     box-shadow:
         0 0 12px rgba(212,175,55,0.25);
 }
+
+.btn-secondary {
+  background: transparent;
+  border: 1px solid #caa24d;
+}
+
+
 .auth-page .form-error {
     margin-top: 10px;
     color: #d4af37;
