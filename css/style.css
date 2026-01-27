@@ -872,3 +872,7 @@ a.btn:active {
   color: #3ddc97;
   text-decoration: underline;
 }
+.auth .btn-warning {
+  border-color: #caa24d;
+  color: #caa24d;
+}
