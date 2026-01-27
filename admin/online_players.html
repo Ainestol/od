@@ -49,73 +49,46 @@
   <p class="muted">
     Aktuálně online: <span id="onlineCount" class="online-badge">0</span>
   </p>
-    <div class="profile-card" style="margin-bottom:20px;">
-  <h3>Filtr</h3>
-
-  <input type="text" id="filterChar" placeholder="Postava">
-  <input type="text" id="filterAccount" placeholder="Účet">
-
-  <select id="filterGM">
-    <option value="">Všichni</option>
-    <option value="gm">GM</option>
-    <option value="player">Player</option>
-  </select>
-
-  <input type="number" id="filterLevel" placeholder="Min. level" min="1">
-
-  <button class="btn btn-secondary" id="resetFilter">
-    Reset
-  </button>
-</div>
-
+    
   <table class="admin-table" id="onlineTable">
     <thead>
-      <tr>
-        <th>Postava</th>
-        <th>Level</th>
-        <th>Účet</th>
-        <th>Odehráno</th>
-        <title>Celkový odehraný čas postavy</title>
-      </tr>
-    </thead>
+  <tr>
+    <th data-key="char_name" data-type="text">POSTAVA</th>
+    <th data-key="level" data-type="number">LEVEL</th>
+    <th data-key="account_name" data-type="text">ÚČET</th>
+    <th data-key="onlineTime" data-type="number">ODEHRÁNO</th>
+  </tr>
+</thead>
     <tbody></tbody>
   </table>
 </main>
 
 <script>
 let allPlayers = [];
+let currentSort = { key: null, dir: 1 };
 
-/* ===== NAČTENÍ DAT Z API ===== */
+/* ===== LOAD DATA ===== */
 async function loadOnlinePlayers() {
-  try {
-    const res = await fetch('/admin/api/list_online_players.php');
-    const data = await res.json();
+  const res = await fetch('/admin/api/list_online_players.php');
+  const data = await res.json();
 
-    if (!data.ok) return;
+  if (!data.ok) return;
 
-    allPlayers = data.players;
+  allPlayers = data.players;
 
-    const count = document.getElementById('onlineCount');
-    if (count) count.textContent = allPlayers.length;
-
-    applyFilter();
-  } catch (e) {
-    console.error('Chyba při načítání online hráčů', e);
-  }
+  document.getElementById('onlineCount').textContent = allPlayers.length;
+  renderTable(allPlayers);
 }
 
-/* ===== VYKRESLENÍ TABULKY ===== */
+/* ===== RENDER TABLE ===== */
 function renderTable(players) {
   const tbody = document.querySelector('#onlineTable tbody');
   tbody.innerHTML = '';
 
   players.forEach(p => {
     const tr = document.createElement('tr');
-    tr.style.cursor = 'default';
 
-    if (p.is_gm == 1) {
-      tr.classList.add('gm-row');
-    }
+    if (p.is_gm == 1) tr.classList.add('gm-row');
 
     tr.innerHTML = `
       <td>
@@ -131,59 +104,54 @@ function renderTable(players) {
   });
 }
 
-/* ===== FILTRACE (EXCEL STYLE) ===== */
-function applyFilter() {
-  const fChar = document.getElementById('filterChar')?.value.toLowerCase() || '';
-  const fAcc  = document.getElementById('filterAccount')?.value.toLowerCase() || '';
-  const fGM   = document.getElementById('filterGM')?.value || '';
-  const fLvl  = parseInt(document.getElementById('filterLevel')?.value || 0);
+/* ===== SORTING ===== */
+function sortBy(key, type) {
+  let dir = 1;
 
-  const filtered = allPlayers.filter(p => {
-    if (fChar && !p.char_name.toLowerCase().includes(fChar)) return false;
-    if (fAcc && !p.account_name.toLowerCase().includes(fAcc)) return false;
-    if (fGM === 'gm' && p.is_gm != 1) return false;
-    if (fGM === 'player' && p.is_gm == 1) return false;
-    if (fLvl && p.level < fLvl) return false;
-    return true;
+  if (currentSort.key === key) {
+    dir = -currentSort.dir;
+  }
+
+  currentSort = { key, dir };
+
+  const sorted = [...allPlayers].sort((a, b) => {
+    let v1 = a[key];
+    let v2 = b[key];
+
+    if (type === 'text') {
+      return v1.localeCompare(v2) * dir;
+    }
+
+    return (v1 - v2) * dir;
   });
 
-  renderTable(filtered);
+  renderTable(sorted);
 }
 
-/* ===== RESET FILTRŮ ===== */
-function resetFilters() {
-  document.getElementById('filterChar').value = '';
-  document.getElementById('filterAccount').value = '';
-  document.getElementById('filterGM').value = '';
-  document.getElementById('filterLevel').value = '';
-  renderTable(allPlayers);
-}
-
-/* ===== POMOCNÉ ===== */
+/* ===== TIME FORMAT ===== */
 function formatTime(sec) {
-  sec = parseInt(sec) || 0;
-
   const h = Math.floor(sec / 3600);
   const m = Math.floor((sec % 3600) / 60);
-
-  if (h > 0) return `${h}h ${m}m`;
-  return `${m}m`;
+  return `${h}h ${m}m`;
 }
-/* ===== EVENTY FILTRŮ ===== */
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll(
-    '#filterChar, #filterAccount, #filterGM, #filterLevel'
-  ).forEach(el => {
-    el.addEventListener('input', applyFilter);
+
+/* ===== HEADER EVENTS ===== */
+document.querySelectorAll('#onlineTable th').forEach(th => {
+  th.style.cursor = 'pointer';
+
+  th.addEventListener('click', () => {
+    sortBy(
+      th.dataset.key,
+      th.dataset.type
+    );
   });
-
-  document.getElementById('resetFilter')
-    ?.addEventListener('click', resetFilters);
-
-  loadOnlinePlayers();
-  setInterval(loadOnlinePlayers, 30000);
 });
+
+/* ===== INIT ===== */
+loadOnlinePlayers();
+setInterval(loadOnlinePlayers, 30000);
 </script>
+
 
 
 </body>

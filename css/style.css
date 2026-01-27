@@ -868,3 +868,7 @@ a.btn:active {
   background: #3ddc97;
   margin-left: 6px;
 }
+#onlineTable th:hover {
+  color: #3ddc97;
+  text-decoration: underline;
+}
