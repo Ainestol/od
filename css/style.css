@@ -465,6 +465,28 @@ nav a:hover {
   margin-bottom: 15px;
 }
 
+.bug-user-message {
+  margin: 20px 0 30px;
+  padding: 18px 20px;
+  border: 1px solid #caa24d;
+  background: rgba(0,0,0,0.55);
+}
+
+.bug-user-message h3 {
+  margin: 0 0 12px;
+  color: #caa24d;
+  font-size: 18px;
+}
+
+.bug-user-message pre {
+  margin: 0;
+  color: #f0e6b8;
+  font-size: 15px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+
 .bug-message pre {
   margin: 0;
   color: #e6d18c;
