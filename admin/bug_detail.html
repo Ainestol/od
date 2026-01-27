@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <title>Bug detail | Admin</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body class="auth-page profile-page">
+
+<header class="main-header">
+  <div class="logo"><a href="/">Ordo Draconis</a></div>
+  <div class="auth">
+    <a href="/admin/index.html" class="btn">Admin</a>
+    <a href="/api/logout.php" class="btn">Odhlásit</a>
+  </div>
+</header>
+
+<main class="auth-container profile-shell">
+  <h1 id="bugTitle">Bug detail</h1>
+
+  <div class="profile-card">
+    <p><strong>User:</strong> <span id="bugUser"></span></p>
+    <p><strong>Account:</strong> <span id="bugAccount"></span></p>
+    <p><strong>Category:</strong> <span id="bugCategory"></span></p>
+
+    <label>Status</label>
+    <select id="bugStatus">
+      <option value="new">NEW</option>
+      <option value="in_progress">IN PROGRESS</option>
+      <option value="resolved">RESOLVED</option>
+      <option value="closed">CLOSED</option>
+    </select>
+
+    <label>Message</label>
+    <div id="bugMessage" class="profile-card muted"></div>
+
+    <label>Admin reply</label>
+    <textarea id="adminReply" rows="5"></textarea>
+
+    <button id="saveBtn" class="btn btn-primary">Uložit</button>
+  </div>
+<script>
+const params = new URLSearchParams(window.location.search);
+const id = params.get('id');
+
+fetch(`/admin/api/get_bug_report.php?id=${id}`)
+  .then(r => r.json())
+  .then(data => {
+    if (!data.ok) return;
+
+    const b = data.bug;
+
+    document.getElementById('bugTitle').textContent = b.title;
+    document.getElementById('bugUser').textContent = b.email;
+    document.getElementById('bugAccount').textContent = b.game_account || '-';
+    document.getElementById('bugCategory').textContent = b.category;
+    document.getElementById('bugMessage').textContent = b.message;
+    document.getElementById('bugStatus').value = b.status;
+    document.getElementById('adminReply').value = b.admin_reply || '';
+  });
+
+document.getElementById('saveBtn').addEventListener('click', async () => {
+  const payload = {
+    id,
+    status: document.getElementById('bugStatus').value,
+    reply: document.getElementById('adminReply').value
+  };
+
+  const res = await fetch('/admin/api/update_bug_report.php', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(payload)
+  });
+
+  const data = await res.json();
+  if (data.ok) alert('Uloženo');
+});
+</script>
+
+
+</main>
