@@ -458,6 +458,20 @@ nav a:hover {
         inset 0 0 12px rgba(212,175,55,0.08);
 }
 
+.bug-message {
+  background: rgba(0,0,0,.4);
+  border: 1px solid #caa24d;
+  padding: 10px;
+  margin-bottom: 15px;
+}
+
+.bug-message pre {
+  margin: 0;
+  color: #e6d18c;
+  white-space: pre-wrap;
+}
+
+
 .top-actions .btn {
   display: inline-block;
   padding: 10px 14px;
@@ -485,6 +499,15 @@ nav a:hover {
   color: #888;
   text-decoration: none;
 }
+
+a.btn,
+a.btn:visited,
+a.btn:hover,
+a.btn:active {
+  color: #caa24d;
+  text-decoration: none;
+}
+
 
 .lang a.active,
 .lang a:hover {

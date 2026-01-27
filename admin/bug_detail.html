@@ -18,9 +18,8 @@
 
 <main class="auth-container profile-shell">
   <h1 id="bugTitle">Bug detail</h1>
-<a href="/admin/bug_reports.html" class="btn btn-secondary" style="margin-bottom:15px;">
+<a href="/admin/bug_reports.html" class="btn btn-secondary">
   ← Zpět na přehled bug reportů
-  
 </a>
   <div class="profile-card">
     <p><strong>User:</strong> <span id="bugUser"></span></p>
@@ -37,6 +36,13 @@
 
     <label>Message</label>
     <div id="bugMessage" class="profile-card muted"></div>
+
+<div class="form-group">
+  <label>Reported issue (user message)</label>
+  <div class="bug-message">
+    <pre id="bugMessage"></pre>
+  </div>
+</div>
 
     <label>Admin reply</label>
     <textarea id="adminReply" rows="5"></textarea>
@@ -61,6 +67,7 @@ fetch(`/admin/api/get_bug_report.php?id=${id}`)
     document.getElementById('bugMessage').textContent = b.message;
     document.getElementById('bugStatus').value = b.status;
     document.getElementById('adminReply').value = b.admin_reply || '';
+    document.getElementById('bugMessage').textContent = data.message || '';
   });
 
 document.getElementById('saveBtn').addEventListener('click', async () => {
