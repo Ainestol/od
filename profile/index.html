@@ -146,6 +146,14 @@
     <label>Herní účet (volitelné)</label>
     <select id="bugAccount">
       <option value="">— vyber účet —</option>
+
+<hr style="margin:30px 0;">
+
+<h3>Moje hlášení</h3>
+<div id="myBugs" class="link-list">
+  <div class="muted">Načítám hlášení…</div>
+</div>
+
     </select>
 
     <label>Kategorie</label>
@@ -620,6 +628,36 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 </script>
 
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const box = document.getElementById('myBugs');
+  if (!box) return;
+
+  fetch('/api/list_my_bug_reports.php')
+    .then(r => r.json())
+    .then(data => {
+      if (!data.ok) {
+        box.innerHTML = '<div class="muted">Žádná hlášení</div>';
+        return;
+      }
+
+      box.innerHTML = '';
+
+      data.bugs.forEach(bug => {
+        const row = document.createElement('a');
+        row.href = `/profile/bug_detail.html?id=${bug.id}`;
+        row.className = 'link-item';
+
+        row.innerHTML = `
+          <strong>[${bug.status.toUpperCase()}]</strong>
+          ${bug.title}
+        `;
+
+        box.appendChild(row);
+      });
+    });
+});
+</script>
 
 
 </body>
