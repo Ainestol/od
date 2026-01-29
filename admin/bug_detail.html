@@ -84,8 +84,7 @@ fetch(`/admin/api/get_bug_report.php?id=${id}`)
     document.getElementById('bugCategory').textContent = b.category;
     document.getElementById('bugStatus').value = b.status;
     updateBadge(b.status);
-    document.getElementById('adminReply').value = b.admin_reply || '';
-
+    
     const msg = document.getElementById('bugUserMessage');
     msg.textContent = b.message && b.message.trim()
       ? b.message
