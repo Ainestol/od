@@ -16,7 +16,7 @@ const replyHint = document.getElementById('replyHint');
 let canReply = false;
 
 /* ===== NAČTENÍ DETAILU ===== */
-fetch(`/api/get_bug_report.php?id=${bugId}`)
+fetch(`/api/get_my_bug_report.php?id=${bugId}`)
   .then(r => r.json())
   .then(data => {
     if (!data.ok) {
@@ -39,7 +39,7 @@ fetch(`/api/get_bug_report.php?id=${bugId}`)
   });
 
 /* ===== NAČTENÍ ZPRÁV ===== */
-fetch(`/api/get_bug_messages.php?id=${bugId}`)
+fetch(`/api/get_my_bug_messages.php?id=${bugId}`)
   .then(r => r.json())
   .then(data => {
     messagesBox.innerHTML = '';
