@@ -48,7 +48,10 @@
 
     <!-- ADMIN REPLY -->
     <label style="margin-top:20px;">Admin reply</label>
-    <textarea id="adminReply" rows="5"></textarea>
+    <div id="messageHistory"></div>
+
+<textarea id="newMessage" rows="4"></textarea>
+<button id="sendMessage">Odeslat odpověď</button>
 
     <button id="saveBtn" class="btn btn-primary" style="margin-top:20px;">
       Uložit
@@ -114,6 +117,6 @@ document.getElementById('bugStatus').addEventListener('change', (e) => {
 });
 
 </script>
-
+<script src="/js/bug-admin-detail.js"></script>
 </body>
 </html>

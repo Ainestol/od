@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <title>Detail hlášení | Ordo Draconis</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/profile.css">
+</head>
+
+<body class="auth-page profile-page">
+
+<header class="main-header">
+  <div class="logo"><a href="/">Ordo Draconis</a></div>
+  <div class="auth auth-center">
+    <a href="/profile/index.html" class="btn">Zpět na profil</a>
+    <a href="/api/logout.php" class="btn">Odhlásit se</a>
+  </div>
+</header>
+
+<main class="auth-container profile-shell">
+
+  <h1>Detail hlášení</h1>
+
+  <!-- INFO O TICKETU -->
+  <div id="bugInfo" class="profile-card">
+    <div class="muted">Načítám detail…</div>
+  </div>
+
+  <!-- HISTORIE ZPRÁV -->
+  <div class="profile-card">
+    <h3>Historie komunikace</h3>
+    <div id="messages">
+      <div class="muted">Načítám zprávy…</div>
+    </div>
+  </div>
+
+  <!-- FORM PRO ODPOVĚĎ -->
+  <div id="replyBox" class="profile-card" style="display:none;">
+    <h3>Odpověď</h3>
+
+    <textarea id="replyMessage" rows="5" maxlength="1000"
+      placeholder="Napiš odpověď…"></textarea>
+
+    <div class="muted" id="replyHint"></div>
+
+    <button id="replySend" class="btn btn-primary">
+      Odeslat odpověď
+    </button>
+  </div>
+
+</main>
+
+<script src="/profile/js/bug_detail.js"></script>
+</body>
+</html>
