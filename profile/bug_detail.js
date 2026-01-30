@@ -8,17 +8,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  const bugInfo = document.getElementById('bugInfo');
+  const bugInfo   = document.getElementById('bugInfo');
   const messagesBox = document.getElementById('messages');
-  const replyBox = document.getElementById('replyBox');
-  const replyBtn = document.getElementById('replySend');
-  const replyMsg = document.getElementById('replyMessage');
+  const replyBox  = document.getElementById('replyBox');
+  const replyBtn  = document.getElementById('replySend');
+  const replyMsg  = document.getElementById('replyMessage');
   const replyHint = document.getElementById('replyHint');
 
   const confirmBox = document.getElementById('confirmResolvedBox');
   const confirmBtn = document.getElementById('confirmResolvedBtn');
-
-  window.currentBugStatus = null;
 
   /* =========================
      NAČTENÍ DETAILU TICKETU
@@ -34,7 +32,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const b = data.bug;
-    window.currentBugStatus = b.status;
 
     bugInfo.innerHTML = `
       <strong>Název:</strong> ${b.title}<br>
@@ -43,7 +40,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       <strong>Vytvořeno:</strong> ${b.created_at}
     `;
 
-    /* zobrazit tlačítko jen při RESOLVED */
+    /* 👉 TLAČÍTKO PRO USERA: jen při RESOLVED */
     if (b.status === 'RESOLVED') {
       confirmBox.style.display = 'block';
     } else {
@@ -90,7 +87,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       messagesBox.appendChild(div);
     });
 
-    /* ping-pong */
+    /* ping-pong logika */
     replyBox.style.display = 'block';
 
     if (lastAuthor === 'admin') {
@@ -135,7 +132,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   /* =========================
-     POTVRZENÍ VYŘEŠENÍ
+     POTVRZENÍ VYŘEŠENÍ USEREM
      ========================= */
   confirmBtn.addEventListener('click', async () => {
     confirmBtn.disabled = true;
