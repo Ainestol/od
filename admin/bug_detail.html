@@ -62,62 +62,8 @@
 
 </main>
 
-<script>
-const params = new URLSearchParams(window.location.search);
-const id = params.get('id');
-const badge = document.getElementById('statusBadge');
+<script src="bug_admin_detail.js"></script>
 
-function updateBadge(status) {
-  badge.className = 'status-badge status-' + status;
-  badge.textContent = status.replace('_', ' ').toUpperCase();
-}
-
-fetch(`/admin/api/get_bug_report.php?id=${id}`)
-  .then(r => r.json())
-  .then(data => {
-    if (!data.ok) return;
-
-    const b = data.bug;
-
-    document.getElementById('bugTitle').textContent = b.title;
-    document.getElementById('bugUser').textContent = b.email;
-    document.getElementById('bugAccount').textContent = b.game_account || '-';
-    document.getElementById('bugCategory').textContent = b.category;
-    document.getElementById('bugStatus').value = b.status;
-    updateBadge(b.status);
-    
-    const msg = document.getElementById('bugUserMessage');
-    msg.textContent = b.message && b.message.trim()
-      ? b.message
-      : '⚠ Uživatel nepřiložil žádný popis problému.';
-  });
-
-document.getElementById('saveBtn').addEventListener('click', async () => {
-  const payload = {
-    id,
-    status: document.getElementById('bugStatus').value,
-    reply: document.getElementById('adminReply').value
-  };
-
-  const res = await fetch('/admin/api/update_bug_report.php', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  });
-
-  const data = await res.json();
-  if (data.ok) {
-    alert('Uloženo');
-  } else {
-    alert('Chyba při ukládání');
-  }
-});
-document.getElementById('bugStatus').addEventListener('change', (e) => {
-  updateBadge(e.target.value);
-});
-
-</script>
-<script src="/admin/bug_admin_detail.js"></script>
 
 </body>
 </html>
