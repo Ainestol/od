@@ -15,6 +15,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   const replyMsg = document.getElementById('replyMessage');
   const replyHint = document.getElementById('replyHint');
 
+  const confirmBox = document.getElementById('confirmResolvedBox');
+  const confirmBtn = document.getElementById('confirmResolvedBtn');
+
+  window.currentBugStatus = null;
+
   /* =========================
      NAČTENÍ DETAILU TICKETU
      ========================= */
@@ -29,13 +34,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const b = data.bug;
+    window.currentBugStatus = b.status;
 
     bugInfo.innerHTML = `
       <strong>Název:</strong> ${b.title}<br>
       <strong>Kategorie:</strong> ${b.category}<br>
-      <strong>Status:</strong> ${b.status.toUpperCase()}<br>
+      <strong>Status:</strong> ${b.status}<br>
       <strong>Vytvořeno:</strong> ${b.created_at}
     `;
+
+    /* zobrazit tlačítko jen při RESOLVED */
+    if (b.status === 'RESOLVED') {
+      confirmBox.style.display = 'block';
+    } else {
+      confirmBox.style.display = 'none';
+    }
   }
 
   /* =========================
@@ -45,7 +58,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const res = await fetch(`/api/get_my_bug_messages.php?id=${id}`);
     const data = await res.json();
 
-    if (!data.ok) {
+    if (!data.ok || !Array.isArray(data.messages)) {
       messagesBox.innerHTML =
         '<div class="muted">Žádné zprávy</div>';
       return;
@@ -61,8 +74,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       div.className = 'profile-card muted';
       div.style.marginBottom = '10px';
 
+      const authorLabel =
+        m.author_role === 'admin'
+          ? 'Admin'
+          : m.author_role === 'system'
+          ? 'Systém'
+          : 'Ty';
+
       div.innerHTML = `
-        <strong>${m.author_role === 'admin' ? 'Admin' : 'Ty'}:</strong><br>
+        <strong>${authorLabel}:</strong><br>
         ${m.message}<br>
         <small>${m.created_at}</small>
       `;
@@ -70,15 +90,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       messagesBox.appendChild(div);
     });
 
-    /* ping-pong logika */
+    /* ping-pong */
+    replyBox.style.display = 'block';
+
     if (lastAuthor === 'admin') {
-      replyBox.style.display = 'block';
       replyHint.textContent = '';
       replyBtn.disabled = false;
     } else {
-      replyBox.style.display = 'block';
-      replyHint.textContent =
-        'Čeká se na odpověď administrátora.';
+      replyHint.textContent = 'Čeká se na odpověď administrátora.';
       replyBtn.disabled = true;
     }
   }
@@ -90,25 +109,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     const text = replyMsg.value.trim();
     if (!text) return;
 
+    if (text.length > 1000) {
+      alert('Zpráva může mít maximálně 1000 znaků.');
+      return;
+    }
+
     replyBtn.disabled = true;
 
     const res = await fetch('/api/add_bug_message.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        id,
-        message: text
-      })
+      body: JSON.stringify({ id, message: text })
     });
 
     const data = await res.json();
 
     if (!data.ok) {
-      alert(
-        data.error === 'WAIT_FOR_ADMIN'
-          ? 'Počkej na odpověď administrátora'
-          : 'Chyba při odesílání'
-      );
+      alert('Chyba při odesílání');
       replyBtn.disabled = false;
       return;
     }
@@ -117,6 +134,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadMessages();
   });
 
+  /* =========================
+     POTVRZENÍ VYŘEŠENÍ
+     ========================= */
+  confirmBtn.addEventListener('click', async () => {
+    confirmBtn.disabled = true;
+
+    const res = await fetch('/api/confirm_bug_resolved.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id })
+    });
+
+    const data = await res.json();
+
+    if (!data.ok) {
+      alert('Nelze potvrdit vyřešení');
+      confirmBtn.disabled = false;
+      return;
+    }
+
+    confirmBox.style.display = 'none';
+    await loadMessages();
+  });
+
+  /* INIT */
   await loadBug();
   await loadMessages();
 });
