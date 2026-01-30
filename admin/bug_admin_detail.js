@@ -1,6 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
   console.log('BUG ADMIN DETAIL JS LOADED');
 
+  /* =========================
+     ZÁKLADNÍ PROMĚNNÉ
+     ========================= */
   const params = new URLSearchParams(window.location.search);
   const id = params.get('id');
 
@@ -8,74 +11,142 @@ document.addEventListener('DOMContentLoaded', () => {
   const textarea  = document.getElementById('adminMessage');
   const history   = document.getElementById('messageHistory');
   const statusSel = document.getElementById('bugStatus');
-  const badge = document.getElementById('statusBadge');
+  const badge     = document.getElementById('statusBadge');
 
-function updateBadge(status) {
-  if (!badge) return;
-  badge.className = 'status-badge status-' + status;
-  badge.textContent = status.replace('_', ' ').toUpperCase();
-}
   if (!id || !saveBtn || !textarea || !history || !statusSel) {
-    console.warn('Missing elements');
+    console.error('Chybí povinné elementy v DOM');
     return;
   }
 
-  // === NAČTENÍ HISTORIE ===
-  async function loadMessages() {
-    const r = await fetch(`/admin/api/get_bug_messages.php?id=${id}`);
-    const d = await r.json();
-    if (!d.ok) return;
+  /* =========================
+     STATUS BADGE
+     ========================= */
+  function updateBadge(status) {
+    if (!badge) return;
+    badge.className = 'status-badge status-' + status;
+    badge.textContent = status.replace('_', ' ').toUpperCase();
+  }
 
-    history.innerHTML = '';
-    let lastRole = null;
+  statusSel.addEventListener('change', () => {
+    updateBadge(statusSel.value);
+  });
 
-    d.messages.forEach(m => {
-      lastRole = m.author_role;
-      const div = document.createElement('div');
-      div.className = 'profile-card muted';
-      div.innerHTML = `
-        <strong>${m.author_role.toUpperCase()}</strong><br>
-        ${m.message}<br>
-        <small>${m.created_at}</small>
-      `;
-      history.appendChild(div);
-    });
+  /* =========================
+     NAČTENÍ DETAILU BUGU
+     ========================= */
+  async function loadBugDetail() {
+    try {
+      const res = await fetch(`/admin/api/get_bug_report.php?id=${id}`);
+      const data = await res.json();
+      if (!data.ok) return;
 
-    // 🔒 ping-pong
-    if (lastRole === 'admin') {
-      textarea.disabled = true;
-      textarea.placeholder = 'Čeká se na odpověď uživatele…';
-    } else {
-      textarea.disabled = false;
+      const b = data.bug;
+
+      document.getElementById('bugTitle').textContent    = b.title;
+      document.getElementById('bugUser').textContent     = b.email;
+      document.getElementById('bugAccount').textContent  = b.game_account || '-';
+      document.getElementById('bugCategory').textContent = b.category;
+
+      const msg = document.getElementById('bugUserMessage');
+      msg.textContent = b.message && b.message.trim()
+        ? b.message
+        : '⚠ Uživatel nepřiložil žádný popis problému.';
+
+      statusSel.value = b.status;
+      updateBadge(b.status);
+
+    } catch (e) {
+      console.error('Chyba při načítání detailu bugu', e);
     }
   }
 
-  // === ULOŽENÍ (status + zpráva) ===
+  /* =========================
+     NAČTENÍ HISTORIE ZPRÁV
+     ========================= */
+  async function loadMessages() {
+    try {
+      const res = await fetch(`/admin/api/get_bug_messages.php?id=${id}`);
+      const data = await res.json();
+      if (!data.ok) return;
+
+      history.innerHTML = '';
+      let lastRole = null;
+
+      data.messages.forEach(m => {
+        lastRole = m.author_role;
+
+        const div = document.createElement('div');
+        div.className = 'profile-card muted';
+        div.style.marginBottom = '10px';
+
+        div.innerHTML = `
+          <strong>${m.author_role.toUpperCase()}</strong><br>
+          ${m.message}<br>
+          <small>${m.created_at}</small>
+        `;
+
+        history.appendChild(div);
+      });
+
+      /* ping-pong logika */
+      if (lastRole === 'admin') {
+        textarea.disabled = true;
+        textarea.placeholder = 'Čeká se na odpověď uživatele…';
+      } else {
+        textarea.disabled = false;
+        textarea.placeholder = 'Napiš odpověď…';
+      }
+
+    } catch (e) {
+      console.error('Chyba při načítání zpráv', e);
+      history.innerHTML =
+        '<div class="form-error">Chyba při načítání historie</div>';
+    }
+  }
+
+  /* =========================
+     ULOŽENÍ ZPRÁVY + STATUSU
+     ========================= */
   saveBtn.addEventListener('click', async () => {
     const message = textarea.value.trim();
     const status  = statusSel.value;
 
-    const res = await fetch('/admin/api/save_bug_detail.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        id,
-        status,
-        message
-      })
-    });
+    saveBtn.disabled = true;
 
-    const data = await res.json();
+    try {
+      const res = await fetch('/admin/api/save_bug_detail.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id,
+          status,
+          message
+        })
+      });
 
-    if (!data.ok) {
-      alert(data.error || 'Chyba při ukládání');
-      return;
+      const data = await res.json();
+
+      if (!data.ok) {
+        alert(data.detail || data.error || 'Chyba při ukládání');
+        saveBtn.disabled = false;
+        return;
+      }
+
+      textarea.value = '';
+      await loadMessages();
+      alert('Uloženo');
+
+    } catch (e) {
+      console.error(e);
+      alert('Chyba komunikace se serverem');
     }
 
-    textarea.value = '';
-    await loadMessages();
-    alert('Uloženo');
+    saveBtn.disabled = false;
   });
 
+  /* =========================
+     INIT
+     ========================= */
+  loadBugDetail();
   loadMessages();
 });
