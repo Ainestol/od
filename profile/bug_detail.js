@@ -122,10 +122,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     const data = await res.json();
 
     if (!data.ok) {
-      alert('Chyba při odesílání');
-      replyBtn.disabled = false;
-      return;
-    }
+  if (data.error === 'TICKET_LOCKED') {
+    alert('Ticket je uzamčen – problém byl potvrzen jako vyřešen.');
+  } else {
+    alert('Chyba při odesílání');
+  }
+  replyBtn.disabled = false;
+  return;
+}
 
     replyMsg.value = '';
     await loadMessages();
