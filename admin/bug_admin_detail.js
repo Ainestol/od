@@ -8,7 +8,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const textarea  = document.getElementById('adminMessage');
   const history   = document.getElementById('messageHistory');
   const statusSel = document.getElementById('bugStatus');
+  const badge = document.getElementById('statusBadge');
 
+function updateBadge(status) {
+  if (!badge) return;
+  badge.className = 'status-badge status-' + status;
+  badge.textContent = status.replace('_', ' ').toUpperCase();
+}
   if (!id || !saveBtn || !textarea || !history || !statusSel) {
     console.warn('Missing elements');
     return;
