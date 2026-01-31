@@ -134,7 +134,7 @@
       </div>
     </section>
 
-    <section id="support" class="profile-card panel">
+   <section id="support" class="profile-card panel">
   <h2>Bug report</h2>
   <p class="muted">Something not working? Let us know.</p>
 
@@ -161,11 +161,22 @@
     <label>Issue description</label>
     <textarea id="bugMessage" rows="6" maxlength="1000" required></textarea>
     <div id="bugCounter" class="char-counter">0 / 1000</div>
+
     <button class="btn btn-primary" type="submit">
       Submit report
     </button>
   </form>
+
+  <!-- 🔽 PŘESNĚ SEM TO PATŘÍ 🔽 -->
+  <hr style="margin:30px 0;">
+
+  <h3>My reports</h3>
+
+  <div id="myBugs" class="link-list">
+    <div class="muted">Loading reports…</div>
+  </div>
 </section>
+
 
   </div>
 </main>
@@ -604,6 +615,36 @@ fetch('/api/me.php', { credentials: 'same-origin' })
   });
 </script>
 
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const box = document.getElementById('myBugs');
+  if (!box) return;
+
+  fetch('/api/list_my_bug_reports.php')
+    .then(r => r.json())
+    .then(data => {
+      if (!data.ok) {
+        box.innerHTML = '<div class="muted">No reports</div>';
+        return;
+      }
+
+      box.innerHTML = '';
+
+      data.bugs.forEach(bug => {
+        const row = document.createElement('a');
+        row.href = `/profile/bug_detail.html?id=${bug.id}`;
+        row.className = 'link-item';
+
+        row.innerHTML = `
+          <strong>[${bug.status.toUpperCase()}]</strong>
+          ${bug.title}
+        `;
+
+        box.appendChild(row);
+      });
+    });
+});
+</script>
 
 
 </body>
