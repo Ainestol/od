@@ -12,9 +12,7 @@
 <header class="main-header">
   <div class="logo"><a href="/">Ordo Draconis</a></div>
   <div class="auth auth-center">
-    <a href="/profile/index.html?tab=support" class="btn">
-  ← Zpět na profil
-</a>
+    <a id="backToProfile" class="btn"></a>
     <a href="/api/logout.php" class="btn">Odhlásit se</a>
   </div>
 </header>
@@ -33,6 +31,7 @@
     <h3>Historie komunikace</h3>
     <div id="messages">
       <div class="muted">Načítám zprávy…</div>
+      <div id="systemMessage" class="muted" style="display:none;"></div>
     </div>
   </div>
 
@@ -51,8 +50,9 @@
   </div>
 <div id="confirmResolvedBox" class="profile-card" style="display:none;">
   <button id="confirmResolvedBtn" class="btn btn-success">
-    ✅ Problém je vyřešen
-  </button>
+  ✅ Problém je vyřešen
+</button>
+
   <p class="muted">
   Klikni pouze v případě, že problém skutečně funguje.
 </p>
