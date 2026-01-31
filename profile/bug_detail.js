@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
+    
     const b = data.bug;
 
     bugInfo.innerHTML = `

@@ -218,6 +218,16 @@ document.addEventListener('DOMContentLoaded', () => {
   tabs.forEach(t => t.addEventListener('click', () => show(t.dataset.tab)));
   const first = document.querySelector('.profile-tabs .tab.active') || tabs[0];
   if (first) show(first.dataset.tab);
+  const params = new URLSearchParams(window.location.search);
+const tab = params.get('tab');
+
+if (tab) {
+  const btn = document.querySelector(`[data-tab="${tab}"]`);
+  if (btn) {
+    btn.click();
+  }
+}
+
 });
 </script>
 
