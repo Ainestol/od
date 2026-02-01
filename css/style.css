@@ -908,3 +908,25 @@ a.btn:active {
 .admin-page .auth-container {
   max-width: 1600px; /* admin tabulky chtějí šířku */
 }
+/* ===== ADMIN PAGE FIX ===== */
+body.admin-page {
+  overflow: auto;
+}
+/* ===== ADMIN HEADER BUTTONS FIX ===== */
+body.admin-page .auth .btn,
+body.admin-page .admin-btn {
+  min-height: 42px;
+  padding: 0 18px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+body.admin-page .main-header {
+  white-space: normal;
+}
