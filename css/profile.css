@@ -308,3 +308,12 @@ body.auth-page.profile-page { overflow: auto; }
   letter-spacing: 2px;
   text-transform: uppercase;
 }
+.admin-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 12px 22px;     /* STEJNÉ jako .btn */
+  line-height: 1;
+  height: auto;
+}
