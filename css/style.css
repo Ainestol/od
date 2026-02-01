@@ -890,3 +890,14 @@ a.btn:active {
 .admin-btn:hover {
   background: rgba(241, 196, 15, 0.12);
 }
+.auth {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.auth .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
