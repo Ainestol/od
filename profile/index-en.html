@@ -607,7 +607,7 @@ fetch('/api/me.php', { credentials: 'same-origin' })
   .then(data => {
     if (data.ok && data.role === 'admin') {
       const btn = document.getElementById('adminBtn');
-      if (btn) btn.style.display = 'inline-block';
+      if (btn) btn.style.display = 'inline-flex';
     }
   })
   .catch(() => {
