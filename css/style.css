@@ -901,3 +901,10 @@ a.btn:active {
   align-items: center;
   justify-content: center;
 }
+.admin-page {
+  overflow: auto;
+}
+
+.admin-page .auth-container {
+  max-width: 1600px; /* admin tabulky chtějí šířku */
+}
