@@ -987,4 +987,11 @@ body.admin-page .main-header {
   justify-content: flex-start;
   gap: 16px;
 }
+/* ===== ADMIN CONTENT PAGES (BUG REPORTS, DETAIL, ETC.) ===== */
+body.profile-page.admin-content {
+  overflow: auto;
+}
 
+body.profile-page.admin-content .auth-container {
+  max-width: 1600px;
+}
