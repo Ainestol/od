@@ -982,3 +982,14 @@ body.admin-page .main-header .auth .btn {
   letter-spacing: 2px;
   text-transform: uppercase;
 }
+/* ADMIN BUG REPORTS – stejný header jako admin index */
+body.admin-page .main-header {
+  align-items: flex-start;
+}
+
+body.admin-page .auth {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: 8px;
+}
