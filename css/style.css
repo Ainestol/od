@@ -930,3 +930,18 @@ body.admin-page .admin-btn {
 body.admin-page .main-header {
   white-space: normal;
 }
+/* ===== FIX ADMIN HEADER LAYOUT ===== */
+body.admin-page .main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+body.admin-page .main-header .logo a {
+  display: inline-flex;
+  align-items: center;
+  height: 42px;
+  line-height: 1;
+}
+body.admin-page .main-header {
+  white-space: normal;
+}
