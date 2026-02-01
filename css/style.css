@@ -945,3 +945,40 @@ body.admin-page .main-header .logo a {
 body.admin-page .main-header {
   white-space: normal;
 }
+/* ===== ADMIN HEADER FIX ===== */
+
+body.admin-page .main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 24px 40px;
+}
+
+body.admin-page .main-header .logo a {
+  display: inline-flex;
+  align-items: center;
+
+  font-family: 'Cinzel', serif;
+  font-size: 22px;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+
+  color: #d4af37;
+}
+
+body.admin-page .main-header .auth {
+  display: flex;
+  gap: 12px;
+}
+
+body.admin-page .main-header .auth .btn {
+  background: linear-gradient(to bottom, #111, #0b0b0b);
+  border: 1px solid #3a3322;
+  color: #d4af37;
+
+  padding: 10px 18px;
+  font-family: 'Cinzel', serif;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
