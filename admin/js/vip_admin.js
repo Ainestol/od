@@ -9,28 +9,28 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function adminAddVip() {
-    const result = document.getElementById('vipAddResult');
+  try {
+    const payload = {
+      scope: document.getElementById('vipScope').value,
+      targetId: Number(document.getElementById('vipTargetId').value),
+      levelId: Number(document.getElementById('vipLevelId').value),
+      days: Number(document.getElementById('vipDays').value)
+    };
 
-    try {
-        const payload = {
-            scope: document.getElementById('vipScope').value,
-            targetId: Number(document.getElementById('vipTargetId').value),
-            levelId: Number(document.getElementById('vipLevelId').value),
-            days: Number(document.getElementById('vipDays').value)
-        };
+    const res = await apiFetch('/api/admin/vip_add.php', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
 
-        const res = await apiFetch('/api/admin/vip_add.php', {
-            method: 'POST',
-            body: JSON.stringify(payload)
-        });
+    document.getElementById('vipAddResult').innerText =
+      'OK – VIP přidáno (ID ' + res.vip_grant_id + ')';
 
-        result.innerText = `VIP přidáno (ID ${res.vip_grant_id})`;
-        loadVipList();
-
-    } catch (e) {
-        result.innerText = `Chyba: ${e.message}`;
-    }
+  } catch (e) {
+    document.getElementById('vipAddResult').innerText =
+      'Chyba: ' + e.message;
+  }
 }
+
 
 async function loadVipList() {
     const tbody = document.getElementById('vipTable');
