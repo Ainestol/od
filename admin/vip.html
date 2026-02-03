@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin – VIP správa</title>
+
+    <!-- tvé existující CSS -->
+    <link rel="stylesheet" href="/admin/css/admin.css">
+
+    <!-- JS -->
+    <script src="/admin/js/api.js" defer></script>
+    <script src="/admin/js/vip_admin.js" defer></script>
+</head>
+<body>
+
+<header>
+    <h1>Admin – VIP správa</h1>
+    <nav>
+        <a href="/admin/index.html">Dashboard</a>
+        <a href="/admin/bug_reports.html">Bug reporty</a>
+        <a href="/admin/vip.html" class="active">VIP</a>
+    </nav>
+</header>
+
+<main>
+
+    <!-- === RUČNÍ PŘIDÁNÍ VIP === -->
+    <section>
+        <h2>Přidat VIP</h2>
+
+        <label>Scope:</label>
+        <select id="vipScope">
+            <option value="WEB">WEB</option>
+            <option value="GAME">GAME</option>
+            <option value="CHAR">CHAR</option>
+        </select>
+
+        <label>Target ID:</label>
+        <input type="number" id="vipTargetId">
+
+        <label>Level:</label>
+        <input type="number" id="vipLevelId" value="2">
+
+        <label>Dní:</label>
+        <input type="number" id="vipDays" value="30">
+
+        <button id="vipAddBtn">Přidat VIP</button>
+
+        <div id="vipAddResult" class="result"></div>
+    </section>
+
+    <hr>
+
+    <!-- === PŘEHLED VIP === -->
+    <section>
+        <h2>Aktivní VIP</h2>
+
+        <button id="vipReloadBtn">Načíst VIP</button>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Scope</th>
+                    <th>Target</th>
+                    <th>Level</th>
+                    <th>Platí do</th>
+                    <th>Akce</th>
+                </tr>
+            </thead>
+            <tbody id="vipTable"></tbody>
+        </table>
+    </section>
+
+</main>
+
+</body>
+</html>
