@@ -22,44 +22,23 @@
 
 <main>
 
-  <!-- TABS -->
-  <div class="tabs">
-    <button data-tab="users" class="active">Web účty</button>
-    <button data-tab="games">Game účty</button>
-    <button data-tab="chars">Postavy</button>
-  </div>
+  <h2>Web účty</h2>
 
-  <!-- WEB -->
-  <section id="tab-users" class="tab">
-    <table>
-      <thead>
-        <tr><th>Email</th><th>Role</th><th>ID</th><th>Akce</th></tr>
-      </thead>
-      <tbody id="usersTable"></tbody>
-    </table>
-  </section>
-
-  <!-- GAME -->
-  <section id="tab-games" class="tab hidden">
-    <table>
-      <thead>
-        <tr><th>Login</th><th>Web uživatel</th><th>ID</th><th>Akce</th></tr>
-      </thead>
-      <tbody id="gamesTable"></tbody>
-    </table>
-  </section>
-
-  <!-- CHAR -->
-  <section id="tab-chars" class="tab hidden">
-    <table>
-      <thead>
-        <tr><th>Postava</th><th>Login</th><th>ID</th><th>Akce</th></tr>
-      </thead>
-      <tbody id="charsTable"></tbody>
-    </table>
-  </section>
+  <table class="tree">
+    <thead>
+      <tr>
+        <th>Email / Login</th>
+        <th>Role</th>
+        <th>Akce</th>
+      </tr>
+    </thead>
+    <tbody id="webUsersBody">
+      <!-- plní users_admin.js -->
+    </tbody>
+  </table>
 
 </main>
+
 
 </body>
 </html>
