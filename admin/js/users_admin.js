@@ -1,9 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     setupTabs();
-    loadUsers();
-    loadGameAccounts();
-    loadCharacters();
-});
+    loadWEbUsers();
+    });
 async function loadWebUsers() {
     const res = await apiFetch('/api/admin/users_list.php');
     const tbody = document.getElementById('webUsersBody');
@@ -38,60 +36,6 @@ function setupTabs() {
         });
     });
 }
-async function loadUsers() {
-    const res = await apiFetch('/api/admin/users_list.php');
-    const tbody = document.getElementById('webUsersBody');
-    tbody.innerHTML = '';
-
-    res.data.forEach(u => {
-        tbody.innerHTML += `
-          <tr>
-            <td>${u.email}</td>
-            <td>${u.role}</td>
-            <td class="id">${u.id}</td>
-            <td>
-              <button onclick="vipFromUser(${u.id})">VIP</button>
-            </td>
-          </tr>
-        `;
-    });
-}
-async function loadGameAccounts() {
-    const res = await apiFetch('/api/admin/game_accounts_list.php');
-    const tbody = document.getElementById('webUsersBody');
-    tbody.innerHTML = '';
-
-    res.data.forEach(g => {
-        tbody.innerHTML += `
-          <tr>
-            <td>${g.login}</td>
-            <td>${g.email ?? '-'}</td>
-            <td class="id">${g.id}</td>
-            <td>
-              <button onclick="vipFromGame(${g.id})">VIP</button>
-            </td>
-          </tr>
-        `;
-    });
-}
-async function loadCharacters() {
-    const res = await apiFetch('/api/admin/characters_list.php');
-    const tbody = document.getElementById('webUsersBody');
-    tbody.innerHTML = '';
-
-    res.data.forEach(c => {
-        tbody.innerHTML += `
-          <tr>
-            <td>${c.char_name}</td>
-            <td>${c.account_name}</td>
-            <td class="id">${c.charId}</td>
-            <td>
-              <button onclick="vipFromChar(${c.charId})">VIP</button>
-            </td>
-          </tr>
-        `;
-    });
-
 async function toggleGameAccounts(webUserId, btn) {
     const tr = btn.closest('tr');
 
@@ -168,18 +112,4 @@ async function toggleCharacters(gameAccountId, btn) {
 function openVip(scope, id) {
     window.location.href =
       `/admin/vip.html?scope=${scope}&targetId=${id}`;
-}
-
-
-}
-function vipFromUser(id) {
-    window.location.href = `/admin/vip.html?scope=WEB&targetId=${id}`;
-}
-
-function vipFromGame(id) {
-    window.location.href = `/admin/vip.html?scope=GAME&targetId=${id}`;
-}
-
-function vipFromChar(id) {
-    window.location.href = `/admin/vip.html?scope=CHAR&targetId=${id}`;
 }
