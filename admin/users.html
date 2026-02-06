@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin – Uživatelé</title>
+
+  <link rel="stylesheet" href="/admin/css/admin.css">
+
+  <script src="/admin/js/api.js" defer></script>
+  <script src="/admin/js/users_admin.js" defer></script>
+</head>
+<body>
+
+<header>
+  <h1>Admin – Přehled uživatelů</h1>
+  <nav>
+    <a href="/admin/index.html">Dashboard</a>
+    <a href="/admin/users.html" class="active">Uživatelé</a>
+    <a href="/admin/vip.html">VIP</a>
+  </nav>
+</header>
+
+<main>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button data-tab="users" class="active">Web účty</button>
+    <button data-tab="games">Game účty</button>
+    <button data-tab="chars">Postavy</button>
+  </div>
+
+  <!-- WEB -->
+  <section id="tab-users" class="tab">
+    <table>
+      <thead>
+        <tr><th>Email</th><th>Role</th><th>ID</th><th>Akce</th></tr>
+      </thead>
+      <tbody id="usersTable"></tbody>
+    </table>
+  </section>
+
+  <!-- GAME -->
+  <section id="tab-games" class="tab hidden">
+    <table>
+      <thead>
+        <tr><th>Login</th><th>Web uživatel</th><th>ID</th><th>Akce</th></tr>
+      </thead>
+      <tbody id="gamesTable"></tbody>
+    </table>
+  </section>
+
+  <!-- CHAR -->
+  <section id="tab-chars" class="tab hidden">
+    <table>
+      <thead>
+        <tr><th>Postava</th><th>Login</th><th>ID</th><th>Akce</th></tr>
+      </thead>
+      <tbody id="charsTable"></tbody>
+    </table>
+  </section>
+
+</main>
+
+</body>
+</html>

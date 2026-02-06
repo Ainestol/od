@@ -1,4 +1,19 @@
 document.addEventListener('DOMContentLoaded', () => {
+
+ const params = new URLSearchParams(window.location.search);
+    const scope = params.get('scope');
+    const targetId = params.get('targetId');
+
+    if (scope && targetId) {
+        const scopeSelect = document.getElementById('vipScope');
+        const targetInput = document.getElementById('vipTargetId');
+
+        if (scopeSelect && targetInput) {
+            scopeSelect.value = scope;
+            targetInput.value = targetId;
+        }
+    }
+
     document.getElementById('vipAddBtn')
         .addEventListener('click', adminAddVip);
 
