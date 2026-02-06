@@ -1,7 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     setupTabs();
-    loadWEbUsers();
-    });
+    loadWebUsers();
+});
+
 async function loadWebUsers() {
     const res = await apiFetch('/api/admin/users_list.php');
     const tbody = document.getElementById('webUsersBody');
@@ -38,6 +39,11 @@ function setupTabs() {
 }
 async function toggleGameAccounts(webUserId, btn) {
     const tr = btn.closest('tr');
+    document.addEventListener('DOMContentLoaded', () => {
+    setupTabs();
+    loadWebUsers();
+});
+
 
     // zavřít pokud už otevřené
     if (tr.nextElementSibling?.classList.contains('child-row')) {
@@ -72,12 +78,18 @@ async function toggleGameAccounts(webUserId, btn) {
             </table>
         </td>
     `;
+document.querySelectorAll('.child-row').forEach(r => r.remove());
 
     tr.after(child);
 }
 
 async function toggleCharacters(gameAccountId, btn) {
     const tr = btn.closest('tr');
+    document.addEventListener('DOMContentLoaded', () => {
+    setupTabs();
+    loadWebUsers();
+});
+
 
     if (tr.nextElementSibling?.classList.contains('child-row')) {
         tr.nextElementSibling.remove();
