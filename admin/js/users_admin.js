@@ -40,7 +40,7 @@ function setupTabs() {
 }
 async function loadUsers() {
     const res = await apiFetch('/api/admin/users_list.php');
-    const tbody = document.getElementById('usersTable');
+    const tbody = document.getElementById('webUsersBody');
     tbody.innerHTML = '';
 
     res.data.forEach(u => {
@@ -58,7 +58,7 @@ async function loadUsers() {
 }
 async function loadGameAccounts() {
     const res = await apiFetch('/api/admin/game_accounts_list.php');
-    const tbody = document.getElementById('gamesTable');
+    const tbody = document.getElementById('webUsersBody');
     tbody.innerHTML = '';
 
     res.data.forEach(g => {
@@ -76,7 +76,7 @@ async function loadGameAccounts() {
 }
 async function loadCharacters() {
     const res = await apiFetch('/api/admin/characters_list.php');
-    const tbody = document.getElementById('charsTable');
+    const tbody = document.getElementById('webUsersBody');
     tbody.innerHTML = '';
 
     res.data.forEach(c => {
