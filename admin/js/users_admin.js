@@ -104,20 +104,20 @@ async function toggleCharacters(gameAccountId, btn) {
     );
 
     const child = document.createElement('tr');
-    child.className = 'child-row';
-    child.innerHTML = `
-        <td colspan="3">
-            <ul>
-              ${res.data.map(c => `
-                <li>
-                  ${c.name}
-                  <small>#${c.id}</small>
-                  <button onclick="openVip('CHAR', ${c.id})">VIP</button>
-                </li>
-              `).join('')}
-            </ul>
-        </td>
-    `;
+child.className = 'child-row';
+child.innerHTML = `
+    <td colspan="3">
+        <ul>
+          ${res.data.map(c => `
+            <li>
+              ${c.char_name}
+              <small>#${c.charId}</small>
+              <button onclick="openVip('CHAR', ${c.charId})">VIP</button>
+            </li>
+          `).join('')}
+        </ul>
+    </td>
+`;
 
     tr.after(child);
 }
