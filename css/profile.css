@@ -338,20 +338,3 @@ body.auth-page.profile-page { overflow: auto; }
 .char-row .offline {
   color: #888;
 }
-.mini-row {
-  cursor: pointer;
-}
-.account-header {
-  min-height: 68px;
-  padding: 14px 18px;
-  font-weight: 600;
-}
-
-.account-header:hover {
-  background: rgba(255, 215, 0, 0.06);
-}
-.mini-row::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-}
