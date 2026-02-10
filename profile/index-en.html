@@ -670,16 +670,30 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 
 <script>
+async function loadVipMap(login) {
+  const res = await fetch(`/api/list_characters_with_vip.php?account=${encodeURIComponent(login)}`);
+  const data = await res.json();
+
+  const map = {};
+  if (data.ok && Array.isArray(data.characters)) {
+    data.characters.forEach(ch => {
+      map[ch.charId] = !!ch.has_vip;
+    });
+  }
+  return map;
+}
+</script>
+
+
+<script>
 document.addEventListener('click', async (e) => {
   const row = e.target.closest('.account-row');
   if (!row) return;
 
   const login = row.dataset.login;
   const box = document.getElementById('chars-' + login);
-
   if (!box) return;
 
-  /* toggle */
   if (!box.classList.contains('hidden')) {
     box.classList.add('hidden');
     box.innerHTML = '';
@@ -690,6 +704,8 @@ document.addEventListener('click', async (e) => {
   box.innerHTML = '<div class="muted">Loading characters…</div>';
 
   try {
+    const vipMap = await loadVipMap(login);
+
     const res = await fetch(`/api/list_characters.php?account=${encodeURIComponent(login)}`);
     const data = await res.json();
 
@@ -704,12 +720,18 @@ document.addEventListener('click', async (e) => {
       const el = document.createElement('div');
       el.className = 'char-row';
 
+      const hasVip = vipMap[ch.charId];
+      const vipTag = hasVip
+        ? '<span class="tag vip">VIP</span>'
+        : '';
+
       el.innerHTML = `
         <span><strong>${ch.char_name}</strong></span>
         <span>Lv ${ch.level}</span>
         <span class="${ch.online ? 'online' : 'offline'}">
           ${ch.online ? 'ONLINE' : 'offline'}
         </span>
+        ${vipTag}
       `;
 
       box.appendChild(el);
@@ -720,6 +742,7 @@ document.addEventListener('click', async (e) => {
   }
 });
 </script>
+
 
 
 </body>
