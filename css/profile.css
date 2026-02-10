@@ -338,3 +338,12 @@ body.auth-page.profile-page { overflow: auto; }
 .char-row .offline {
   color: #888;
 }
+.mini-row {
+  cursor: pointer;
+}
+
+.mini-row::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
