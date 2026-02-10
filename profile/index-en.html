@@ -283,6 +283,8 @@ document.addEventListener('DOMContentLoaded', () => {
 <script>
 async function loadGameAccounts() {
   const list = document.getElementById('gameAccountsList');
+  const countEl = document.getElementById('accountsCount');
+
   list.innerHTML = '<div class="muted">Loading game accounts…</div>';
 
   let res;
@@ -290,19 +292,23 @@ async function loadGameAccounts() {
     res = await fetch('/api/list_game_accounts.php');
   } catch (e) {
     list.innerHTML = '<div class="form-error">Server connection error.</div>';
+    if (countEl) countEl.textContent = '(0 / 10)';
     return;
   }
 
   if (!res.ok) {
     list.innerHTML = '<div class="form-error">Unable to load accounts.</div>';
+    if (countEl) countEl.textContent = '(0 / 10)';
     return;
   }
 
   const data = await res.json();
-const countEl = document.getElementById('accountsCount');
-if (countEl) {
-  countEl.textContent = `(${data.accounts.length} / 10)`;
-}
+
+  // update account count
+  if (countEl) {
+    countEl.textContent = `(${data.accounts.length} / 10)`;
+  }
+
   list.innerHTML = '';
 
   if (!data.ok || !data.accounts.length) {
@@ -311,45 +317,65 @@ if (countEl) {
   }
 
   data.accounts.forEach(acc => {
-  const row = document.createElement('div');
-  row.className = 'mini-row';
+    const row = document.createElement('div');
+    row.className = 'mini-row';
 
-  const isPrimary = Number(acc.is_primary) === 1;
+    const isPrimary = Number(acc.is_primary) === 1;
 
-  if (isPrimary) {
-    row.classList.add('primary-account');
-  }
+    if (isPrimary) {
+      row.classList.add('primary-account');
+    }
 
-  row.innerHTML = `
-    <strong>
-      ${isPrimary ? '⭐ ' : ''}Account:
-    </strong> ${acc.login}
+    // ===== PREMIUM STATUS TAG =====
+    let premiumTag = '<span class="tag muted">Premium: inactive</span>';
 
-    <span class="tag">${acc.chars_count} characters</span>
-    <span class="tag">${acc.created_at}</span>
-
-    <div class="actions">
-      ${
-        isPrimary
-          ? '<span class="tag primary">PRIMARY</span>'
-          : `<button class="btn btn-small" data-primary="${acc.login}">
-               Set primary
-             </button>`
+    if (acc.premium_days_left !== null) {
+      if (acc.premium_days_left < 0) {
+        premiumTag = '<span class="tag danger">Premium: expired</span>';
+      } else if (acc.premium_days_left <= 3) {
+        premiumTag = `
+          <span class="tag warning">
+            Premium: ${acc.premium_days_left} days left
+          </span>`;
+      } else {
+        premiumTag = `
+          <span class="tag success">
+            Premium: ${acc.premium_days_left} days left
+          </span>`;
       }
-      <button class="btn btn-small btn-danger" data-login="${acc.login}">
-        Delete
-      </button>
-      <button class="btn btn-small" data-reset="${acc.login}">
-        Change password
-      </button>
-    </div>
-  `;
+    }
 
-  list.appendChild(row);
-});
+    row.innerHTML = `
+      <strong>
+        ${isPrimary ? '⭐ ' : ''}Account:
+      </strong> ${acc.login}
 
+      <span class="tag">${acc.chars_count} characters</span>
+      ${premiumTag}
+      <span class="tag">${acc.created_at}</span>
+
+      <div class="actions">
+        ${
+          isPrimary
+            ? '<span class="tag primary">PRIMARY</span>'
+            : `<button class="btn btn-small" data-primary="${acc.login}">
+                 Set primary
+               </button>`
+        }
+        <button class="btn btn-small btn-danger" data-login="${acc.login}">
+          Delete
+        </button>
+        <button class="btn btn-small" data-reset="${acc.login}">
+          Change password
+        </button>
+      </div>
+    `;
+
+    list.appendChild(row);
+  });
 }
 </script>
+
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
