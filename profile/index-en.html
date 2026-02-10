@@ -346,30 +346,31 @@ async function loadGameAccounts() {
     }
 
     row.innerHTML = `
-      <strong>
-        ${isPrimary ? '⭐ ' : ''}Account:
-      </strong> ${acc.login}
+  <strong>
+    ${isPrimary ? '⭐ ' : ''}Account:
+  </strong> ${acc.login}
 
-      <span class="tag">${acc.chars_count} characters</span>
-      ${premiumTag}
-      <span class="tag">${acc.created_at}</span>
+  <span class="tag">${acc.chars_count} characters</span>
+  <span class="tag">${acc.created_at}</span>
+  ${premiumTag}
 
-      <div class="actions">
-        ${
-          isPrimary
-            ? '<span class="tag primary">PRIMARY</span>'
-            : `<button class="btn btn-small" data-primary="${acc.login}">
-                 Set primary
-               </button>`
-        }
-        <button class="btn btn-small btn-danger" data-login="${acc.login}">
-          Delete
-        </button>
-        <button class="btn btn-small" data-reset="${acc.login}">
-          Change password
-        </button>
-      </div>
-    `;
+  <div class="actions">
+    ${
+      isPrimary
+        ? '<span class="tag primary">PRIMARY</span>'
+        : `<button class="btn btn-small" data-primary="${acc.login}">
+             Set primary
+           </button>`
+    }
+    <button class="btn btn-small btn-danger" data-login="${acc.login}">
+      Delete
+    </button>
+    <button class="btn btn-small" data-reset="${acc.login}">
+      Change password
+    </button>
+  </div>
+`;
+
 
     list.appendChild(row);
   });
