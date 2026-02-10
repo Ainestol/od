@@ -317,3 +317,24 @@ body.auth-page.profile-page { overflow: auto; }
   line-height: 1;
   height: auto;
 }
+.char-list {
+  margin-left: 30px;
+  margin-top: 8px;
+  padding: 10px;
+  border-left: 2px solid rgba(255,215,0,0.4);
+}
+
+.char-row {
+  display: flex;
+  gap: 12px;
+  padding: 4px 0;
+  font-size: 14px;
+}
+
+.char-row .online {
+  color: #4caf50;
+}
+
+.char-row .offline {
+  color: #888;
+}
