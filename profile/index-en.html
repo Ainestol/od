@@ -690,7 +690,7 @@ document.addEventListener('click', async (e) => {
   box.innerHTML = '<div class="muted">Loading characters…</div>';
 
   try {
-    const res = await fetch(`/api/list_characters.php?account=${encodeURIComponent(login)}`);
+    const res = await fetch(`/api/list_characters_with_vip.php?account=${encodeURIComponent(login)}`);
     const data = await res.json();
 
     if (!data.ok || !data.characters.length) {
