@@ -338,10 +338,4 @@ body.auth-page.profile-page { overflow: auto; }
 .char-row .offline {
   color: #888;
 }
-.mini-row {
-  padding: 14px 16px;     /* zvětší klikací plochu */
-  line-height: 1.4;
-  display: flex;
-  align-items: center;   /* vertikální zarovnání */
-  gap: 12px;
-}
+
