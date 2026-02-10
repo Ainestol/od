@@ -707,7 +707,6 @@ document.addEventListener('click', async (e) => {
 
   const login = row.dataset.login;
   const box = document.getElementById('chars-' + login);
-
   if (!box) return;
 
   /* toggle */
@@ -721,8 +720,10 @@ document.addEventListener('click', async (e) => {
   box.innerHTML = '<div class="muted">Loading characters…</div>';
 
   try {
+    /* 1️⃣ načteme VIP mapu */
     const vipMap = await loadVipMap(login);
 
+    /* 2️⃣ načteme postavy (původní API) */
     const res = await fetch(`/api/list_characters.php?account=${encodeURIComponent(login)}`);
     const data = await res.json();
 
@@ -733,27 +734,34 @@ document.addEventListener('click', async (e) => {
 
     box.innerHTML = '';
 
+    /* 3️⃣ vykreslení postav */
     data.characters.forEach(ch => {
-  const el = document.createElement('div');
-  el.className = 'char-row';
+      const el = document.createElement('div');
+      el.className = 'char-row';
 
-  el.innerHTML = `
-    <span><strong>${ch.char_name}</strong></span>
-    <span>Lv ${ch.level}</span>
-    <span class="${ch.online ? 'online' : 'offline'}">
-      ${ch.online ? 'ONLINE' : 'offline'}
-    </span>
-  `;
+      const hasVip = vipMap[ch.charId];
+      const vipTag = hasVip
+        ? '<span class="tag vip">VIP</span>'
+        : '';
 
-  box.appendChild(el);
-});
+      el.innerHTML = `
+        <span><strong>${ch.char_name}</strong></span>
+        <span>Lv ${ch.level}</span>
+        <span class="${ch.online ? 'online' : 'offline'}">
+          ${ch.online ? 'ONLINE' : 'offline'}
+        </span>
+        ${vipTag}
+      `;
 
+      box.appendChild(el);
+    });
 
   } catch (err) {
     box.innerHTML = '<div class="form-error">Failed to load characters</div>';
   }
 });
 </script>
+
 
 </body>
 </html>
