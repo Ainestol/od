@@ -685,6 +685,22 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 
 <script>
+async function loadVipMap(login) {
+  const res = await fetch(`/api/list_characters_with_vip.php?account=${encodeURIComponent(login)}`);
+  const data = await res.json();
+
+  const map = {};
+  if (data.ok && Array.isArray(data.characters)) {
+    data.characters.forEach(ch => {
+      map[ch.charId] = !!ch.has_vip;
+    });
+  }
+  return map;
+}
+</script>
+
+
+<script>
 document.addEventListener('click', async (e) => {
   const row = e.target.closest('.account-row');
   if (!row) return;
@@ -705,6 +721,8 @@ document.addEventListener('click', async (e) => {
   box.innerHTML = '<div class="muted">Loading characters…</div>';
 
   try {
+    const vipMap = await loadVipMap(login);
+
     const res = await fetch(`/api/list_characters.php?account=${encodeURIComponent(login)}`);
     const data = await res.json();
 
@@ -716,19 +734,20 @@ document.addEventListener('click', async (e) => {
     box.innerHTML = '';
 
     data.characters.forEach(ch => {
-      const el = document.createElement('div');
-      el.className = 'char-row';
+  const el = document.createElement('div');
+  el.className = 'char-row';
 
-      el.innerHTML = `
-        <span><strong>${ch.char_name}</strong></span>
-        <span>Lv ${ch.level}</span>
-        <span class="${ch.online ? 'online' : 'offline'}">
-          ${ch.online ? 'ONLINE' : 'offline'}
-        </span>
-      `;
+  el.innerHTML = `
+    <span><strong>${ch.char_name}</strong></span>
+    <span>Lv ${ch.level}</span>
+    <span class="${ch.online ? 'online' : 'offline'}">
+      ${ch.online ? 'ONLINE' : 'offline'}
+    </span>
+  `;
 
-      box.appendChild(el);
-    });
+  box.appendChild(el);
+});
+
 
   } catch (err) {
     box.innerHTML = '<div class="form-error">Failed to load characters</div>';
