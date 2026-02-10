@@ -346,30 +346,26 @@ async function loadGameAccounts() {
     }
 
     row.innerHTML = `
-  <strong>
-    ${isPrimary ? '⭐ ' : ''}Account:
-  </strong> ${acc.login}
+  <div class="account-row" data-login="${acc.login}">
+    <strong>${isPrimary ? '⭐ ' : ''}Account:</strong> ${acc.login}
 
-  <span class="tag">${acc.chars_count} characters</span>
-  <span class="tag">${acc.created_at}</span>
-  ${premiumTag}
+    <span class="tag">${acc.chars_count} characters</span>
+    ${premiumTag}
+    <span class="tag">${acc.created_at}</span>
 
-  <div class="actions">
-    ${
-      isPrimary
+    <div class="actions">
+      ${isPrimary
         ? '<span class="tag primary">PRIMARY</span>'
-        : `<button class="btn btn-small" data-primary="${acc.login}">
-             Set primary
-           </button>`
-    }
-    <button class="btn btn-small btn-danger" data-login="${acc.login}">
-      Delete
-    </button>
-    <button class="btn btn-small" data-reset="${acc.login}">
-      Change password
-    </button>
+        : `<button class="btn btn-small" data-primary="${acc.login}">Set primary</button>`
+      }
+      <button class="btn btn-small btn-danger" data-login="${acc.login}">Delete</button>
+      <button class="btn btn-small" data-reset="${acc.login}">Change password</button>
+    </div>
   </div>
+
+  <div class="char-list hidden" id="chars-${acc.login}"></div>
 `;
+
 
 
     list.appendChild(row);
@@ -670,6 +666,59 @@ document.addEventListener('DOMContentLoaded', () => {
         box.appendChild(row);
       });
     });
+});
+</script>
+
+<script>
+document.addEventListener('click', async (e) => {
+  const row = e.target.closest('.account-row');
+  if (!row) return;
+
+  const login = row.dataset.login;
+  const box = document.getElementById('chars-' + login);
+
+  if (!box) return;
+
+  /* toggle */
+  if (!box.classList.contains('hidden')) {
+    box.classList.add('hidden');
+    box.innerHTML = '';
+    return;
+  }
+
+  box.classList.remove('hidden');
+  box.innerHTML = '<div class="muted">Loading characters…</div>';
+
+  try {
+    const res = await fetch(`/api/list_characters.php?account=${encodeURIComponent(login)}`);
+    const data = await res.json();
+
+    if (!data.ok || !data.characters.length) {
+      box.innerHTML = '<div class="muted">No characters</div>';
+      return;
+    }
+
+    box.innerHTML = '';
+
+    data.characters.forEach(ch => {
+      const el = document.createElement('div');
+      el.className = 'char-row';
+
+      el.innerHTML = `
+        <span><strong>${ch.char_name}</strong></span>
+        <span>Lv ${ch.level}</span>
+        <span>${ch.classid}</span>
+        <span class="${ch.online ? 'online' : 'offline'}">
+          ${ch.online ? 'ONLINE' : 'offline'}
+        </span>
+      `;
+
+      box.appendChild(el);
+    });
+
+  } catch (err) {
+    box.innerHTML = '<div class="form-error">Failed to load characters</div>';
+  }
 });
 </script>
 
