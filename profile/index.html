@@ -128,6 +128,33 @@
       <div class="link-list">
   <div class="muted">Načítám hlasování…</div>
 </div>
+  <hr style="margin:20px 0;">
+
+<button id="openVipModal" class="btn btn-primary">
+  Activate VIP 24h
+</button>
+
+<div id="vipModal" class="modal hidden">
+  <div class="modal-box">
+    <h3>Activate VIP 24 Hours</h3>
+
+    <label>Character</label>
+    <select id="vipCharSelect"></select>
+
+    <label>Currency</label>
+    <select id="vipCurrency">
+      <option value="VOTE_COIN">4 Vote Coin</option>
+      <option value="DC">1 Dragon Coin</option>
+    </select>
+
+    <div class="modal-actions">
+      <button id="vipCancel" class="btn">Cancel</button>
+      <button id="vipConfirm" class="btn btn-primary">
+        Activate
+      </button>
+    </div>
+  </div>
+</div>
     </section>
 
       <section id="donate" class="profile-card panel">
@@ -899,6 +926,63 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
+<script>
+async function loadAllCharactersForVip() {
+  const select = document.getElementById('vipCharSelect');
+  select.innerHTML = '';
+
+  const resAcc = await fetch('/api/list_game_accounts.php');
+  const dataAcc = await resAcc.json();
+  if (!dataAcc.ok) return;
+
+  for (const acc of dataAcc.accounts) {
+    const resChar = await fetch(`/api/list_characters.php?account=${encodeURIComponent(acc.login)}`);
+    const dataChar = await resChar.json();
+    if (!dataChar.ok) continue;
+
+    dataChar.characters.forEach(ch => {
+      const opt = document.createElement('option');
+      opt.value = ch.charId;
+      opt.textContent = `${ch.char_name} (Lv ${ch.level})`;
+      select.appendChild(opt);
+    });
+  }
+}
+
+document.getElementById('openVipModal')?.addEventListener('click', async () => {
+  await loadAllCharactersForVip();
+  document.getElementById('vipModal').classList.remove('hidden');
+});
+
+document.getElementById('vipCancel')?.addEventListener('click', () => {
+  document.getElementById('vipModal').classList.add('hidden');
+});
+
+document.getElementById('vipConfirm')?.addEventListener('click', async () => {
+  const charId = document.getElementById('vipCharSelect').value;
+  const currency = document.getElementById('vipCurrency').value;
+
+  const res = await fetch('/api/activate_vip_24h.php', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({
+      char_id: charId,
+      currency: currency
+    })
+  });
+
+  const data = await res.json();
+
+  if (data.ok) {
+    alert('VIP Activated!');
+    document.getElementById('vipModal').classList.add('hidden');
+    loadVoteBalance();
+    loadDcBalance();
+  } else {
+    alert('Activation failed.');
+  }
+});
+</script>
 
 
 </body>
