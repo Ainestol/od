@@ -129,15 +129,16 @@
   <div class="muted">Načítám hlasování…</div>
 </div>
   <hr style="margin:20px 0;">
-
+  <button id="convertVcToDc" class="btn">
+    Převod 4 Vote Coin → 1 Dragon Coin
+  </button>
 <button id="openVipModal" class="btn btn-primary">
-  Activate VIP 24h
+  Activace VIP 24h
 </button>
 
 <div id="vipModal" class="modal hidden">
   <div class="modal-box">
     <h3>Activate VIP 24 Hours</h3>
-
     <label>Character</label>
     <select id="vipCharSelect"></select>
 
@@ -980,6 +981,35 @@ document.getElementById('vipConfirm')?.addEventListener('click', async () => {
     loadDcBalance();
   } else {
     alert('Activation failed.');
+  }
+});
+</script>
+
+<script>
+document.getElementById('convertVcToDc')?.addEventListener('click', async () => {
+
+  if (!confirm('Convert 4 Vote Coin into 1 Dragon Coin?')) {
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/convert_vc_to_dc.php', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'}
+    });
+
+    const data = await res.json();
+
+    if (data.ok) {
+      alert('Conversion successful!');
+      loadVoteBalance();
+      loadDcBalance();
+    } else {
+      alert(data.error || 'Conversion failed.');
+    }
+
+  } catch (err) {
+    alert('Server error.');
   }
 });
 </script>
