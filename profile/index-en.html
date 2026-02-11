@@ -126,7 +126,7 @@
   <div class="muted">Loading votes…</div>
 </div>
 <hr style="margin:20px 0;">
-<button id="convertVcToDc" class="btn">
+<button id="convertVcToDc" class="btn btn-primary">
     Convert 4 Vote Coin → 1 Dragon Coin
   </button>
 <button id="openVipModal" class="btn btn-primary">
@@ -941,38 +941,58 @@ document.getElementById('vipCancel')?.addEventListener('click', () => {
   document.getElementById('vipModal').classList.add('hidden');
 });
 
-document.getElementById('vipConfirm')?.addEventListener('click', async () => {
+document.getElementById('vipConfirm')?.addEventListener('click', async (e) => {
+
+  const btn = e.target;
+  if (btn.disabled) return;
+
+  btn.disabled = true;
+  btn.textContent = 'Activating...';
+
   const charId = document.getElementById('vipCharSelect').value;
   const currency = document.getElementById('vipCurrency').value;
 
-  const res = await fetch('/api/activate_vip_24h.php', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({
-      char_id: charId,
-      currency: currency
-    })
-  });
+  try {
+    const res = await fetch('/api/activate_vip_24h.php', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        char_id: charId,
+        currency: currency
+      })
+    });
 
-  const data = await res.json();
+    const data = await res.json();
 
-  if (data.ok) {
-    alert('VIP Activated!');
-    document.getElementById('vipModal').classList.add('hidden');
-    loadVoteBalance();
-    loadDcBalance();
-  } else {
-    alert('Activation failed.');
+    if (data.ok) {
+      document.getElementById('vipModal').classList.add('hidden');
+      loadVoteBalance();
+      loadDcBalance();
+    } else {
+      alert(data.error || 'Activation failed.');
+    }
+
+  } catch (err) {
+    alert('Server error.');
   }
+
+  btn.disabled = false;
+  btn.textContent = 'Activate';
 });
 </script>
 
 <script>
-document.getElementById('convertVcToDc')?.addEventListener('click', async () => {
+document.getElementById('convertVcToDc')?.addEventListener('click', async (e) => {
+
+  const btn = e.target;
+  if (btn.disabled) return;
 
   if (!confirm('Convert 4 Vote Coin into 1 Dragon Coin?')) {
     return;
   }
+
+  btn.disabled = true;
+  btn.textContent = 'Processing...';
 
   try {
     const res = await fetch('/api/convert_vc_to_dc.php', {
@@ -983,7 +1003,6 @@ document.getElementById('convertVcToDc')?.addEventListener('click', async () => 
     const data = await res.json();
 
     if (data.ok) {
-      alert('Conversion successful!');
       loadVoteBalance();
       loadDcBalance();
     } else {
@@ -993,6 +1012,9 @@ document.getElementById('convertVcToDc')?.addEventListener('click', async () => 
   } catch (err) {
     alert('Server error.');
   }
+
+  btn.disabled = false;
+  btn.textContent = 'Convert 4 Vote Coin → 1 Dragon Coin';
 });
 </script>
 
