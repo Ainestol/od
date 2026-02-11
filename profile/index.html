@@ -120,6 +120,9 @@
       <div id="voteBalance" class="wallet-balance">
   Vote Coin: <strong>0</strong>
 </div>
+<div id="dcBalance" class="wallet-balance">
+  Dragon Coin: <strong>0</strong>
+</div>
       <p class="muted">Odkazy na hlasování budou zde (4–5 webů).</p>
 
       <div class="link-list">
@@ -873,8 +876,29 @@ async function loadVoteBalance() {
   }
 }
 
-document.addEventListener('DOMContentLoaded', loadVoteBalance);
+async function loadDcBalance() {
+  try {
+    const res = await fetch('/api/get_wallet_balance.php?currency=DC');
+    const data = await res.json();
+    if (!data.ok) return;
+
+    const el = document.querySelector('#dcBalance strong');
+    if (el) {
+      el.textContent = data.balance;
+    }
+
+  } catch (err) {
+    console.error('DC balance error:', err);
+  }
+}
+
+/* 🔄 načtení obou při startu stránky */
+document.addEventListener('DOMContentLoaded', () => {
+  loadVoteBalance();
+  loadDcBalance();
+});
 </script>
+
 
 
 </body>
