@@ -967,6 +967,34 @@ document.getElementById('vipConfirm')?.addEventListener('click', async () => {
 });
 </script>
 
+<script>
+document.getElementById('convertVcToDc')?.addEventListener('click', async () => {
+
+  if (!confirm('Convert 4 Vote Coin into 1 Dragon Coin?')) {
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/convert_vc_to_dc.php', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'}
+    });
+
+    const data = await res.json();
+
+    if (data.ok) {
+      alert('Conversion successful!');
+      loadVoteBalance();
+      loadDcBalance();
+    } else {
+      alert(data.error || 'Conversion failed.');
+    }
+
+  } catch (err) {
+    alert('Server error.');
+  }
+});
+</script>
 
 </body>
 </html>
