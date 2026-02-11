@@ -114,6 +114,9 @@
 
     <section id="vote" class="profile-card panel">
       <h2>Server vote</h2>
+      <div id="voteBalance" class="wallet-balance">
+  Vote Coin: <strong>0</strong>
+</div>
       <p class="muted">Vote links will appear here (4–5 sites).</p>
 
       <div class="link-list">
@@ -815,9 +818,10 @@ document.addEventListener('click', async (e) => {
       const data = await res.json();
 
       if (data.ok) {
-        alert('Vote Coin připsán!');
-        loadVoteSites();
-      } else if (data.error === 'COOLDOWN') {
+  alert('Vote Coin credited!');
+  loadVoteSites();
+  loadVoteBalance();
+} else if (data.error === 'COOLDOWN') {
         alert('Vote je v cooldownu.');
       } else {
         alert('Hlasování se nepodařilo.');
@@ -832,6 +836,26 @@ document.addEventListener('click', async (e) => {
 
 /* inicializace */
 document.addEventListener('DOMContentLoaded', loadVoteSites);
+</script>
+
+<script>
+async function loadVoteBalance() {
+  try {
+    const res = await fetch('/api/get_wallet_balance.php?currency=VOTE_COIN');
+    const data = await res.json();
+    if (!data.ok) return;
+
+    const el = document.querySelector('#voteBalance strong');
+    if (el) {
+      el.textContent = data.balance;
+    }
+
+  } catch (err) {
+    console.error('Vote balance error:', err);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadVoteBalance);
 </script>
 
 
