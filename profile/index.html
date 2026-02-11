@@ -120,11 +120,8 @@
       <p class="muted">Odkazy na hlasování budou zde (4–5 webů).</p>
 
       <div class="link-list">
-        <a href="#" class="link-item">Hlasování #1</a>
-        <a href="#" class="link-item">Hlasování #2</a>
-        <a href="#" class="link-item">Hlasování #3</a>
-        <a href="#" class="link-item">Hlasování #4</a>
-      </div>
+  <div class="muted">Načítám hlasování…</div>
+</div>
     </section>
 
       <section id="donate" class="profile-card panel">
@@ -761,6 +758,100 @@ document.addEventListener('click', async (e) => {
   }
 });
 </script>
+
+<script>
+let voteCache = [];
+
+/* Načtení vote webů */
+async function loadVoteSites() {
+  try {
+    const res = await fetch('/api/vote_status.php');
+    const data = await res.json();
+    if (!data.ok) return;
+
+    voteCache = data.sites;
+
+    const box = document.querySelector('#vote .link-list');
+    if (!box) return;
+
+    box.innerHTML = '';
+
+    if (!voteCache.length) {
+      box.innerHTML = '<div class="muted">Žádné aktivní vote weby.</div>';
+      return;
+    }
+
+    voteCache.forEach(site => {
+      const el = document.createElement('div');
+
+      const status = site.remaining > 0
+        ? `${Math.ceil(site.remaining / 3600)}h`
+        : 'READY';
+
+      const disabled = site.remaining > 0 ? 'disabled' : '';
+
+      el.innerHTML = `
+        <button class="btn vote-btn" data-id="${site.id}" ${disabled}>
+          ${site.name} – ${status}
+        </button>
+      `;
+
+      box.appendChild(el);
+    });
+
+  } catch (err) {
+    console.error('Vote load error:', err);
+  }
+}
+
+/* Kliknutí na vote */
+document.addEventListener('click', async (e) => {
+  const btn = e.target.closest('.vote-btn');
+  if (!btn) return;
+
+  const id = btn.dataset.id;
+  const site = voteCache.find(s => s.id == id);
+  if (!site) return;
+
+  /* otevřeme vote stránku */
+  window.open(site.url, '_blank');
+
+  /* malá pauza aby uživatel fakt odešel */
+  setTimeout(async () => {
+
+    const confirmVote = confirm('Potvrdit hlasování?');
+
+    if (!confirmVote) return;
+
+    try {
+      const res = await fetch('/api/vote_confirm.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ site_id: id })
+      });
+
+      const data = await res.json();
+
+      if (data.ok) {
+        alert('Vote Coin připsán!');
+        loadVoteSites();
+      } else if (data.error === 'COOLDOWN') {
+        alert('Vote je v cooldownu.');
+      } else {
+        alert('Hlasování se nepodařilo.');
+      }
+
+    } catch (err) {
+      console.error('Vote confirm error:', err);
+    }
+
+  }, 3000); // 3 sekundy čekání
+});
+
+/* inicializace */
+document.addEventListener('DOMContentLoaded', loadVoteSites);
+</script>
+
 
 
 </body>
