@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin – Economy</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="admin-page">
+
+<h1>Economy Panel</h1>
+
+<div class="admin-card">
+
+  <label>Email uživatele</label>
+  <input type="text" id="searchEmail">
+  <button id="searchUser" class="btn btn-primary">Hledat</button>
+
+</div>
+
+<div id="userResult" class="admin-card hidden">
+
+  <h3 id="userEmail"></h3>
+
+  <div>
+    Vote Coin: <strong id="adminVC">0</strong><br>
+    Dragon Coin: <strong id="adminDC">0</strong>
+  </div>
+
+  <hr>
+
+  <h4>Upravit měnu</h4>
+
+  <select id="currencySelect">
+    <option value="VOTE_COIN">Vote Coin</option>
+    <option value="DC">Dragon Coin</option>
+  </select>
+
+  <input type="number" id="amountInput" placeholder="částka">
+
+  <button id="adjustBalance" class="btn">
+    Provést změnu
+  </button>
+
+  <hr>
+
+  <h4>Ledger historie</h4>
+  <div id="ledgerList"></div>
+
+</div>
+
+<script src="/admin/js/economy.js"></script>
+
+</body>
+</html>
