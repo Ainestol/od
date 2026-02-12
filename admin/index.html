@@ -7,30 +7,15 @@
     <link rel="stylesheet" href="/css/admin.css">
 </head>
 
-<body class="auth-page profile-page admin-content">
+<body class="admin-page">
 
-    <script>
-fetch('/api/me.php')
-  .then(r => r.json())
-  .then(me => {
-    if (!me.ok || me.role !== 'admin') {
-      window.location.href = '/profile/index.html';
-    }
-  });
-</script>
+<div id="adminHeader"></div>
 
+<main class="auth-container">
 
-
-<header class="main-header">
-  <div class="logo"><a href="/">Ordo Draconis</a></div>
-  <div class="auth">
-    <a href="/profile/index.html" class="btn">Profil</a>
-    <a href="/api/logout.php" class="btn">Odhlásit</a>
-  </div>
-</header>
-
-<main class="auth-container profile-shell">
-  <h1>Admin panel</h1>
+  <section class="admin-card">
+    <h2>Admin Dashboard</h2>
+  </section>
 
   <div class="admin-grid">
 
@@ -41,30 +26,42 @@ fetch('/api/me.php')
     </div>
 
     <div class="admin-card">
-  <h3>VIP & Wallet</h3>
-  <p>Správa VIP, DC a uživatelských výhod</p>
-  <a href="/admin/vip.html" class="btn btn-primary">Otevřít</a>
-</div>
+      <h3>VIP & Wallet</h3>
+      <p>Správa VIP, DC a uživatelských výhod</p>
+      <a href="/admin/vip.html" class="btn btn-primary">Otevřít</a>
+    </div>
 
     <div class="admin-card">
       <h3>Online players</h3>
       <p>Aktuálně přihlášení hráči</p>
       <a href="/admin/online_players.html" class="btn btn-primary">Otevřít</a>
     </div>
-<div class="admin-card">
+
+    <div class="admin-card">
       <h3>Ekonomika</h3>
-      <p>Pro úpravu měny</p>
+      <p>Úprava měny a ledger</p>
       <a href="/admin/economy.html" class="btn btn-primary">Otevřít</a>
     </div>
-  <div class="admin-card">
-      <h3>Přehled WEB - GAME - CHARACTERS</h3>
-      <p>Správa VIP účtů </p>
+
+    <div class="admin-card">
+      <h3>Uživatelé</h3>
+      <p>Přehled WEB → GAME → CHAR</p>
       <a href="/admin/users.html" class="btn btn-primary">Otevřít</a>
     </div>
 
   </div>
+
 </main>
 
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  const res = await fetch('/api/me.php');
+  const me = await res.json();
+  if (!me.ok || me.role !== 'admin') {
+    window.location.replace('/profile/index.html');
+  }
+});
+</script>
 
 </body>
 </html>
