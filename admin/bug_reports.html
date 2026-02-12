@@ -68,21 +68,22 @@ function renderTable() {
     const tr = document.createElement('tr');
     tr.style.cursor = 'pointer';
 
-    const statusClass = 'status-' + t.status.toLowerCase;
+    const normalizedStatus = t.status.toLowerCase().replace(' ', '_');
+const statusClass = 'status-' + normalizedStatus;
 
-    tr.innerHTML = `
-      <td>${t.id}</td>
-      <td>${t.email}</td>
-      <td>${t.game_account ? t.game_account : '-'}</td>
-      <td>${t.category}</td>
-      <td>${t.title}</td>
-      <td>
-        <span class="status-badge ${statusClass}">
-          ${t.status.replace('_', ' ').toUpperCase()}
-        </span>
-      </td>
-      <td>${t.created_at}</td>
-    `;
+tr.innerHTML = `
+  <td>${t.id}</td>
+  <td>${t.email}</td>
+  <td>${t.game_account ? t.game_account : '-'}</td>
+  <td>${t.category}</td>
+  <td>${t.title}</td>
+  <td>
+    <span class="status-badge ${statusClass}">
+      ${t.status.toUpperCase()}
+    </span>
+  </td>
+  <td>${t.created_at}</td>
+`;
 
     tr.addEventListener('click', () => {
       window.location.href = `/admin/bug_detail.html?id=${t.id}`;
