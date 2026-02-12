@@ -8,18 +8,7 @@
 
 <body class="admin-page">
 
-<header class="main-header">
-    <div class="logo">
-        <a href="/admin/index.html">ORDO DRACONIS – ADMIN</a>
-    </div>
-    <div class="auth">
-        <a href="/admin/index.html" class="btn">Dashboard</a>
-        <a href="/admin/users.html" class="btn">Uživatelé</a>
-        <a href="/admin/vip.html" class="btn">VIP</a>
-        <a href="/admin/bug_reports.html" class="btn btn-secondary">Bug reports</a>
-        <a href="/api/logout.php" class="btn">Odhlásit</a>
-    </div>
-</header>
+<div id="adminHeader"></div>
 
 <main class="auth-container">
 
@@ -67,6 +56,40 @@
 </main>
 
 <script src="/admin/js/bug_admin_detail.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  fetch('/admin/partials/admin_header.html')
+    .then(r => r.text())
+    .then(html => {
+      const container = document.getElementById('adminHeader');
+      if (!container) return;
+
+      container.innerHTML = html;
+
+      // 🔹 zvýraznění aktuální stránky
+      const links = container.querySelectorAll('.auth a');
+
+      links.forEach(link => {
+        const linkPath = new URL(link.href).pathname;
+        const currentPath = window.location.pathname;
+
+        if (linkPath === currentPath) {
+          link.classList.remove('btn');
+          link.classList.add('btn-primary');
+        }
+      });
+
+    })
+    .catch(err => {
+      console.error('Admin header load error:', err);
+    });
+
+});
+</script>
+
+
 
 </body>
 
