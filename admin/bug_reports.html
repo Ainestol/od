@@ -68,7 +68,7 @@ function renderTable() {
     const tr = document.createElement('tr');
     tr.style.cursor = 'pointer';
 
-    const statusClass = 'status-' + t.status;
+    const statusClass = 'status-' + t.status.toLowerCase;
 
     tr.innerHTML = `
       <td>${t.id}</td>
