@@ -6,65 +6,68 @@
   <link rel="stylesheet" href="/css/admin.css">
 </head>
 
-<body class="auth-page profile-page admin-content">
-
+<body class="admin-page">
 
 <header class="main-header">
-  <div class="logo"><a href="/">Ordo Draconis</a></div>
-  <div class="auth">
-    <a href="/admin/index.html" class="btn">Admin</a>
-    <a href="/api/logout.php" class="btn">Odhlásit</a>
-  </div>
+    <div class="logo">
+        <a href="/admin/index.html">ORDO DRACONIS – ADMIN</a>
+    </div>
+    <div class="auth">
+        <a href="/admin/index.html" class="btn">Dashboard</a>
+        <a href="/admin/users.html" class="btn">Uživatelé</a>
+        <a href="/admin/vip.html" class="btn">VIP</a>
+        <a href="/admin/bug_reports.html" class="btn btn-secondary">Bug reports</a>
+        <a href="/api/logout.php" class="btn">Odhlásit</a>
+    </div>
 </header>
 
-<main class="auth-container profile-shell">
+<main class="auth-container">
 
-  <h1 id="bugTitle">Bug detail</h1>
+    <section class="admin-card">
 
-  <a href="/admin/bug_reports.html" class="btn btn-secondary" style="margin-bottom:20px;">
-    ← Zpět na přehled bug reportů
-  </a>
+        <h2 id="bugTitle">Bug detail</h2>
 
-  <div class="profile-card">
+        <p><strong>User:</strong> <span id="bugUser"></span></p>
+        <p><strong>Account:</strong> <span id="bugAccount"></span></p>
+        <p><strong>Category:</strong> <span id="bugCategory"></span></p>
 
-    <p><strong>User:</strong> <span id="bugUser"></span></p>
-    <p><strong>Account:</strong> <span id="bugAccount"></span></p>
-    <p><strong>Category:</strong> <span id="bugCategory"></span></p>
-<div id="statusBadge" class="status-badge status-new">
-  NEW
-</div>
-    <label>Status</label>
-    <select id="bugStatus">
-      <option value="new">NEW</option>
-      <option value="in_progress">IN PROGRESS</option>
-      <option value="resolved">RESOLVED</option>
-      <option value="closed">CLOSED</option>
-    </select>
+        <div id="statusBadge" class="status-badge status-new">
+            NEW
+        </div>
 
-    <!-- USER MESSAGE -->
-    <div class="bug-user-message" style="margin-top:20px;">
-      <h3>Reported issue (user message)</h3>
-      <pre id="bugUserMessage" class="profile-card muted"></pre>
-    </div>
+        <label>Status</label>
+        <select id="bugStatus">
+            <option value="new">NEW</option>
+            <option value="in_progress">IN PROGRESS</option>
+            <option value="resolved">RESOLVED</option>
+            <option value="closed">CLOSED</option>
+        </select>
 
-    <!-- ADMIN REPLY -->
-    <label style="margin-top:20px;">Admin reply</label>
-    <div id="messageHistory"></div>
+        <hr style="margin:20px 0;">
 
-<textarea id="adminMessage" rows="4"
-  placeholder="Napiš odpověď…"></textarea>
+        <h3>Reported issue (user message)</h3>
+        <div class="bug-user-message">
+            <pre id="bugUserMessage"></pre>
+        </div>
 
-<button id="saveBtn" class="btn btn-primary">
-  Uložit
-</button>
+        <hr style="margin:20px 0;">
 
+        <h3>Admin reply</h3>
+        <div id="messageHistory"></div>
 
-  </div>
+        <textarea id="adminMessage" rows="4"
+            placeholder="Napiš odpověď…"></textarea>
+
+        <button id="saveBtn" class="btn btn-primary">
+            Uložit
+        </button>
+
+    </section>
 
 </main>
 
-<script src="bug_admin_detail.js"></script>
-
+<script src="/admin/js/bug_admin_detail.js"></script>
 
 </body>
+
 </html>
