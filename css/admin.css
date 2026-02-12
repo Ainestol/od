@@ -234,8 +234,8 @@ input:focus, select:focus {
   border-radius: 4px;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #555;
+@supports selector(::-webkit-scrollbar) {
+  ::-webkit-scrollbar { width: 8px; }
 }
 /* ===== ADMIN STATUS BADGES ===== */
 
