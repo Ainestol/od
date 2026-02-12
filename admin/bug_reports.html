@@ -10,18 +10,7 @@
 
 <body class="admin-page">
 
-<header class="main-header">
-    <div class="logo">
-        <a href="/admin/index.html">ORDO DRACONIS – ADMIN</a>
-    </div>
-    <div class="auth">
-        <a href="/admin/index.html" class="btn">Dashboard</a>
-        <a href="/admin/users.html" class="btn">Uživatelé</a>
-        <a href="/admin/vip.html" class="btn">VIP</a>
-        <a href="/profile/index.html" class="btn btn-secondary">Profil</a>
-        <a href="/api/logout.php" class="btn">Odhlásit</a>
-    </div>
-</header>
+<div id="adminHeader"></div>
 
 <main class="auth-container">
 
@@ -83,6 +72,13 @@ fetch('/admin/api/list_bug_reports.php')
 
       tbody.appendChild(tr);
     });
+  });
+</script>
+<script>
+fetch('/admin/partials/admin_header.html')
+  .then(r => r.text())
+  .then(html => {
+    document.getElementById('adminHeader').innerHTML = html;
   });
 </script>
 
