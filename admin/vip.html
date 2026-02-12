@@ -13,58 +13,60 @@
     <script src="/admin/js/vip_admin.js" defer></script>
 
 </head>
-<body>
+<body class="admin-page">
 
-<header>
-    <h1>Admin – VIP správa</h1>
-    <nav>
-        <a href="/admin/index.html">Dashboard</a>
-        <a href="/admin/bug_reports.html">Bug reporty</a>
-        <a href="/admin/vip.html" class="active">VIP</a>
-    </nav>
+<header class="main-header">
+    <div class="logo">
+        <a href="/admin/index.html">ORDO DRACONIS – ADMIN</a>
+    </div>
+    <div class="auth">
+        <a href="/admin/index.html" class="btn">Dashboard</a>
+        <a href="/admin/bug_reports.html" class="btn">Bug reporty</a>
+        <a href="/admin/vip.html" class="btn btn-primary">VIP</a>
+    </div>
 </header>
 
-<main>
+<main class="auth-container">
 
-    <!-- === RUČNÍ PŘIDÁNÍ VIP === -->
-    <section>
+    <!-- RUČNÍ PŘIDÁNÍ VIP -->
+    <section class="admin-card">
         <h2>Přidat VIP</h2>
 
-        <label>Scope:</label>
+        <label>Scope</label>
         <select id="vipScope">
             <option value="WEB">WEB</option>
             <option value="GAME">GAME</option>
             <option value="CHAR">CHAR</option>
         </select>
 
-        <label>Target ID:</label>
+        <label>Target ID</label>
         <input type="number" id="vipTargetId">
 
-        <label>Level:</label>
+        <label>Level</label>
         <input type="number" id="vipLevelId" value="2">
 
-        <label>Dní:</label>
+        <label>Dní</label>
         <input type="number" id="vipDays" value="30">
 
-        <button id="vipAddBtn">Přidat VIP</button>
+        <button id="vipAddBtn" class="btn btn-primary">Přidat VIP</button>
 
-        <div id="vipAddResult" class="result"></div>
+        <div id="vipAddResult"></div>
     </section>
-    
-<label style="display:block; margin:10px 0;">
-    <input type="checkbox" id="showExpiredVip">
-    Zobrazit i expirované VIP
-</label>
 
-    <hr>
+    <div style="margin:20px 0;">
+        <label>
+            <input type="checkbox" id="showExpiredVip">
+            Zobrazit i expirované VIP
+        </label>
+    </div>
 
-    <!-- === PŘEHLED VIP === -->
-    <section>
+    <!-- PŘEHLED VIP -->
+    <section class="admin-card">
         <h2>Aktivní VIP</h2>
 
-        <button id="vipReloadBtn">Načíst VIP</button>
+        <button id="vipReloadBtn" class="btn">Načíst VIP</button>
 
-        <table>
+        <table class="admin-table">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -82,4 +84,5 @@
 </main>
 
 </body>
+
 </html>
