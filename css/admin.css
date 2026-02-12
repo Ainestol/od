@@ -278,3 +278,7 @@ input:focus, select:focus {
   background: rgba(212,175,55,0.06);
   cursor: pointer;
 }
+body.admin-page,
+body.admin-content {
+    overflow: auto;
+}
