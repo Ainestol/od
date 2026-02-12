@@ -26,7 +26,9 @@
                     <th>Category</th>
                     <th>Title</th>
                     <th>Status</th>
-                    <th>Created</th>
+                    <th id="sortCreated" style="cursor:pointer;">
+                    Created ▲▼
+                    </th>
                 </tr>
             </thead>
             <tbody></tbody>
@@ -36,6 +38,9 @@
 </main>
 
 <script>
+let ticketsData = [];
+let sortAsc = false; // default: nejnovější nahoře
+
 fetch('/admin/api/list_bug_reports.php')
   .then(r => {
     if (!r.ok) throw new Error();
@@ -44,36 +49,58 @@ fetch('/admin/api/list_bug_reports.php')
   .then(data => {
     if (!data.ok) return;
 
-    const tbody = document.querySelector('#ticketsTable tbody');
-
-    data.tickets.forEach(t => {
-      const tr = document.createElement('tr');
-      tr.style.cursor = 'pointer';
-
-      const statusClass = 'status-' + t.status;
-
-      tr.innerHTML = `
-  <td>${t.id}</td>
-  <td>${t.email}</td>
-  <td>${t.game_account ? t.game_account : '-'}</td>
-  <td>${t.category}</td>
-  <td>${t.title}</td>
-  <td>
-    <span class="status-badge ${statusClass}">
-      ${t.status.replace('_', ' ').toUpperCase()}
-    </span>
-  </td>
-  <td>${t.created_at}</td>
-`;
-
-      tr.addEventListener('click', () => {
-  window.location.href = `/admin/bug_detail.html?id=${t.id}`;
-});
-
-      tbody.appendChild(tr);
-    });
+    ticketsData = data.tickets;
+    renderTable();
   });
+
+function renderTable() {
+  const tbody = document.querySelector('#ticketsTable tbody');
+  tbody.innerHTML = '';
+
+  // řazení podle created_at
+  ticketsData.sort((a, b) => {
+    const dateA = new Date(a.created_at);
+    const dateB = new Date(b.created_at);
+    return sortAsc ? dateA - dateB : dateB - dateA;
+  });
+
+  ticketsData.forEach(t => {
+    const tr = document.createElement('tr');
+    tr.style.cursor = 'pointer';
+
+    const statusClass = 'status-' + t.status;
+
+    tr.innerHTML = `
+      <td>${t.id}</td>
+      <td>${t.email}</td>
+      <td>${t.game_account ? t.game_account : '-'}</td>
+      <td>${t.category}</td>
+      <td>${t.title}</td>
+      <td>
+        <span class="status-badge ${statusClass}">
+          ${t.status.replace('_', ' ').toUpperCase()}
+        </span>
+      </td>
+      <td>${t.created_at}</td>
+    `;
+
+    tr.addEventListener('click', () => {
+      window.location.href = `/admin/bug_detail.html?id=${t.id}`;
+    });
+
+    tbody.appendChild(tr);
+  });
+}
+
+// klik na Created
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('sortCreated').addEventListener('click', () => {
+    sortAsc = !sortAsc;
+    renderTable();
+  });
+});
 </script>
+
 <script>
 fetch('/admin/partials/admin_header.html')
   .then(r => r.text())

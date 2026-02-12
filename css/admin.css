@@ -239,39 +239,30 @@ input:focus, select:focus {
 }
 /* ===== ADMIN STATUS BADGES ===== */
 
-.status-badge {
-  display: inline-block;
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: bold;
-  letter-spacing: .5px;
-  text-transform: uppercase;
-}
-
 .status-new {
-  background: #333;
-  color: #ccc;
-  border: 1px solid #555;
+  background: rgba(255, 80, 80, 0.15);
+  border: 1px solid #ff5050;
+  color: #ff6b6b;
 }
 
 .status-in_progress {
-  background: #2c3e50;
-  color: #f1c40f;
-  border: 1px solid #f1c40f;
+  background: rgba(255, 193, 7, 0.15);
+  border: 1px solid #ffc107;
+  color: #ffc107;
 }
 
 .status-resolved {
-  background: #0f5132;
-  color: #3ddc97;
+  background: rgba(61, 220, 151, 0.15);
   border: 1px solid #3ddc97;
+  color: #3ddc97;
 }
 
 .status-closed {
-  background: #1b1b1b;
-  color: #999;
-  border: 1px solid #444;
+  background: rgba(160, 160, 160, 0.15);
+  border: 1px solid #888;
+  color: #aaa;
 }
+
 
 /* klikací řádek */
 .admin-table tbody tr:hover {
