@@ -6,85 +6,44 @@
     
     <link rel="stylesheet" href="/css/admin.css">
 
-  <style>
-    /* ===== STATUS BADGES (ADMIN LIST) ===== */
-    .status-badge {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: bold;
-      letter-spacing: .5px;
-      text-transform: uppercase;
-    }
+ </head>
 
-    .status-new {
-      background: #333;
-      color: #ccc;
-      border: 1px solid #555;
-    }
-
-    .status-in_progress {
-      background: #2c3e50;
-      color: #f1c40f;
-      border: 1px solid #f1c40f;
-    }
-
-    .status-resolved {
-      background: #0f5132;
-      color: #3ddc97;
-      border: 1px solid #3ddc97;
-    }
-
-    .status-closed {
-      background: #1b1b1b;
-      color: #999;
-      border: 1px solid #444;
-    }
-
-    /* aby bylo jasné, že řádek je klikací */
-    .admin-table tbody tr:hover {
-      background: rgba(255, 215, 0, 0.05);
-    }
-  </style>
-</head>
-
-<body class="auth-page profile-page admin-content">
-
-
+<body class="admin-page">
 
 <header class="main-header">
-  <div class="logo">
-    <a href="/">Ordo Draconis</a>
-  </div>
-
-  <div class="auth">
-    <a href="/profile/index.html" class="btn">Profil</a>
-    <a href="/api/logout.php" class="btn">Odhlásit</a>
-  </div>
+    <div class="logo">
+        <a href="/admin/index.html">ORDO DRACONIS – ADMIN</a>
+    </div>
+    <div class="auth">
+        <a href="/admin/index.html" class="btn">Dashboard</a>
+        <a href="/admin/users.html" class="btn">Uživatelé</a>
+        <a href="/admin/vip.html" class="btn">VIP</a>
+        <a href="/profile/index.html" class="btn btn-secondary">Profil</a>
+        <a href="/api/logout.php" class="btn">Odhlásit</a>
+    </div>
 </header>
 
-<main class="auth-container profile-shell">
-  <h1>Bug reports – admin</h1>
-    <a href="/admin/index.html"
-   class="btn btn-secondary"
-   style="margin-bottom:20px; display:inline-flex;">
-  ← Zpět na základní stránku
-</a>
-  <table class="admin-table" id="ticketsTable">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>User</th>
-        <th>Account</th>
-        <th>Category</th>
-        <th>Title</th>
-        <th>Status</th>
-        <th>Created</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+<main class="auth-container">
+
+    <section class="admin-card">
+        <h2>Bug Reports</h2>
+
+        <table class="admin-table" id="ticketsTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>User</th>
+                    <th>Account</th>
+                    <th>Category</th>
+                    <th>Title</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </section>
+
 </main>
 
 <script>
