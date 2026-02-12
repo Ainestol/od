@@ -9,36 +9,40 @@
    <script src="/api/js/api.js" defer></script>
   <script src="/admin/js/users_admin.js" defer></script>
 </head>
-<body>
+<body class="admin-page">
 
-<header>
-  <h1>Admin – Přehled uživatelů</h1>
-  <nav>
-    <a href="/admin/index.html">Dashboard</a>
-    <a href="/admin/users.html" class="active">Uživatelé</a>
-    <a href="/admin/vip.html">VIP</a>
-  </nav>
+<header class="main-header">
+    <div class="logo">
+        <a href="/admin/index.html">ORDO DRACONIS – ADMIN</a>
+    </div>
+    <div class="auth">
+        <a href="/admin/index.html" class="btn">Dashboard</a>
+        <a href="/admin/users.html" class="btn btn-primary">Uživatelé</a>
+        <a href="/admin/vip.html" class="btn">VIP</a>
+    </div>
 </header>
 
-<main>
+<main class="auth-container">
 
-  <h2>Web účty</h2>
+    <section class="admin-card">
+        <h2>Web účty</h2>
 
-  <table class="tree">
-    <thead>
-      <tr>
-        <th>Email / Login</th>
-        <th>Role</th>
-        <th>Akce</th>
-      </tr>
-    </thead>
-    <tbody id="webUsersBody">
-      <!-- plní users_admin.js -->
-    </tbody>
-  </table>
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Email / Login</th>
+                    <th>Role</th>
+                    <th>Akce</th>
+                </tr>
+            </thead>
+            <tbody id="webUsersBody">
+                <!-- plní users_admin.js -->
+            </tbody>
+        </table>
+    </section>
 
 </main>
 
-
 </body>
+
 </html>
