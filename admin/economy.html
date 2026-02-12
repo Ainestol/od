@@ -7,50 +7,69 @@
 </head>
 <body class="admin-page">
 
-<h1>Economy Panel</h1>
-<a href="/admin/index.html" class="btn btn-secondary" style="margin-bottom:20px;">
-    ← Zpět na základní stránku
-  </a>
-<div class="admin-card">
+<header class="main-header">
+    <div class="logo">
+        <a href="/admin/index.html">ORDO DRACONIS – ADMIN</a>
+    </div>
+    <div class="auth">
+        <a href="/admin/index.html" class="btn">Dashboard</a>
+        <a href="/admin/users.html" class="btn">Uživatelé</a>
+        <a href="/admin/vip.html" class="btn">VIP</a>
+        <a href="/admin/economy.html" class="btn btn-secondary">Economy</a>
+        <a href="/admin/bug_reports.html" class="btn">Bug reports</a>
+        <a href="/api/logout.php" class="btn">Odhlásit</a>
+    </div>
+</header>
 
-  <label>Email uživatele</label>
-  <input type="text" id="searchEmail">
-  <button id="searchUser" class="btn btn-primary">Hledat</button>
+<main class="auth-container">
 
-</div>
+    <section class="admin-card">
+        <h2>Economy Panel</h2>
 
-<div id="userResult" class="admin-card hidden">
+        <label>Email uživatele</label>
+        <div style="display:flex; gap:10px;">
+            <input type="text" id="searchEmail">
+            <button id="searchUser" class="btn btn-primary">Hledat</button>
+        </div>
+    </section>
 
-  <h3 id="userEmail"></h3>
+    <section id="userResult" class="admin-card hidden">
 
-  <div>
-    Vote Coin: <strong id="adminVC">0</strong><br>
-    Dragon Coin: <strong id="adminDC">0</strong>
-  </div>
+        <h3 id="userEmail"></h3>
 
-  <hr>
+        <div style="margin-bottom:15px;">
+            Vote Coin: <strong id="adminVC">0</strong><br>
+            Dragon Coin: <strong id="adminDC">0</strong>
+        </div>
 
-  <h4>Upravit měnu</h4>
+        <hr>
 
-  <select id="currencySelect">
-    <option value="VOTE_COIN">Vote Coin</option>
-    <option value="DC">Dragon Coin</option>
-  </select>
+        <h4>Upravit měnu</h4>
 
-  <input type="number" id="amountInput" placeholder="částka">
+        <div style="display:flex; gap:10px; align-items:center;">
+            <select id="currencySelect">
+                <option value="VOTE_COIN">Vote Coin</option>
+                <option value="DC">Dragon Coin</option>
+            </select>
 
-  <button id="adjustBalance" class="btn">
-    Provést změnu
-  </button>
+            <input type="number" id="amountInput" placeholder="částka">
 
-  <hr>
+            <button id="adjustBalance" class="btn btn-primary">
+                Provést změnu
+            </button>
+        </div>
 
-  <h4>Ledger historie</h4>
-  <div id="ledgerList"></div>
+        <hr>
 
-</div>
+        <h4>Ledger historie</h4>
+        <div id="ledgerList"></div>
+
+    </section>
+
+</main>
 
 <script src="/admin/js/economy.js"></script>
 
 </body>
+
 </html>
