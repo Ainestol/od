@@ -79,8 +79,19 @@ fetch('/admin/partials/admin_header.html')
   .then(r => r.text())
   .then(html => {
     document.getElementById('adminHeader').innerHTML = html;
+
+    // 🔥 zvýraznění aktivní stránky
+    const links = document.querySelectorAll('.admin-nav a');
+    const currentPath = window.location.pathname;
+
+    links.forEach(link => {
+      if (currentPath.includes(link.getAttribute('href'))) {
+        link.classList.add('active');
+      }
+    });
   });
 </script>
+
 
 </body>
 
