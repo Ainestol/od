@@ -146,14 +146,16 @@ fetch('/admin/partials/admin_header.html')
     document.getElementById('adminHeader').innerHTML = html;
 
     // 🔥 zvýraznění aktivní stránky
-    const links = document.querySelectorAll('.admin-nav a');
-    const currentPath = window.location.pathname;
+   const links = document.querySelectorAll('.admin-nav a');
+const currentFile = window.location.pathname.split("/").pop();
 
-    links.forEach(link => {
-      if (currentPath.includes(link.getAttribute('href'))) {
-        link.classList.add('active');
-      }
-    });
+links.forEach(link => {
+  const linkFile = link.getAttribute('href').split("/").pop();
+
+  if (currentFile === linkFile) {
+    link.classList.add('active');
+  }
+});
   });
 </script>
 
