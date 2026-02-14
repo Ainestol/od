@@ -346,3 +346,11 @@ body.auth-page.profile-page { overflow: auto; }
   border-radius: 4px;
   font-size: 12px;
 }
+.profile-vip-box {
+  background: linear-gradient(90deg, #3ddc97, #1e8c5c);
+  padding: 12px 18px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  color: #0f2f1f;
+  font-weight: bold;
+}
