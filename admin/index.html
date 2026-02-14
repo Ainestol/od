@@ -3,35 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <title>Admin panel | Ordo Draconis</title>
-    
-    <link rel="stylesheet" href="/css/admin.css">
+  <link rel="stylesheet" href="/css/admin.css">
 </head>
 
 <body class="admin-page">
 
-<header class="main-header">
-  <div class="logo">
-    <a href="/admin/index.html">ORDO DRACONIS – ADMIN</a>
-  </div>
-
-  <div class="auth">
-
-    <!-- ADMIN SEKCE -->
-    <a href="/admin/index.html" class="btn">Dashboard</a>
-    <a href="/admin/users.html" class="btn">Uživatelé</a>
-    <a href="/admin/vip.html" class="btn">VIP</a>
-    <a href="/admin/economy.html" class="btn">Economy</a>
-    <a href="/admin/bug_reports.html" class="btn">Bug reports</a>
-    <a href="/admin/online_players.html">Online hráči</a>
-
-    <span class="divider"></span>
-
-    <!-- USER SEKCE -->
-    <a href="/profile/index.html" class="btn btn-secondary">Profil</a>
-    <a href="/api/logout.php" class="btn">Odhlásit</a>
-
-  </div>
-</header>
+<div id="adminHeader"></div>
 
 <main class="auth-container">
 
@@ -75,10 +52,32 @@
 
 </main>
 
+<!-- Načtení headeru + aktivní záložka -->
+<script>
+fetch('/admin/partials/admin_header.html')
+  .then(r => r.text())
+  .then(html => {
+    document.getElementById('adminHeader').innerHTML = html;
+
+    const links = document.querySelectorAll('.admin-nav a');
+    const currentFile = window.location.pathname.split("/").pop();
+
+    links.forEach(link => {
+      const linkFile = link.getAttribute('href').split("/").pop();
+
+      if (currentFile === linkFile) {
+        link.classList.add('active');
+      }
+    });
+  });
+</script>
+
+<!-- Kontrola admin oprávnění -->
 <script>
 document.addEventListener('DOMContentLoaded', async () => {
   const res = await fetch('/api/me.php');
   const me = await res.json();
+
   if (!me.ok || me.role !== 'admin') {
     window.location.replace('/profile/index.html');
   }
