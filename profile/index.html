@@ -733,14 +733,22 @@ async function loadVipMap(login) {
   const data = await res.json();
 
   const map = {};
+
   if (data.ok && Array.isArray(data.characters)) {
     data.characters.forEach(ch => {
-      map[ch.charId] = !!ch.has_vip;
+
+      map[ch.charId] = {
+        hasVip: !!ch.has_vip,
+        endAt: ch.vip_end_at || null
+      };
+
     });
   }
+
   return map;
 }
 </script>
+
 
 
 <script>
