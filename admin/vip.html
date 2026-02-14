@@ -73,45 +73,7 @@
     </section>
 
 </main>
-<script>
-fetch('/admin/api/list_bug_reports.php')
-  .then(r => {
-    if (!r.ok) throw new Error();
-    return r.json();
-  })
-  .then(data => {
-    if (!data.ok) return;
 
-    const tbody = document.querySelector('#ticketsTable tbody');
-
-    data.tickets.forEach(t => {
-      const tr = document.createElement('tr');
-      tr.style.cursor = 'pointer';
-
-      const statusClass = 'status-' + t.status;
-
-      tr.innerHTML = `
-  <td>${t.id}</td>
-  <td>${t.email}</td>
-  <td>${t.game_account ? t.game_account : '-'}</td>
-  <td>${t.category}</td>
-  <td>${t.title}</td>
-  <td>
-    <span class="status-badge ${statusClass}">
-      ${t.status.replace('_', ' ').toUpperCase()}
-    </span>
-  </td>
-  <td>${t.created_at}</td>
-`;
-
-      tr.addEventListener('click', () => {
-  window.location.href = `/admin/bug_detail.html?id=${t.id}`;
-});
-
-      tbody.appendChild(tr);
-    });
-  });
-</script>
 <script>
 fetch('/admin/partials/admin_header.html')
   .then(r => r.text())
