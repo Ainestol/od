@@ -404,7 +404,10 @@ row.innerHTML = `
 
     <span class="tag">${acc.chars_count} characters</span>
     ${premiumTag}
-    <span class="tag">${acc.created_at}</span>
+${acc.premium_end_at 
+  ? `<span class="tag">${acc.premium_end_at}</span>` 
+  : `<span class="tag">${acc.created_at}</span>`
+}
 
     <div class="actions">
       ${isPrimary
