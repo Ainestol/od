@@ -790,10 +790,18 @@ document.addEventListener('click', async (e) => {
       const el = document.createElement('div');
       el.className = 'char-row';
 
-      const hasVip = vipMap[ch.charId];
-      const vipTag = hasVip
-        ? '<span class="tag vip">VIP</span>'
-        : '';
+      const vipData = vipMap[ch.charId];
+
+let vipTag = '';
+
+if (vipData && vipData.hasVip) {
+  vipTag = `
+    <span class="tag vip">
+      VIP do ${vipData.endAt}
+    </span>
+  `;
+}
+
 
       el.innerHTML = `
         <span><strong>${ch.char_name}</strong></span>
