@@ -212,27 +212,39 @@
 </main>
 
 <script>
-async function checkSession() {
+document.addEventListener('DOMContentLoaded', async () => {
+
   try {
     const res = await fetch('/api/me.php', { credentials: 'same-origin' });
-    if (!res.ok) return false;
     const data = await res.json();
-    return data.ok === true;
-  } catch {
-    return false;
-  }
-}
 
-document.addEventListener('DOMContentLoaded', async () => {
-  const ok = await checkSession();
-  if (!ok) {
-    const isEn = document.documentElement.lang === 'en';
-    window.location.href = isEn
-      ? '/auth/login-en.html'
-      : '/auth/login.html';
+    if (!data.ok) {
+      const isEn = document.documentElement.lang === 'en';
+      window.location.href = isEn
+        ? '/auth/login-en.html'
+        : '/auth/login.html';
+      return;
+    }
+
+    // 🔥 WEB VIP ZOBRAZENÍ
+    if (data.web_vip) {
+      const vipBox = document.createElement("div");
+      vipBox.className = "profile-vip-box";
+      vipBox.innerHTML = `
+        <strong>WEB VIP aktivní</strong><br>
+        Platí do: ${data.web_vip.end_at}<br>
+        Zbývá dní: ${data.web_vip.days_left}
+      `;
+      document.querySelector(".auth-container").prepend(vipBox);
+    }
+
+  } catch (e) {
+    window.location.href = '/auth/login.html';
   }
+
 });
 </script>
+
 
 
 
