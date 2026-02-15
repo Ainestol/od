@@ -4,16 +4,17 @@
   <meta charset="UTF-8">
   <title>Donate | Ordo Draconis</title>
   <link rel="stylesheet" href="../css/style.css">
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
 </head>
 
-<body>
+<body class="scroll-right logo-pulse">
+
 <div class="layout">
 
-  <!-- LEVÁ STRANA -->
+  <!-- LEFT SIDE -->
   <div class="hero-bg hero-donate"></div>
 
-  <!-- PRAVÁ STRANA -->
+  <!-- RIGHT SIDE -->
   <aside class="right">
 
     <div class="side-header">
@@ -21,20 +22,21 @@
 
       <div class="top-actions">
         <div class="auth">
-  <a href="/auth/register-en.html" class="btn">Registration</a>
-  <a href="/auth/login-en.html" class="btn">Login</a>
-</div>
-           <div class="lang">
-  <a href="donate.html">CS</a> |
-  <a href="donate-en.html" class="active">EN</a>
+          <a href="/auth/register-en.html" class="btn">Registration</a>
+          <a href="/auth/login-en.html" class="btn">Login</a>
+        </div>
 
- <div class="server-status online">
-  <span class="dot"></span>
-  Online
-  <span class="divider">·</span>
-  <span class="players"></span>
-</div>
-</div>
+        <div class="lang">
+          <a href="donate.html">CS</a> |
+          <a href="donate-en.html" class="active">EN</a>
+
+          <div class="server-status online">
+            <span class="dot"></span>
+            Online
+            <span class="divider">·</span>
+            <span class="players"></span>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -48,30 +50,79 @@
 
     <div class="content-box">
       <h3>Donate</h3>
-      <p>This section of the website is dedicated to supporting the Ordo Draconis server.<br>
-At the moment, the donation system is still being prepared.
 
-It will not be a pay-to-win system.<br>
-The entire system is currently under development, as our goal is to create a server where donations<br>
- do not affect gameplay or provide unfair advantages.
+      <p>
+        This page is dedicated to supporting the Ordo Draconis server. Donations are voluntary contributions for server operation and maintenance
+        (hardware, hosting, development, security, fixes). <strong>This is not P2W</strong> — we do not want a system that gives anyone power advantages in-game.
+      </p>
 
-At this time, we are only considering<br>
- a possible rate increase for VIP players. However, nothing has been decided yet, and it is still unclear<br>
-  whether it will be possible to purchase cosmetic items such as mount skins or mounts themselves.<br>
-   Seeing Lineage II from a saddle will not affect the game in any way.<br>
+      <h4 class="subhead">Premium (supporting the server)</h4>
+      <p>
+        As a thank you for your contribution, you can obtain <strong>Premium</strong> in two variants:
+      </p>
+      <ul class="rules-list">
+        <li><strong>Premium GAME</strong> — applies to one game account (and therefore all characters on that account).</li>
+        <li><strong>Premium WEB</strong> — applies to your whole web account (all game accounts linked to it and all their characters).</li>
+      </ul>
 
+      <h4 class="subhead">How extensions work</h4>
+      <ul class="rules-list">
+        <li><strong>GAME Premium + purchasing again</strong> = time is extended (e.g., +30 days).</li>
+        <li><strong>WEB Premium + purchasing again</strong> = time stacks (e.g., +30 days).</li>
+        <li>
+          <strong>Switching from GAME → WEB</strong>: if you have active GAME Premium and activate WEB Premium,
+          <strong>WEB Premium overwrites GAME</strong> and starts a new period based on WEB Premium.
+        </li>
+      </ul>
+      <p class="rules-note">
+        Benefits can also be obtained without paying.
+      </p>
 
-Donations are therefore completely optional.<br>
- We will be grateful for any contribution that helps support the operation of the server.<br>
+      <h4 class="subhead">VIP 24h (no payment required)</h4>
+      <p>
+        VIP does not have to be bought with money. It can also be earned through voting:
+      </p>
+      <ul class="rules-list">
+        <li><strong>VIP 24h</strong> = <strong>4 Vote Coins</strong></li>
+        <li>or <strong>1 Dragon Coin</strong> (value = 4 Vote Coins)</li>
+        <li>Vote Coins can be exchanged for Dragon Coins</li>
+      </ul>
 
+      <h4 class="subhead">VIP / Premium benefits</h4>
+      <ul class="rules-list">
+        <li><strong>.offline</strong> command (offline trade / selling / crafting / buff shop via <strong>.sellbuffs</strong>)</li>
+        <li>more QoL benefits will be added over time, always with a <strong>non-P2W</strong> focus</li>
+      </ul>
 
-<p>Kind regards,</p>
-<p>Team Ordo Draconis</p>
+      <h4 class="subhead">Coming soon</h4>
+      <p>
+        We are preparing <strong>cosmetic</strong> features that do not affect character power (e.g., mounts, skins, etc.).
+        The goal is a better experience — not a PvP advantage.
+      </p>
+
+      <h4 class="subhead">Important (fair and honest)</h4>
+      <ul class="rules-list">
+        <li><strong>Donate = contribution</strong> to support the project, not a “purchase of goods” — therefore it does not create standard e-shop refund claims.</li>
+        <li><strong>We do not handle or guarantee</strong> private trades between players (selling currency/items outside the system is forbidden).</li>
+        <li>This is a community project — we do our best for stability, but maintenance, downtime or fixes may occur.</li>
+      </ul>
+
       <p>_________________</p>
+      <p>Kind regards,<br>Team Ordo Draconis</p>
+    </div>
+
+    <!-- footer links -->
+    <div class="page-footer">
+      <a href="https://discord.gg/TVUJ_INVITE" target="_blank" rel="noopener">Discord</a>
+      <span>·</span>
+      <a href="rules-en.html">Rules</a>
+      <span>·</span>
+      <a href="gdpr-en.html">Privacy</a>
     </div>
 
   </aside>
 </div>
+
 <script>
 async function updateServerStatus() {
   try {

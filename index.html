@@ -1,140 +1,167 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ordo Draconis</title>
-  <link rel="stylesheet" href="css/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap" rel="stylesheet" />
 </head>
 
 <body>
-<div class="layout">
+  <div class="layout">
 
-  <!-- LEVÁ STRANA -->
-  <div class="hero-bg hero-home"></div>
+    <!-- LEVÁ STRANA -->
+    <div class="hero-bg hero-home"></div>
 
-  <!-- PRAVÁ STRANA -->
-  <aside class="right">
+    <!-- PRAVÁ STRANA -->
+    <aside class="right">
 
-    <div class="side-header">
-    <div class="side-logo">Ordo Draconis</div>
-      <div class="top-actions">
-        <div class="auth">
-    <a href="/auth/register.html" class="btn">Registrace</a>
-    <a href="/auth/login.html" class="btn">Přihlášení</a>
-</div>
+      <!-- HLAVIČKA -->
+      <div class="side-header">
+        <div class="side-logo">Ordo Draconis</div>
+
+        <div class="top-actions">
+          <div class="auth">
+            <a href="/auth/register.html" class="btn">Registrace</a>
+            <a href="/auth/login.html" class="btn">Přihlášení</a>
+          </div>
+
           <div class="lang">
-          <a href="index.html" class="active">CS</a> | 
-          <a href="index-en.html">EN</a>
+            <a href="index.html" class="active">CS</a> |
+            <a href="index-en.html">EN</a>
 
-         <div class="server-status online">
-         <span class="dot"></span>
-         Online
-         <span class="divider">·</span>
-         <span class="players"></span>
+            <div class="server-status online">
+              <span class="dot"></span>
+              <span class="status-text">Online</span>
+              <span class="divider">·</span>
+              <span class="players"></span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <nav class="side-nav">
-      <a href="/">Domů</a>
-      <a href="pages/server.html">O serveru</a>
-      <a href="pages/start.html">Začít hrát</a>
-      <a href="pages/world.html">Svět</a>
-      <a href="pages/donate.html">Donate</a>
+      <!-- MENU -->
+      <nav class="side-nav">
+        <a href="index.html" class="active">Domů</a>
+        <a href="pages/server.html">O serveru</a>
+        <a href="pages/start.html">Začít hrát</a>
+        <a href="pages/world.html">Svět</a>
+        <a href="pages/donate.html">Donate</a>
       </nav>
 
-    <div class="content-box">
+      <!-- OBSAH -->
+      <div class="content-box">
 
-  <h3>Základní nastavení serveru</h3>
+        <h3>Základní nastavení serveru</h3>
 
-  <div class="rates-grid">
+        <div class="rates-grid">
 
-    <div class="rate-card">
-      <button class="rate-title">XP RATE</button>
-      <div class="rate-detail">
-        XP rate 3×<br>
-        Po levelu 55: 2×<br>
-        Po levelu 74: 1×
+          <div class="rate-card">
+            <button type="button" class="rate-title">XP RATE</button>
+            <div class="rate-detail">
+              XP rate 3×<br>
+              Po levelu 55: 2×<br>
+              Po levelu 74: 1×
+            </div>
+          </div>
+
+          <div class="rate-card">
+            <button type="button" class="rate-title">SP RATE</button>
+            <div class="rate-detail">
+              SP rate 3×
+            </div>
+          </div>
+
+          <div class="rate-card">
+            <button type="button" class="rate-title">DROP RATE</button>
+            <div class="rate-detail">
+              Drop rate 4×<br>
+              Bossové: 3×<br>
+              WB šperky: 2× amount
+            </div>
+          </div>
+
+          <div class="rate-card">
+            <button type="button" class="rate-title">SPOIL RATE</button>
+            <div class="rate-detail">
+              Spoil rate 4×
+            </div>
+          </div>
+
+        </div>
+
+        <div class="server-extra">
+          <p>Fungující pet questy.</p>
+          <p>Hrady, geodata, adventurer (RB finder).</p>
+          <p>Drop info.</p>
+        </div>
+
       </div>
-    </div>
 
-    <div class="rate-card">
-      <button class="rate-title">SP RATE</button>
-      <div class="rate-detail">
-        SP rate 3×
+      <!-- ✅ FOOTER STEJNÝ JAKO NA OSTATNÍCH STRÁNKÁCH -->
+      <div class="page-footer">
+        <a href="https://discord.gg/TVUJ_INVITE" target="_blank" rel="noopener">Discord</a>
+        <span>·</span>
+        <a href="pages/rules.html">Pravidla</a>
+        <span>·</span>
+        <a href="pages/gdpr.html">GDPR</a>
       </div>
-    </div>
 
-    <div class="rate-card">
-      <button class="rate-title">DROP RATE</button>
-      <div class="rate-detail">
-        Drop rate 4×<br>
-        Bossové: 3×<br>
-        WB šperky: 2× amount
-      </div>
-    </div>
-
-    <div class="rate-card">
-      <button class="rate-title">SPOIL RATE</button>
-      <div class="rate-detail">
-        Spoil rate 4×
-      </div>
-    </div>
-
+    </aside>
   </div>
 
-  <div class="server-extra">
-    <p>Fungující pet questy.</p>
-    <p>Hrady, geodata, adventurer (RB finder).</p>
-    <p>Drop info.</p>
-  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
 
-</div>
-<script>
-const rateButtons = document.querySelectorAll('.rate-title');
+      // ===== RATES (accordion) =====
+      const rateButtons = document.querySelectorAll('.rate-title');
+      rateButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          const currentCard = button.closest('.rate-card');
+          const isOpen = currentCard.classList.contains('open');
 
-rateButtons.forEach(button => {
-  button.addEventListener('click', () => {
-    const currentCard = button.closest('.rate-card');
-    const isOpen = currentCard.classList.contains('open');
+          document.querySelectorAll('.rate-card').forEach(card => card.classList.remove('open'));
+          if (!isOpen) currentCard.classList.add('open');
+        });
+      });
 
-    // zavřít všechny
-    document.querySelectorAll('.rate-card').forEach(card => {
-      card.classList.remove('open');
+      // ===== SERVER STATUS =====
+      async function updateServerStatus() {
+        try {
+          const res = await fetch('/api/status.php', { cache: 'no-store' });
+          const data = await res.json();
+
+          const statusEl = document.querySelector('.server-status');
+          const dot = document.querySelector('.server-status .dot');
+          const players = document.querySelector('.server-status .players');
+          const statusText = document.querySelector('.server-status .status-text');
+
+          if (!statusEl || !dot || !players || !statusText) return;
+
+          if (data.online) {
+            statusEl.classList.add('online');
+            statusEl.classList.remove('offline');
+            dot.style.background = '#2ecc71';
+            players.textContent = (data.players ?? 0) + ' Hráčů';
+            statusText.textContent = 'Online';
+          } else {
+            statusEl.classList.add('offline');
+            statusEl.classList.remove('online');
+            dot.style.background = '#e74c3c';
+            players.textContent = 'Offline';
+            statusText.textContent = 'Offline';
+          }
+        } catch (e) {
+          console.error('Status error', e);
+        }
+      }
+
+      updateServerStatus();
+      setInterval(updateServerStatus, 10000);
+
     });
-
-    // pokud nebyla otevřená, otevřít ji
-    if (!isOpen) {
-      currentCard.classList.add('open');
-    }
-  });
-});
-</script>
-<script>
-async function updateServerStatus() {
-  try {
-    const res = await fetch('/api/status.php');
-    const data = await res.json();
-
-    const dot = document.querySelector('.server-status .dot');
-    const players = document.querySelector('.server-status .players');
-
-    if (data.online) {
-      dot.style.background = '#2ecc71';
-      players.textContent = data.players + ' Hráčů';
-    } else {
-      dot.style.background = '#e74c3c';
-      players.textContent = 'Offline';
-    }
-  } catch (e) {
-    console.error('Status error', e);
-  }
-}
-
-updateServerStatus();
-setInterval(updateServerStatus, 10000);
-</script>
+  </script>
 </body>
 </html>

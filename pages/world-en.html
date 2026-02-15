@@ -4,36 +4,38 @@
   <meta charset="UTF-8">
   <title>World | Ordo Draconis</title>
   <link rel="stylesheet" href="../css/style.css">
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
 </head>
 
-<body>
+<body class="scroll-right logo-pulse">
 <div class="layout">
 
-  <!-- LEVÁ STRANA -->
+  <!-- LEFT SIDE -->
   <div class="hero-bg hero-world"></div>
 
-  <!-- PRAVÁ STRANA -->
+  <!-- RIGHT SIDE -->
   <aside class="right">
 
     <div class="side-header">
       <div class="side-logo">Ordo Draconis</div>
+
       <div class="top-actions">
         <div class="auth">
-  <a href="/auth/register-en.html" class="btn">Registration</a>
-  <a href="/auth/login-en.html" class="btn">Login</a>
-</div>
-        <div class="lang">
-  <a href="world.html">CS</a> |
-  <a href="world-en.html" class="active">EN</a>
+          <a href="/auth/register-en.html" class="btn">Registration</a>
+          <a href="/auth/login-en.html" class="btn">Login</a>
+        </div>
 
-  <div class="server-status online">
-    <span class="dot"></span>
-    Online
-    <span class="divider">·</span>
-    <span class="players"></span>
-  </div>
-</div>
+        <div class="lang">
+          <a href="world.html">CS</a> |
+          <a href="world-en.html" class="active">EN</a>
+
+          <div class="server-status online">
+            <span class="dot"></span>
+            Online
+            <span class="divider">·</span>
+            <span class="players"></span>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -51,8 +53,18 @@
       <p>This section of the website is still under development. We are currently waiting for player feedback on what features they would like to see here, such as player level filters, PvP/PK points, amount of Adena, and more.</p>
     </div>
 
+    <!-- ✅ NEW: footer links -->
+  <div class="page-footer">
+  <a href="https://discord.gg/TVUJ_INVITE" target="_blank" rel="noopener">Discord</a>
+  <span>·</span>
+  <a href="rules-en.html">Rules</a>
+  <span>·</span>
+  <a href="gdpr-en.html">GDPR</a>
+</div>
+
   </aside>
 </div>
+
 <script>
 async function updateServerStatus() {
   try {

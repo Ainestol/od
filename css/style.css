@@ -268,6 +268,11 @@ nav a:hover {
     pointer-events: none;
     z-index: 0;
 }
+/* Na některých stránkách nechceme emblem z auth-page (už máme .right::before) */
+body.no-auth-emblem::before {
+  display: none !important;
+  content: none !important;
+}
 
 .auth-page .main-header,
 .auth-page .top-bar {
@@ -994,4 +999,362 @@ body.profile-page.admin-content {
 
 body.profile-page.admin-content .auth-container {
   max-width: 1600px;
+}
+/* =========================
+   MINI LINKS (Discord / Rules / GDPR)
+   ========================= */
+
+/* aby šlo footerem tlačit dolů */
+.right {
+  display: flex;
+  flex-direction: column;
+}
+
+/* spodní utility oblast vpravo */
+.right-footer {
+  margin-top: auto;           /* <- tohle ho pošle úplně dolů */
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;      /* vpravo */
+  gap: 10px;
+}
+
+/* tlačítka */
+.mini-links {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.mini-link {
+  background: transparent;
+  border: 1px solid rgba(212,175,55,0.35);
+  color: #bfb8a0;
+  padding: 6px 10px;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color .25s, color .25s, box-shadow .25s, background .25s;
+}
+
+.mini-link:hover {
+  color: #d4af37;
+  border-color: rgba(212,175,55,0.75);
+  background: rgba(0,0,0,0.25);
+  box-shadow: 0 0 10px rgba(212,175,55,0.10);
+}
+
+.mini-link.active {
+  color: #ffd36a;
+  border-color: #d4af37;
+  box-shadow: 0 0 12px rgba(212,175,55,0.18);
+}
+
+/* panely se otevřou NAD tlačítky (neposouvají layout) */
+.mini-panels {
+  position: absolute;
+  right: 0;
+  bottom: 44px;               /* nad tlačítkama */
+  width: min(700px, 100%);
+}
+
+.mini-panel {
+  display: none;
+  background: linear-gradient(to bottom, rgba(15,15,15,0.82), rgba(5,5,5,0.82));
+  border: 1px solid rgba(212,175,55,0.25);
+  box-shadow: 0 0 20px rgba(0,0,0,0.85), 0 0 40px rgba(212,175,55,0.06);
+  padding: 18px 18px 16px;
+}
+
+.mini-panel.open { display: block; }
+
+.mini-panel h4 {
+  margin: 0 0 10px;
+  color: #d4af37;
+  letter-spacing: 1px;
+  font-size: 16px;
+}
+
+.mini-panel p {
+  margin: 0 0 10px;
+  color: #bfb8a0;
+  line-height: 1.6;
+}
+
+.mini-list {
+  margin: 0;
+  padding-left: 18px;
+  color: #bfb8a0;
+}
+
+.mini-list li {
+  margin: 0 0 8px;
+  line-height: 1.55;
+}
+
+.mini-cta {
+  display: inline-block;
+  padding: 8px 14px;
+  border: 1px solid #3a3322;
+  background: rgba(0,0,0,0.35);
+  color: #d4af37;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 12px;
+  transition: border-color .25s, box-shadow .25s, background .25s;
+}
+
+.mini-cta:hover {
+  border-color: #d4af37;
+  background: rgba(0,0,0,0.55);
+  box-shadow: 0 0 12px rgba(212,175,55,0.18);
+}
+/* aby pravý panel byl flex a footer šel dolů */
+.right { display: flex; flex-direction: column; }
+
+/* utility footer vpravo dole */
+.right-footer {
+  margin-top: auto;
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+/* panely se otevírají NAD tlačítky */
+.mini-panels {
+  position: absolute;
+  right: 0;
+  bottom: 44px;
+  width: min(700px, 100%);
+}
+.mini-panel { display: none; }
+.mini-panel.open { display: block; }
+/* ===== Page footer links (Discord / Rules / GDPR) ===== */
+.page-footer {
+  margin-top: auto;
+  padding-top: 18px;
+  padding-bottom: 6px;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  align-items: center;
+
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+
+  color: #6f6a58;
+  position: relative;
+  z-index: 3;
+}
+
+.page-footer a {
+  color: #8f876b;
+  text-decoration: none;
+  transition: color .25s, text-shadow .25s;
+}
+
+.page-footer a:hover {
+  color: #d4af37;
+  text-shadow: 0 0 6px rgba(212,175,55,0.25);
+}
+
+.page-footer a.active {
+  color: #ffd36a;
+}
+
+.rules-list {
+  margin: 12px 0 0;
+  padding-left: 18px;
+  color: #bfb8a0;
+}
+
+.rules-list li {
+  margin: 0 0 10px;
+  line-height: 1.6;
+}
+
+.rules-note {
+  margin-top: 16px;
+  font-size: 12px;
+  color: #8f876b;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding-top: 12px;
+}
+
+.subhead {
+  margin-top: 18px;
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: #d4af37;
+  letter-spacing: 1px;
+}
+.page-footer{
+  margin-top: auto;
+  padding-top: 18px;
+  padding-bottom: 6px;
+  display:flex;
+  gap:10px;
+  justify-content:flex-end;
+  align-items:center;
+  font-size:12px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  color:#6f6a58;
+  position:relative;
+  z-index:3;
+}
+
+.page-footer a{
+  color:#8f876b;
+  text-decoration:none;
+  transition: color .25s, text-shadow .25s;
+}
+
+.page-footer a:hover{
+  color:#d4af37;
+  text-shadow: 0 0 6px rgba(212,175,55,0.25);
+}
+/* ===== SCROLL ONLY RIGHT PANEL (GDPR/RULES) ===== */
+body.scroll-right {
+  overflow: hidden; /* žádný scroll celé stránky */
+}
+
+body.scroll-right .layout {
+  height: 100vh; /* celý layout pevně na výšku okna */
+}
+
+/* Levý obrázek pořád na plnou výšku */
+body.scroll-right .hero-bg {
+  height: 100vh;
+}
+
+/* Pravá strana bude scrollovat */
+body.scroll-right .right {
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  /* aby scroll nepřetahoval celou stránku (lepší pocit) */
+  overscroll-behavior: contain;
+
+  /* ať footer/obsah není nalepený úplně na spodku */
+  padding-bottom: 28px;
+}
+
+/* Pokud by se ti zdálo, že se to "lámě" kvůli absolutnímu emblému */
+body.scroll-right .right::before {
+  position: fixed;
+  top: 120px;
+  right: 80px;
+}
+/* GDPR/RULES: schovej dekorativní čáru přes celou stránku */
+body.scroll-right.auth-page::after {
+  display: none !important;
+}
+
+
+/* ===== LOGO PULSE (text glow) ===== */
+body.logo-pulse .side-logo{
+  /* ať to nemůže přebít jiný styl */
+  text-shadow:
+    0 0 6px rgba(255, 80, 80, 0.65),
+    0 0 16px rgba(255, 60, 60, 0.45),
+    0 0 34px rgba(255, 0, 0, 0.28);
+
+  animation: logoGlowPulse 3.2s ease-in-out infinite;
+}
+
+/* Pokud je side-logo odkaz (někde máš <a>) */
+body.logo-pulse .side-logo a{
+  color: inherit;
+  text-shadow: inherit;
+  animation: logoGlowPulse 3.2s ease-in-out infinite;
+}
+
+@keyframes logoGlowPulse{
+  0%, 100%{
+    /* “slabší” fáze */
+    text-shadow:
+      0 0 4px rgba(255, 80, 80, 0.35),
+      0 0 10px rgba(255, 60, 60, 0.25),
+      0 0 18px rgba(255, 0, 0, 0.16);
+    filter: saturate(1.05) brightness(1.02);
+  }
+  50%{
+    /* “extrém” – ať to fakt vidíš */
+    text-shadow:
+      0 0 10px rgba(255, 120, 120, 0.85),
+      0 0 26px rgba(255, 60, 60, 0.75),
+      0 0 60px rgba(255, 0, 0, 0.45),
+      0 0 120px rgba(255, 0, 0, 0.25);
+    filter: saturate(1.6) brightness(1.18);
+  }
+}
+/* Checkbox / consent text – register page */
+.auth-page .auth-form .form-group label,
+.auth-page .auth-form .form-group,
+.auth-page .auth-form .form-group .form-hint {
+  color: #cfcfcf; /* šedobílá */
+}
+
+/* === Register: consent checkboxes - layout fix + subtle colors === */
+
+/* Každý řádek s checkboxem bude na vlastním řádku */
+.auth-page .auth-form label {
+  display: block;           /* důležité: každý label řádek */
+  margin: 6px 0;
+  color: #cfcfcf;           /* šedý text */
+  line-height: 1.35;
+}
+
+/* Checkbox zarovnání s textem */
+.auth-page .auth-form label input[type="checkbox"] {
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+/* Odkazy v těchto textech – šedé, ne zlaté, bez "svícení" */
+.auth-page .auth-form label a {
+  color: #b7b7b7;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+
+.auth-page .auth-form label a:hover,
+.auth-page .auth-form label a:visited {
+  color: #b7b7b7; /* stejné i na hover/visited */
+}
+
+
+
+
+/* === AUTH (login/register): zrušit zlaté linky nahoře a dole === */
+body.auth-page .main-header,
+body.auth-page .main-footer {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* kdyby byly kreslené pseudo-elementem */
+body.auth-page .main-header::before,
+body.auth-page .main-header::after,
+body.auth-page .main-footer::before,
+body.auth-page .main-footer::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* někdy je to ještě “separator” jako <hr> */
+body.auth-page hr {
+  display: none !important;
 }

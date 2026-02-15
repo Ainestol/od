@@ -11,22 +11,22 @@
 
 <body class="auth-page">
 
-    <!-- HEADER (stejný jako na indexu) -->
+    <!-- HEADER -->
     <header class="main-header">
-    <div class="logo">
-        <a href="/">Ordo Draconis</a>
-    </div>
+        <div class="logo">
+            <a href="/">Ordo Draconis</a>
+        </div>
 
-    <div class="auth">
-        <a href="/auth/register.html" class="btn active">Registrace</a>
-        <a href="/auth/login.html" class="btn">Přihlášení</a>
-    </div>
+        <div class="auth">
+            <a href="/auth/register.html" class="btn active">Registrace</a>
+            <a href="/auth/login.html" class="btn">Přihlášení</a>
+        </div>
 
-    <div class="lang">
-        <a href="/auth/register.html" class="active">CS</a>
-        <a href="/auth/register-en.html">EN</a>
-    </div>
-</header>
+        <div class="lang">
+            <a href="/auth/register.html" class="active">CS</a>
+            <a href="/auth/register-en.html">EN</a>
+        </div>
+    </header>
 
     <!-- HLAVNÍ OBSAH -->
     <main class="auth-container">
@@ -37,12 +37,12 @@
         </p>
 
         <form id="registerForm" class="auth-form">
-            
+
             <div class="form-group">
                 <label for="email">E-mailová adresa</label>
-                <input 
-                    type="email" 
-                    id="email" 
+                <input
+                    type="email"
+                    id="email"
                     name="email"
                     placeholder="tvuj@email.cz"
                     required
@@ -51,9 +51,9 @@
 
             <div class="form-group">
                 <label for="password">Heslo</label>
-                <input 
-                    type="password" 
-                    id="password" 
+                <input
+                    type="password"
+                    id="password"
                     name="password"
                     placeholder="********"
                     minlength="6"
@@ -61,22 +61,48 @@
                 >
             </div>
 
-            <div class="form-group">
+            <div class="form-check">
                 <label for="password_confirm">Potvrzení hesla</label>
-                <input 
-                    type="password" 
-                    id="password_confirm" 
+                <input
+                    type="password"
+                    id="password_confirm"
                     name="password_confirm"
                     placeholder="********"
                     minlength="6"
                     required
                 >
                 <div class="form-hint">
-                     Heslo musí mít alespoň 6 znaků.
+                    Heslo musí mít alespoň 6 znaků.
                 </div>
             </div>
 
-           <div class="form-error" id="registerError" style="display:none;"></div>
+            <!-- ✅ SOUHLASY -->
+            <div class="form-check">
+                <label class="checkline">
+                    <input type="checkbox" id="agree_rules" name="agree_rules" required>
+                    <span>
+                        Potvrzuji, že jsem si přečetl(a) a souhlasím s
+                        <a href="/pages/rules.html" target="_blank" rel="noopener">Pravidly serveru</a>.
+                    </span>
+                </label>
+
+                <label class="checkline" style="margin-top:10px;">
+                    <input type="checkbox" id="ack_privacy" name="ack_privacy" required>
+                    <span>
+                        Beru na vědomí
+                        <a href="/pages/gdpr.html" target="_blank" rel="noopener">Zásady soukromí (GDPR)</a>.
+                    </span>
+                </label>
+
+                <label class="checkline" style="margin-top:10px;">
+                    <input type="checkbox" id="age_15" name="age_15" required>
+                    <span>
+                        Potvrzuji, že je mi alespoň <strong>15 let</strong>.
+                    </span>
+                </label>
+            </div>
+
+            <div class="form-error" id="registerError" style="display:none;"></div>
 
             <button type="submit" class="btn-primary">
                 Vytvořit účet
@@ -95,46 +121,76 @@
     <footer class="main-footer">
         <p>© Ordo Draconis</p>
     </footer>
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('registerForm');
   const errorBox = document.getElementById('registerError');
+
   const errorMessages = {
-  EMAIL_EXISTS: 'Účet s touto e-mailovou adresou už existuje.',
-  INVALID_EMAIL: 'Zadej platnou e-mailovou adresu.',
-  PASSWORD_TOO_SHORT: 'Heslo musí mít alespoň 6 znaků.',
-  SERVER_ERROR: 'Došlo k chybě serveru. Zkus to prosím později.'
-};
-  if (!form || !errorBox) {
-    console.error('Register form or error box missing');
-    return;
+    EMAIL_EXISTS: 'Účet s touto e-mailovou adresou už existuje.',
+    INVALID_EMAIL: 'Zadej platnou e-mailovou adresu.',
+    PASSWORD_TOO_SHORT: 'Heslo musí mít alespoň 6 znaků.',
+    SERVER_ERROR: 'Došlo k chybě serveru. Zkus to prosím později.'
+  };
+
+  function showError(msg) {
+    errorBox.textContent = msg;
+    errorBox.style.display = 'block';
   }
+
+  if (!form || !errorBox) return;
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-
     errorBox.style.display = 'none';
 
-    const email = document.getElementById('email').value;
+    const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
+   const passwordConfirm = document.getElementById('password_confirm').value;
 
-    const res = await fetch('/api/register.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    });
+if (password !== passwordConfirm) {
+  errorBox.textContent = 'Hesla se neshodují.';
+  errorBox.style.display = 'block';
+  return;
+}
+    // ✅ checkboxy (HTML required to hlídá taky, ale tohle dá hezkou hlášku)
+    const agreeRules = document.getElementById('agree_rules').checked;
+    const ackPrivacy = document.getElementById('ack_privacy').checked;
+    const age15 = document.getElementById('age_15').checked;
 
-    const data = await res.json();
+    if (!agreeRules) { showError('Musíš souhlasit s Pravidly serveru.'); return; }
+    if (!ackPrivacy) { showError('Musíš potvrdit Zásady soukromí (GDPR).'); return; }
+    if (!age15) { showError('Registrace je povolena pouze pro osoby 15+.'); return; }
 
-    if (data.status === 'ok') {
-      window.location.href = '/auth/login.html';
-    } else {
-      const message = errorMessages[data.error] || 'Registrace selhala';
-      errorBox.textContent = message;
-      errorBox.style.display = 'block';
+    try {
+      const res = await fetch('/api/register.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          password,
+          agree_rules: true,
+          ack_privacy: true,
+          age_15: true
+        })
+      });
+
+      const data = await res.json();
+
+      if (data.status === 'ok') {
+        window.location.href = '/auth/login.html';
+      } else {
+        const message = errorMessages[data.error] || 'Registrace selhala';
+        showError(message);
+      }
+    } catch (err) {
+      console.error(err);
+      showError('Registrace selhala – zkontroluj připojení a zkus to znovu.');
     }
   });
 });
 </script>
+
 </body>
 </html>

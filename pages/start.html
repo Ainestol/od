@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <title>Začít hrát | Ordo Draconis</title>
   <link rel="stylesheet" href="../css/style.css">
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
 </head>
 
-<body>
+<body class="scroll-right logo-pulse">
 <div class="layout">
 
   <!-- LEVÁ STRANA -->
@@ -21,20 +21,21 @@
 
       <div class="top-actions">
         <div class="auth">
-  <a href="/auth/register.html" class="btn">Registrace</a>
-  <a href="/auth/login.html" class="btn">Přihlášení</a>
-</div>
-          <div class="lang">
-  <a href="start.html" class="active">CS</a> |
-  <a href="start-en.html">EN</a>
+          <a href="/auth/register.html" class="btn">Registrace</a>
+          <a href="/auth/login.html" class="btn">Přihlášení</a>
+        </div>
 
-  <div class="server-status online">
-  <span class="dot"></span>
-  Online
-  <span class="divider">·</span>
-  <span class="players"></span>
-</div>
-</div>
+        <div class="lang">
+          <a href="start.html" class="active">CS</a> |
+          <a href="start-en.html">EN</a>
+
+          <div class="server-status online">
+            <span class="dot"></span>
+            Online
+            <span class="divider">·</span>
+            <span class="players"></span>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -49,33 +50,42 @@
     <div class="content-box">
       <h3>Začít hrát</h3>
 
-  <p>
-    Pokud se chceš připojit do světa Lineage II Ordo Draconis,
-    postupuj podle následujících kroků.
-  </p>
+      <p>
+        Pokud se chceš připojit do světa Lineage II Ordo Draconis,
+        postupuj podle následujících kroků.
+      </p>
 
-  <h4>Krok 1 – Stáhnout herního klienta</h4>
-  <p>
-    Tlačítko ke stahnutí herního klienta už čeká. 
-  </p>
+      <h4>Krok 1 – Stáhnout herního klienta</h4>
+      <p>Tlačítko ke stahnutí herního klienta už čeká.</p>
 
-  <a href="https://drive.google.com/file/d/1YgZyrOmL5CxjkjZbKLiRqBJrH9psOMXQ/view?usp=drive_link" 
-     target="_blank" 
-     class="download-link">
-    Herní klient
-  </a>
+      <a href="https://drive.google.com/file/d/1YgZyrOmL5CxjkjZbKLiRqBJrH9psOMXQ/view?usp=drive_link"
+         target="_blank"
+         class="download-link">
+        Herní klient
+      </a>
 
-  <h4>Krok 2 – Nastavení hry</h4>
-  <p>
-    Po stažení rozbal soubory na disk, kde máš dostatek místa.
-  </p>
+      <h4>Krok 2 – Nastavení hry</h4>
+      <p>Po stažení rozbal soubory na disk, kde máš dostatek místa.</p>
 
-  <h4>Krok 3 – Připojení na server</h4>
-  <p>
-    Spust soubor <strong>l2.exe</strong> ve složce system.<br>
-    Prozatím je hra dostupná pouze pro testování.
-  </p>
+      <h4>Krok 3 – Připojení na server</h4>
+      <p>
+        Spust soubor <strong>l2.exe</strong> ve složce system.<br>
+        Prozatím je hra dostupná pouze pro testování.
+      </p>
+    </div>
+
+    <!-- ✅ NOVĚ: odkazy dole -->
+    <div class="page-footer">
+      <a href="https://discord.gg/TVUJ_INVITE" target="_blank" rel="noopener">Discord</a>
+      <span>·</span>
+      <a href="rules.html">Pravidla</a>
+      <span>·</span>
+      <a href="gdpr.html">GDPR</a>
+    </div>
+
+  </aside>
 </div>
+
 <script>
 async function updateServerStatus() {
   try {

@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <title>Svět | Ordo Draconis</title>
   <link rel="stylesheet" href="../css/style.css">
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
 </head>
 
-<body>
+<body class="scroll-right logo-pulse">
 <div class="layout">
 
   <!-- LEVÁ STRANA -->
@@ -17,21 +17,23 @@
   <aside class="right">
 
     <div class="side-header">
-    <div class="side-logo">Ordo Draconis</div>
+      <div class="side-logo">Ordo Draconis</div>
+
       <div class="top-actions">
         <div class="auth">
-    <a href="/auth/register.html" class="btn">Registrace</a>
-    <a href="/auth/login.html" class="btn">Přihlášení</a>
-</div>
-          <div class="lang">
+          <a href="/auth/register.html" class="btn">Registrace</a>
+          <a href="/auth/login.html" class="btn">Přihlášení</a>
+        </div>
+
+        <div class="lang">
           <a href="world.html" class="active">CS</a> |
           <a href="world-en.html">EN</a>
 
-         <div class="server-status online">
-         <span class="dot"></span>
-         Online
-         <span class="divider">·</span>
-         <span class="players"></span>
+          <div class="server-status online">
+            <span class="dot"></span>
+            Online
+            <span class="divider">·</span>
+            <span class="players"></span>
           </div>
         </div>
       </div>
@@ -48,11 +50,24 @@
     <div class="content-box">
       <h3>Svět</h3>
       <p>Svět Adenu, města, zóny, bossové.</p>
-      <p>Tato část webu se teprve připravuje, čekáme na zpětnou vazbu co by vlastně hráci zde chtěli mít, např filtr lvl hráčů, pvp/pk bodů, počet adena atd.  </p>
+      <p>
+        Tato část webu se teprve připravuje, čekáme na zpětnou vazbu co by vlastně hráci zde chtěli mít,
+        např filtr lvl hráčů, pvp/pk bodů, počet adena atd.
+      </p>
+    </div>
+
+    <!-- ✅ NOVĚ: odkazy dole -->
+    <div class="page-footer">
+      <a href="https://discord.gg/TVUJ_INVITE" target="_blank" rel="noopener">Discord</a>
+      <span>·</span>
+      <a href="rules.html">Pravidla</a>
+      <span>·</span>
+      <a href="gdpr.html">GDPR</a>
     </div>
 
   </aside>
 </div>
+
 <script>
 async function updateServerStatus() {
   try {
