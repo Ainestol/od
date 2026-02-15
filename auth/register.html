@@ -177,14 +177,16 @@ if (password !== passwordConfirm) {
       });
 
       const data = await res.json();
-
-      if (data.status === 'ok') {
-  window.location.href = '/auth/verify-sent.html?email=' + encodeURIComponent(email);
+      console.log('CS REGISTER', res.status, data);
+      if (res.ok && (data.status === 'ok' || data.ok === true)) {
+  window.location.href = '/auth/verify-sent.html?email=' + encodeURIComponent(email) + '&t=' + Date.now();
   return;
-} else {
-        const message = errorMessages[data.error] || 'Registrace selhala';
-        showError(message);
-      }
+}
+
+const message = errorMessages[data.error] || data.message || 'Registrace selhala';
+showError(message);
+
+      
     } catch (err) {
       console.error(err);
       showError('Registrace selhala – zkontroluj připojení a zkus to znovu.');
