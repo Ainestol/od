@@ -179,9 +179,10 @@
 
         const data = await res.json();
 
-        if (data.status === 'ok') {
-          window.location.href = '/auth/login-en.html';
-        } else {
+       if (data.status === 'ok') {
+  window.location.href = '/auth/verify-sent-en.html?email=' + encodeURIComponent(email);
+  return;
+} else {
           const message = errorMessages[data.error] || 'Registration failed';
           showError(message);
         }

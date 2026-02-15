@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Email sent | Ordo Draconis</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="auth-page">
+
+<header class="main-header">
+  <div class="logo"><a href="/">Ordo Draconis</a></div>
+
+  <div class="auth">
+    <a href="/auth/login-en.html" class="btn">Login</a>
+  </div>
+
+  <div class="lang">
+    <a href="/auth/verify-sent.html">CS</a>
+    <a href="/auth/verify-sent-en.html" class="active">EN</a>
+  </div>
+</header>
+
+<main class="auth-container">
+  <h1>Verify your email</h1>
+
+  <p class="auth-subtitle" id="msg">
+    We’ve sent a verification email. Please check your inbox (and spam).
+  </p>
+
+  <div style="margin-top:16px">
+    <a class="btn-primary" href="/auth/login-en.html">Go to login</a>
+  </div>
+
+  <p style="margin-top:16px;color:#999;font-size:13px">
+    Didn’t receive anything? Wait a minute and check spam. Then try registering again.
+  </p>
+</main>
+
+<footer class="main-footer"><p>© Ordo Draconis</p></footer>
+
+<script>
+  const params = new URLSearchParams(location.search);
+  const email = params.get('email');
+  if (email) {
+    document.getElementById('msg').innerHTML =
+      "We’ve sent a verification email to <strong>" + email.replace(/</g,"&lt;") + "</strong>. Please check your inbox (and spam).";
+  }
+</script>
+
+</body>
+</html>
