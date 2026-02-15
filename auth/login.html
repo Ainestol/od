@@ -1,112 +1,155 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-    <meta charset="UTF-8">
-    <title>Přihlášení | Ordo Draconis</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <link rel="stylesheet" href="/css/style.css">
-    </head>
+  <meta charset="UTF-8">
+  <title>Přihlášení | Ordo Draconis</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
 
 <body class="auth-page">
 
-    <!-- HEADER -->
-    <header class="main-header">
+  <!-- HEADER -->
+  <header class="main-header">
     <div class="logo">
-        <a href="/">Ordo Draconis</a>
+      <a href="/">Ordo Draconis</a>
     </div>
 
     <div class="auth">
-        <a href="/auth/register.html" class="btn active">Registrace</a>
-        <a href="/auth/login.html" class="btn">Přihlášení</a>
+      <a href="/auth/register.html" class="btn">Registrace</a>
+      <a href="/auth/login.html" class="btn active">Přihlášení</a>
     </div>
 
     <div class="lang">
-  <a href="/auth/login.html" class="active">CS</a>
-  <a href="/auth/login-en.html">EN</a>
-</div>
-</header>
+      <a href="/auth/login.html" class="active">CS</a>
+      <a href="/auth/login-en.html">EN</a>
+    </div>
+  </header>
 
-    <!-- CONTENT -->
-    <main class="auth-container">
-        <h1>Přihlášení</h1>
-        <p class="auth-subtitle">
-            Přihlas se ke svému webovému účtu Ordo Draconis.
-        </p>
+  <!-- CONTENT -->
+  <main class="auth-container">
+    <h1>Přihlášení</h1>
+    <p class="auth-subtitle">
+      Přihlas se ke svému webovému účtu Ordo Draconis.
+    </p>
 
-        <form id="loginForm" class="auth-form">
+    <form id="loginForm" class="auth-form">
 
-            <div class="form-group">
-                <label for="email">E-mailová adresa</label>
-                <input 
-                    type="email"
-                    id="email"
-                    name="email"
-                    placeholder="tvuj@email.cz"
-                    required
-                >
-            </div>
+      <div class="form-group">
+        <label for="email">E-mailová adresa</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          placeholder="tvuj@email.cz"
+          required
+          autocomplete="email"
+          autocapitalize="none"
+          spellcheck="false"
+          autofocus
+        >
+      </div>
 
-            <div class="form-group">
-                <label for="password">Heslo</label>
-                <input 
-                    type="password"
-                    id="password"
-                    name="password"
-                    placeholder="********"
-                    required
-                >
-            </div>
+      <div class="form-group">
+        <label for="password">Heslo</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          placeholder="********"
+          required
+          autocomplete="current-password"
+        >
+      </div>
 
-            <!-- chyba – zatím jen text -->
-            <div class="form-error" id="loginError" style="display:none;">
-                     Incorrect email address or password.
-            </div>
+      <!-- ✅ Remember me -->
+      <div class="form-check">
+        <label class="checkline">
+          <input type="checkbox" id="remember" name="remember">
+          <span>Zůstat přihlášený</span>
+        </label>
+      </div>
 
-            <button type="submit" class="btn-primary">
-                Přihlásit se
-            </button>
-        </form>
+      <!-- chyba -->
+      <div class="form-error" id="loginError" style="display:none;"></div>
 
-        <div class="auth-footer">
-            <p>
-                Nemáš ještě účet?
-                <a href="/auth/register.html">Vytvoř si ho</a>
-            </p>
-        </div>
-    </main>
+      <button type="submit" class="btn-primary" id="loginBtn">
+        Přihlásit se
+      </button>
+    </form>
 
-    <footer class="main-footer">
-        <p>© Ordo Draconis</p>
-    </footer>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const form = document.getElementById('loginForm');
+    <div class="auth-footer">
+      <p>
+        Nemáš ještě účet?
+        <a href="/auth/register.html">Vytvoř si ho</a>
+      </p>
+    </div>
+  </main>
 
-  if (!form) {
-    console.error('loginForm nenalezen');
-    return;
-  }
+  <footer class="main-footer">
+    <p>© Ordo Draconis</p>
+  </footer>
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('loginForm');
+      const errorBox = document.getElementById('loginError');
+      const btn = document.getElementById('loginBtn');
 
-    const formData = new FormData(form);
+      const errorMessages = {
+        INVALID_CREDENTIALS: 'Nesprávný e-mail nebo heslo.',
+        INVALID_EMAIL: 'Zadej platnou e-mailovou adresu.',
+        TOO_MANY_ATTEMPTS: 'Příliš mnoho pokusů. Zkus to prosím později.',
+        SERVER_ERROR: 'Došlo k chybě serveru. Zkus to prosím později.'
+      };
 
-    const res = await fetch('/api/login.php', {
-      method: 'POST',
-      body: formData
+      function showError(msg) {
+        errorBox.textContent = msg;
+        errorBox.style.display = 'block';
+      }
+
+      function setLoading(isLoading) {
+        btn.disabled = isLoading;
+        btn.style.opacity = isLoading ? '0.75' : '1';
+        btn.textContent = isLoading ? 'Přihlašuji…' : 'Přihlásit se';
+      }
+
+      if (!form || !errorBox || !btn) return;
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        errorBox.style.display = 'none';
+
+        const formData = new FormData(form);
+        // ✅ přidáme explicitně hodnotu, ať je to v PHP čitelné
+        formData.set('remember', document.getElementById('remember').checked ? '1' : '0');
+
+        setLoading(true);
+
+        try {
+          const res = await fetch('/api/login.php', {
+            method: 'POST',
+            body: formData
+          });
+
+          const data = await res.json().catch(() => ({}));
+
+          if (data.status === 'ok') {
+            window.location.href = '/profile/index.html';
+            return;
+          }
+
+          const message = errorMessages[data.error] || data.error || 'Přihlášení se nezdařilo.';
+          showError(message);
+        } catch (err) {
+          console.error(err);
+          showError('Přihlášení se nezdařilo – zkontroluj připojení a zkus to znovu.');
+        } finally {
+          setLoading(false);
+        }
+      });
     });
+  </script>
 
-    const data = await res.json();
-
-    if (data.status === 'ok') {
-  window.location.href = '/profile/index.html';
-} else {
-      alert(data.error || 'Login failed');
-    }
-  });
-});
-</script>
 </body>
 </html>

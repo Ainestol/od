@@ -1,142 +1,196 @@
 <!DOCTYPE html>
-<html lang="cs">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Register | Ordo Draconis</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <title>Registration | Ordo Draconis</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- sdílené styly webu -->
-    <link rel="stylesheet" href="/css/style.css">
+  <!-- shared styles -->
+  <link rel="stylesheet" href="/css/style.css">
 </head>
 
 <body class="auth-page">
 
-    <!-- HEADER (stejný jako na indexu) -->
-    <header class="main-header">
+  <!-- HEADER -->
+  <header class="main-header">
     <div class="logo">
-        <a href="/index-en.html">Ordo Draconis</a>
+      <a href="/">Ordo Draconis</a>
     </div>
 
     <div class="auth">
-        <a href="/auth/register-en.html" class="btn active">Registration</a>
-        <a href="/auth/login-en.html" class="btn">Login</a>
+      <a href="/auth/register-en.html" class="btn active">Registration</a>
+      <a href="/auth/login-en.html" class="btn">Login</a>
     </div>
 
     <div class="lang">
-        <a href="/auth/register.html">CS</a>
-        <a href="/auth/register-en.html" class="active">EN</a>
+      <a href="/auth/register.html">CS</a>
+      <a href="/auth/register-en.html" class="active">EN</a>
     </div>
-</header>
+  </header>
 
+  <!-- MAIN CONTENT -->
+  <main class="auth-container">
+    <h1>Registration</h1>
+    <p class="auth-subtitle">
+      Create your Ordo Draconis web account.<br>
+      This account will be used to manage game accounts, voting, and supporting the server.
+    </p>
 
-    <!-- HLAVNÍ OBSAH -->
-    <main class="auth-container">
-        <h1>Create Account</h1>
-        <p class="auth-subtitle">
-            Create your Ordo Draconis web account.<br>
-            This account will later be used for game accounts, vote and donate.
-        </p>
+    <form id="registerForm" class="auth-form">
 
-        <form id="registerForm" class="auth-form">
-            
-            <div class="form-group">
-                <label for="email">Email address</label>
-                <input 
-                    type="email" 
-                    id="email" 
-                    name="email"
-                    placeholder="your@email.com"
-                    required
-                >
-            </div>
+      <div class="form-group">
+        <label for="email">Email address</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          placeholder="you@email.com"
+          required
+        >
+      </div>
 
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input 
-                    type="password" 
-                    id="password" 
-                    name="password"
-                    placeholder="********"
-                    minlength="6"
-                    required
-                >
-            </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          placeholder="********"
+          minlength="6"
+          required
+        >
+      </div>
 
-            <div class="form-group">
-                <label for="password_confirm">Confirm password</label>
-                <input 
-                    type="password" 
-                    id="password_confirm" 
-                    name="password_confirm"
-                    placeholder="********"
-                    minlength="6"
-                    required
-                >
-                <div class="form-hint">
-                The password must be at least 6 characters long.
-                </div>
-            </div>
-
-            <!-- chybová hláška – zatím jen statická -->
-            <div class="form-error" id="registerError" style="display:none;"></div>
-
-            <button type="submit" class="btn-primary">
-                Create account
-            </button>
-        </form>
-
-        <div class="auth-footer">
-            <p>
-                Already have an account?
-                <a href="/auth/login.html">Login here</a>
-            </p>
+      <div class="form-check">
+        <label for="password_confirm">Confirm password</label>
+        <input
+          type="password"
+          id="password_confirm"
+          name="password_confirm"
+          placeholder="********"
+          minlength="6"
+          required
+        >
+        <div class="form-hint">
+          Password must be at least 6 characters long.
         </div>
-    </main>
+      </div>
 
-    <!-- FOOTER -->
-    <footer class="main-footer">
-        <p>© Ordo Draconis</p>
-    </footer>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const form = document.getElementById('registerForm');
-  const errorBox = document.getElementById('registerError');
-  const errorMessages = {
-  EMAIL_EXISTS: 'An account with this email already exists.',
-  INVALID_EMAIL: 'Please enter a valid email address.',
-  PASSWORD_TOO_SHORT: 'Password must be at least 6 characters long.',
-  SERVER_ERROR: 'Server error. Please try again later.'
-};
-  if (!form || !errorBox) {
-    console.error('Register form or error box missing');
-    return;
-  }
+      <!-- ✅ CONSENTS -->
+      <div class="form-check">
+        <label class="checkline">
+          <input type="checkbox" id="agree_rules" name="agree_rules" required>
+          <span>
+            I confirm that I have read and agree with the
+            <a href="/pages/rules-en.html" target="_blank" rel="noopener">Server Rules</a>.
+          </span>
+        </label>
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
+        <label class="checkline" style="margin-top:10px;">
+          <input type="checkbox" id="ack_privacy" name="ack_privacy" required>
+          <span>
+            I acknowledge the
+            <a href="/pages/gdpr-en.html" target="_blank" rel="noopener">Privacy Policy</a>.
+          </span>
+        </label>
 
-    errorBox.style.display = 'none';
+        <label class="checkline" style="margin-top:10px;">
+          <input type="checkbox" id="age_15" name="age_15" required>
+          <span>
+            I confirm that I am at least <strong>15 years old</strong>.
+          </span>
+        </label>
+      </div>
 
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
+      <div class="form-error" id="registerError" style="display:none;"></div>
 
-    const res = await fetch('/api/register.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    });
+      <button type="submit" class="btn-primary">
+        Create account
+      </button>
+    </form>
 
-    const data = await res.json();
+    <div class="auth-footer">
+      <p>
+        Already have an account?
+        <a href="/auth/login-en.html">Log in</a>
+      </p>
+    </div>
+  </main>
 
-    if (data.status === 'ok') {
-      window.location.href = '/auth/login.html';
-    } else {
-      const message = errorMessages[data.error] || 'Registration has failed';
-      errorBox.textContent = message;
+  <!-- FOOTER -->
+  <footer class="main-footer">
+    <p>© Ordo Draconis</p>
+  </footer>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('registerForm');
+    const errorBox = document.getElementById('registerError');
+
+    const errorMessages = {
+      EMAIL_EXISTS: 'An account with this email already exists.',
+      INVALID_EMAIL: 'Please enter a valid email address.',
+      PASSWORD_TOO_SHORT: 'Password must be at least 6 characters long.',
+      SERVER_ERROR: 'A server error occurred. Please try again later.'
+    };
+
+    function showError(msg) {
+      errorBox.textContent = msg;
       errorBox.style.display = 'block';
     }
+
+    if (!form || !errorBox) return;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorBox.style.display = 'none';
+
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const passwordConfirm = document.getElementById('password_confirm').value;
+
+      if (password !== passwordConfirm) {
+        showError('Passwords do not match.');
+        return;
+      }
+
+      // ✅ checkboxes (HTML required also blocks submit, but this gives a nice message)
+      const agreeRules = document.getElementById('agree_rules').checked;
+      const ackPrivacy = document.getElementById('ack_privacy').checked;
+      const age15 = document.getElementById('age_15').checked;
+
+      if (!agreeRules) { showError('You must agree to the Server Rules.'); return; }
+      if (!ackPrivacy) { showError('You must acknowledge the Privacy Policy.'); return; }
+      if (!age15) { showError('Registration is allowed for ages 15+ only.'); return; }
+
+      try {
+        const res = await fetch('/api/register.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email,
+            password,
+            agree_rules: true,
+            ack_privacy: true,
+            age_15: true
+          })
+        });
+
+        const data = await res.json();
+
+        if (data.status === 'ok') {
+          window.location.href = '/auth/login-en.html';
+        } else {
+          const message = errorMessages[data.error] || 'Registration failed';
+          showError(message);
+        }
+      } catch (err) {
+        console.error(err);
+        showError('Registration failed — check your connection and try again.');
+      }
+    });
   });
-});
-</script>
+  </script>
+
 </body>
 </html>
