@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ordo Draconis | Lineage II Server</title>
   <link rel="stylesheet" href="css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
@@ -10,35 +11,37 @@
 <body>
 <div class="layout">
 
-  <!-- LEVÁ STRANA -->
+  <!-- LEFT SIDE -->
   <div class="hero-bg hero-home"></div>
 
-  <!-- PRAVÁ STRANA -->
+  <!-- RIGHT SIDE -->
   <aside class="right">
 
     <div class="side-header">
-    <div class="side-logo">Ordo Draconis</div>
-      <div class="top-actions">
-       <div class="auth">
-    <a href="/auth/register-en.html" class="btn">Registration</a>
-    <a href="/auth/login-en.html" class="btn">Login</a>
-</div>
-          <div class="lang">
-  <a href="index.html">CS</a> | 
-  <a href="index-en.html" class="active">EN</a>
+      <div class="side-logo">Ordo Draconis</div>
 
-  <div class="server-status online">
-    <span class="dot"></span>
-    Online
-    <span class="divider">·</span>
-    <span class="players"></span>
-  </div>
-</div>
+      <div class="top-actions">
+        <div class="auth">
+          <a href="/auth/register-en.html" class="btn">Registration</a>
+          <a href="/auth/login-en.html" class="btn">Login</a>
+        </div>
+
+        <div class="lang">
+          <a href="index.html">CS</a> |
+          <a href="index-en.html" class="active">EN</a>
+
+          <div class="server-status online">
+            <span class="dot"></span>
+            Online
+            <span class="divider">·</span>
+            <span class="players"></span>
+          </div>
+        </div>
       </div>
     </div>
 
     <nav class="side-nav">
-      <a href="index-en.html">Home</a>
+      <a href="index-en.html" class="active">Home</a>
       <a href="pages/server-en.html">About server</a>
       <a href="pages/start-en.html">How to start</a>
       <a href="pages/world-en.html">World</a>
@@ -46,52 +49,63 @@
     </nav>
 
     <div class="content-box">
+      <h3>Basic server settings</h3>
 
-  <h3>Basic server settings</h3>
+      <div class="rates-grid">
 
-  <div class="rates-grid">
+        <div class="rate-card">
+          <button type="button" class="rate-title">XP RATE</button>
+          <div class="rate-detail">
+            XP rate 3×<br>
+            After level 55: 2×<br>
+            After level 74: 1×
+          </div>
+        </div>
 
-    <div class="rate-card">
-      <button class="rate-title">XP RATE</button>
-      <div class="rate-detail">
-        XP rate 3×<br>
-        After level 55: 2×<br>
-        After level 74: 1×
+        <div class="rate-card">
+          <button type="button" class="rate-title">SP RATE</button>
+          <div class="rate-detail">
+            SP rate 3×
+          </div>
+        </div>
+
+        <div class="rate-card">
+          <button type="button" class="rate-title">DROP RATE</button>
+          <div class="rate-detail">
+            Drop rate 4×<br>
+            Raid Bosses: 3×<br>
+            WB jewelry: 2× amount
+          </div>
+        </div>
+
+        <div class="rate-card">
+          <button type="button" class="rate-title">SPOIL RATE</button>
+          <div class="rate-detail">
+            Spoil rate 4×
+          </div>
+        </div>
+
+      </div>
+
+      <div class="server-extra">
+        <p>Working pet quests.</p>
+        <p>Castles, geodata, adventurer (RB finder).</p>
+        <p>Drop info.</p>
       </div>
     </div>
 
-    <div class="rate-card">
-      <button class="rate-title">SP RATE</button>
-      <div class="rate-detail">
-        SP rate 3×
-      </div>
-    </div>
-
-    <div class="rate-card">
-      <button class="rate-title">DROP RATE</button>
-      <div class="rate-detail">
-        Drop rate 4×<br>
-        Raid Bosses: 3×<br>
-        WB jewelry: 2× amount
-      </div>
-    </div>
-
-    <div class="rate-card">
-      <button class="rate-title">SPOIL RATE</button>
-      <div class="rate-detail">
-        Spoil rate 4×
-      </div>
-    </div>
-
-  </div>
-
-  <div class="server-extra">
-    <p>Working pet quests.</p>
-    <p>Castles, geodata, adventurer (RB finder).</p>
-    <p>Drop info.</p>
-  </div>
-
+    <!-- ✅ NEW: footer links -->
+    <div class="page-footer">
+  <a href="https://discord.gg/TVUJ_INVITE" target="_blank" rel="noopener">Discord</a>
+  <span>·</span>
+  <a href="pages/rules-en.html">Rules</a>
+  <span>·</span>
+  <a href="pages/gdpr-en.html">GDPR</a>
 </div>
+
+  </aside>
+</div>
+
 <script>
 const rateButtons = document.querySelectorAll('.rate-title');
 
@@ -100,18 +114,17 @@ rateButtons.forEach(button => {
     const currentCard = button.closest('.rate-card');
     const isOpen = currentCard.classList.contains('open');
 
-    // zavřít všechny
     document.querySelectorAll('.rate-card').forEach(card => {
       card.classList.remove('open');
     });
 
-    // pokud nebyla otevřená, otevřít ji
     if (!isOpen) {
       currentCard.classList.add('open');
     }
   });
 });
 </script>
+
 <script>
 async function updateServerStatus() {
   try {
@@ -120,6 +133,8 @@ async function updateServerStatus() {
 
     const dot = document.querySelector('.server-status .dot');
     const players = document.querySelector('.server-status .players');
+
+    if (!dot || !players) return;
 
     if (data.online) {
       dot.style.background = '#2ecc71';

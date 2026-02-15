@@ -2,18 +2,18 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Začít hrát | Ordo Draconis</title>
+  <title>How to start | Ordo Draconis</title>
   <link rel="stylesheet" href="../css/style.css">
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
 </head>
 
-<body>
+<body class="scroll-right logo-pulse">
 <div class="layout">
 
-  <!-- LEVÁ STRANA -->
+  <!-- LEFT SIDE -->
   <div class="hero-bg hero-start"></div>
 
-  <!-- PRAVÁ STRANA -->
+  <!-- RIGHT SIDE -->
   <aside class="right">
 
     <div class="side-header">
@@ -21,20 +21,21 @@
 
       <div class="top-actions">
         <div class="auth">
-  <a href="/auth/register-en.html" class="btn">Registration</a>
-  <a href="/auth/login-en.html" class="btn">Login</a>
-</div>
-        <div class="lang">
-  <a href="start.html">CS</a> |
-  <a href="start-en.html" class="active">EN</a>
+          <a href="/auth/register-en.html" class="btn">Registration</a>
+          <a href="/auth/login-en.html" class="btn">Login</a>
+        </div>
 
-  <div class="server-status online">
-  <span class="dot"></span>
-  Online
-  <span class="divider">·</span>
-  <span class="players"></span>
-</div>
-</div>
+        <div class="lang">
+          <a href="start.html">CS</a> |
+          <a href="start-en.html" class="active">EN</a>
+
+          <div class="server-status online">
+            <span class="dot"></span>
+            Online
+            <span class="divider">·</span>
+            <span class="players"></span>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -49,33 +50,42 @@
     <div class="content-box">
       <h3>How to start</h3>
 
-  <p>
-    If you wish to enter the world of Lineage II Ordo Draconis,
-follow the steps below to begin your journey.
-  </p>
+      <p>
+        If you wish to enter the world of Lineage II Ordo Draconis,
+        follow the steps below to begin your journey.
+      </p>
 
-  <h4>Step 1 – Download the game client</h4>
-  <p>
-    The download button for the game client is ready and waiting. 
-  </p>
+      <h4>Step 1 – Download the game client</h4>
+      <p>The download button for the game client is ready and waiting.</p>
 
-  <a href="https://drive.google.com/file/d/1YgZyrOmL5CxjkjZbKLiRqBJrH9psOMXQ/view?usp=drive_link" 
-     target="_blank" 
-     class="download-link">
-    Game client
-  </a>
+      <a href="https://drive.google.com/file/d/1YgZyrOmL5CxjkjZbKLiRqBJrH9psOMXQ/view?usp=drive_link"
+         target="_blank"
+         class="download-link">
+        Game client
+      </a>
 
-  <h4>Step 2 – Game setup</h4>
-  <p>
-    After downloading, extract the files to a drive where you have enough free space.
-  </p>
+      <h4>Step 2 – Game setup</h4>
+      <p>After downloading, extract the files to a drive where you have enough free space.</p>
 
-  <h4>Step 3 – Connecting to the server</h4>
-  <p>
-    Run the <strong>l2.exe</strong> file in the system folder.<br>
-    For now, the game is available for testing only.
-  </p>
+      <h4>Step 3 – Connecting to the server</h4>
+      <p>
+        Run the <strong>l2.exe</strong> file in the system folder.<br>
+        For now, the game is available for testing only.
+      </p>
+    </div>
+
+    <!-- ✅ NEW: footer links -->
+    <div class="page-footer">
+  <a href="https://discord.gg/TVUJ_INVITE" target="_blank" rel="noopener">Discord</a>
+  <span>·</span>
+  <a href="rules-en.html">Rules</a>
+  <span>·</span>
+  <a href="gdpr-en.html">GDPR</a>
 </div>
+
+  </aside>
+</div>
+
 <script>
 async function updateServerStatus() {
   try {
