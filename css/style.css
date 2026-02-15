@@ -307,7 +307,7 @@ body.no-auth-emblem::before {
 }
 .auth-page .auth-container {
     max-width: 520px;
-    margin-top: 40px;
+    margin-top: 130px;
 
     background: linear-gradient(
         to bottom,
@@ -322,20 +322,10 @@ body.no-auth-emblem::before {
 
     padding: 44px;
 }
-.auth-page::after {
-    content: "";
-    position: absolute;
-
-    left: 0;
-    right: 0;
-    top: 140px;            /* PEVNÁ VÝŠKA – tady si ji doladíš */
-
-    height: 1px;
-    background: rgba(212, 175, 55, 0.6); /* zlatá, jemná */
-
-    pointer-events: none;
-    z-index: 2;
+.auth-page::after { 
+  display: none !important;
 }
+
 .auth-page input[type="email"],
 .auth-page input[type="password"] {
     width: 100%;
@@ -1357,4 +1347,8 @@ body.auth-page .main-footer::after {
 /* někdy je to ještě “separator” jako <hr> */
 body.auth-page hr {
   display: none !important;
+}
+body.auth-page.no-auth-line::after{
+  display:none !important;
+  content:none !important;
 }
