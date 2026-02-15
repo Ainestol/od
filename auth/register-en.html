@@ -167,13 +167,14 @@
         const res = await fetch('/api/register.php', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email,
-            password,
-            agree_rules: true,
-            ack_privacy: true,
-            age_15: true
-          })
+         body: JSON.stringify({
+  email,
+  password,
+  lang: 'en',
+  agree_rules: true,
+  ack_privacy: true,
+  age_15: true
+})
         });
 
         const data = await res.json();
