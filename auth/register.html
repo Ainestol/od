@@ -179,8 +179,9 @@ if (password !== passwordConfirm) {
       const data = await res.json();
 
       if (data.status === 'ok') {
-        window.location.href = '/auth/login.html';
-      } else {
+  window.location.href = '/auth/verify-sent.html?email=' + encodeURIComponent(email);
+  return;
+} else {
         const message = errorMessages[data.error] || 'Registrace selhala';
         showError(message);
       }
