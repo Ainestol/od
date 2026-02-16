@@ -1352,3 +1352,47 @@ body.auth-page.no-auth-line::after{
   display:none !important;
   content:none !important;
 }
+
+/*bannery */
+.page-footer{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.page-footer .footer-links{
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.page-footer .dot{
+  opacity: 0.6;
+}
+
+.page-footer .footer-banners{
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.page-footer .footer-banners a{
+  display: inline-flex;
+  align-items: center;
+}
+
+.page-footer .footer-banners img{
+  height: 26px;      /* <-- tady zmenšuješ/zvětšuješ (např. 22–32) */
+  width: auto;
+  display: block;
+  opacity: 0.95;
+}
+
+.page-footer .footer-banners img:hover{
+  opacity: 1;
+}
