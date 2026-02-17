@@ -1396,3 +1396,16 @@ body.auth-page.no-auth-line::after{
 .page-footer .footer-banners img:hover{
   opacity: 1;
 }
+.footer-banners{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.footer-banners .vote-banner{
+  height:28px;     /* zkus 24–32 podle vzhledu */
+  width:auto;      /* zachová poměr stran */
+  display:block;
+}
+
