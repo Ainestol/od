@@ -1,15 +1,87 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="cs">
 <head>
-  <meta charset="utf-8">
-  <title>Ordo Draconis – Vote</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vote | Ordo Draconis</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    .vote-wrap { max-width: 760px; margin: 40px auto; padding: 0 20px; }
+    .vote-alert {
+      border: 1px solid rgba(255,0,0,.35);
+      background: rgba(255,0,0,.08);
+      padding: 16px 18px;
+      border-radius: 12px;
+      margin: 18px 0 22px;
+      color: #ff2b2b;
+      font-weight: 800;
+      font-size: 18px;
+      line-height: 1.35;
+      text-transform: uppercase;
+    }
+    .vote-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top: 16px; }
+    .vote-actions a { display:inline-flex; align-items:center; justify-content:center; }
+    .muted-small { opacity:.8; font-size: 14px; }
+  </style>
 </head>
-<body>
-  <h1>Ordo Draconis Vote Banner</h1>
 
-  <a href="https://l2rankzone.com/lineage2-servers/ordo-draconis/334/vote" target="_blank" title="l2rankzone lineage 2 private l2servers"><img src="https://files.l2rankzone.com/banners/l2rankzone-l2servers-l2top-v24.webp" alt="l2rankzone lineage 2 private l2servers"/></a>
-  <!-- SEM VLOŽÍŠ HTML kód banneru z L2TopZone / HopZone atd. -->
-  <!-- example: <a href="..."><img src="..."></a> -->
+<body class="auth-page">
+
+  <header class="main-header">
+    <div class="logo"><a href="/">Ordo Draconis</a></div>
+    <div class="auth">
+      <a href="/auth/register.html" class="btn">Registrace</a>
+      <a href="/auth/login.html" class="btn">Přihlášení</a>
+    </div>
+  </header>
+
+  <main class="vote-wrap">
+    <h1>Vote</h1>
+
+    <div class="vote-alert">
+      VOTE COINY SE PŘIPISUJÍ POUZE POKUD JE UŽIVATEL REGISTROVÁN A PŘIHLÁŠEN
+    </div>
+
+    <p class="muted-small">
+      Hlasování probíhá uvnitř profilu hráče (záložka <strong>Hlasování pro server</strong>).
+      Tam se teprve připisují Vote Coiny a hlídá se cooldown.
+    </p>
+
+    <div id="loggedOutBox" style="display:none;">
+      <div class="vote-actions">
+        <a class="btn btn-primary" href="/auth/login.html">Přihlásit se</a>
+        <a class="btn" href="/auth/register.html">Registrace</a>
+      </div>
+    </div>
+
+    <div id="loggedInBox" style="display:none;">
+      <div class="vote-actions">
+        <a class="btn btn-primary" href="/profile/index.html?tab=vote">Přejít na Vote v profilu</a>
+        <a class="btn" href="/profile/index.html">Profil</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="main-footer">
+    <p>© Ordo Draconis</p>
+  </footer>
+
+  <script>
+    (async () => {
+      try {
+        const res = await fetch('/api/me.php', { credentials: 'same-origin' });
+        const me = await res.json();
+
+        if (me && me.ok) {
+          document.getElementById('loggedInBox').style.display = 'block';
+        } else {
+          document.getElementById('loggedOutBox').style.display = 'block';
+        }
+      } catch (e) {
+        document.getElementById('loggedOutBox').style.display = 'block';
+      }
+    })();
+  </script>
 
 </body>
 </html>
