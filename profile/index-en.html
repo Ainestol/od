@@ -120,10 +120,12 @@
       <div id="dcBalance" class="wallet-balance">
   Dragon Coin: <strong>0</strong>
       </div>
-      <p class="muted">Vote links will appear here (4–5 sites).</p>
+      <p class="muted">
+  Click a site to vote. The list is loaded automatically from our database (all active vote sites).
+</p>
 
-      <div class="link-list">
-  <div class="muted">Loading votes…</div>
+<div class="link-list">
+  <div class="muted">Loading vote sites…</div>
 </div>
 <hr style="margin:20px 0;">
 <button id="convertVcToDc" class="btn btn-primary">
@@ -777,15 +779,35 @@ document.addEventListener('click', async (e) => {
 
 <script>
 let voteCache = [];
+let voteBusy = false;
+
+const i18n = (() => {
+  const en = (document.documentElement.lang || '').toLowerCase() === 'en';
+  return {
+    en,
+    txt: {
+      noSites: en ? 'No active vote sites.' : 'Žádné aktivní vote weby.',
+      ready: 'READY',
+      cooldown: en ? 'Vote is on cooldown.' : 'Vote je v cooldownu.',
+      cooldownLeft: en ? 'Cooldown remaining: ' : 'Zbývá cooldown: ',
+      startError: en ? 'Failed to start vote.' : 'Nepodařilo se spustit vote.',
+      openHint: en ? 'Vote page opened. Waiting for verification…' : 'Vote stránka otevřena. Čekám na ověření…',
+      needConfirm: en ? 'Confirm you voted?' : 'Potvrdit, že jsi hlasoval?',
+      rewarded: en ? 'Vote Coin added!' : 'Vote Coin připsán!',
+      pendingLater: en ? 'Not detected yet. Try again later.' : 'Zatím nedetekováno. Zkus to později.',
+      unknownErr: en ? 'Unknown error.' : 'Neznámá chyba.'
+    }
+  };
+})();
 
 /* Načtení vote webů */
 async function loadVoteSites() {
   try {
-    const res = await fetch('/api/vote_status.php');
+    const res = await fetch('/api/vote_status.php', { credentials: 'same-origin' });
     const data = await res.json();
     if (!data.ok) return;
 
-    voteCache = data.sites;
+    voteCache = data.sites || [];
 
     const box = document.querySelector('#vote .link-list');
     if (!box) return;
@@ -793,7 +815,7 @@ async function loadVoteSites() {
     box.innerHTML = '';
 
     if (!voteCache.length) {
-      box.innerHTML = '<div class="muted">Žádné aktivní vote weby.</div>';
+      box.innerHTML = `<div class="muted">${i18n.txt.noSites}</div>`;
       return;
     }
 
@@ -802,7 +824,7 @@ async function loadVoteSites() {
 
       const status = site.remaining > 0
         ? `${Math.ceil(site.remaining / 3600)}h`
-        : 'READY';
+        : i18n.txt.ready;
 
       const disabled = site.remaining > 0 ? 'disabled' : '';
 
@@ -821,89 +843,96 @@ async function loadVoteSites() {
 }
 
 /* Spuštění vote (vytvoří attempt + otevře URL) */
-async function startVote(siteId) {
+async function startVote(siteId, btnEl) {
+  if (voteBusy) return;
+  voteBusy = true;
+
   try {
+    btnEl && (btnEl.disabled = true);
+
     const res = await fetch('/api/vote_start.php', {
       method: 'POST',
+      credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ site_id: siteId })
     });
 
-    const data = await res.json();
+    const data = await res.json().catch(() => ({}));
 
     if (!data.ok) {
       if (data.error === 'COOLDOWN') {
         const rem = typeof data.remaining === 'number' ? data.remaining : 0;
-        alert('This vote is on cooldown. Time left: ' + rem + 's');
-        loadVoteSites();
+        notify?.('error', `${i18n.txt.cooldown} ${i18n.txt.cooldownLeft}${rem}s`);
+        await loadVoteSites();
         return;
       }
-      alert('Error: ' + (data.error || 'UNKNOWN'));
+      notify?.('error', `${i18n.txt.startError} ${data.error || ''}`.trim());
       return;
     }
 
-    // otevři vote stránku
+    // otevři vote stránku (URL bere z DB)
     window.open(data.vote_url, '_blank');
+    notify?.('success', i18n.txt.openHint, 3500);
 
-    // po chvilce: manual confirm (fallback) + polling check
-    setTimeout(async () => {
-      const confirmVote = confirm('Confirm voting? (The reward will be granted only after verification or manual confirmation.)');
-      await pollVote(data.attempt_id, confirmVote);
-    }, 6000);
+    // polling ověření
+    await pollVote(data.attempt_id);
 
   } catch (err) {
     console.error('Vote start error:', err);
-    alert('Failed to start voting..');
+    notify?.('error', i18n.txt.startError);
+  } finally {
+    voteBusy = false;
+    btnEl && (btnEl.disabled = false);
   }
 }
 
-/* Polling vote_check */
-async function pollVote(attemptId, manualConfirm) {
+/* Polling vote_check (nejdřív bez confirm; pokud backend chce confirm, zeptá se až potom) */
+async function pollVote(attemptId) {
   const start = Date.now();
-  const maxMs = 60000; // 60s
-  const waitMs = 5000; // 5s
+  const maxMs = 90000; // 90s
+  const waitMs = 4000; // 4s
+  let manualConfirm = false;
+  let askedConfirm = false;
 
   while (Date.now() - start < maxMs) {
-    try {
-      const res = await fetch('/api/vote_check.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ attempt_id: attemptId, confirm: manualConfirm })
-      });
+    const res = await fetch('/api/vote_check.php', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ attempt_id: attemptId, confirm: manualConfirm })
+    });
 
-      const data = await res.json();
+    const data = await res.json().catch(() => ({}));
 
-      if (!data.ok) {
-        if (data.error === 'COOLDOWN') {
-          alert('This vote is on cooldown.');
-          loadVoteSites();
-          return;
-        }
-        alert('Chyba: ' + (data.error || 'UNKNOWN'));
+    if (!data.ok) {
+      if (data.error === 'COOLDOWN') {
+        notify?.('error', i18n.txt.cooldown);
+        await loadVoteSites();
         return;
       }
-
-      // hotovo
-      if (data.status === 'REWARDED' || data.status === 'USED') {
-        alert('Vote Coin added!');
-        loadVoteSites();
-        if (typeof loadVoteBalance === 'function') loadVoteBalance();
-        return;
-      }
-
-      // čekáme: POSTBACK pending / waiting_confirm
-      // pokud user dal "Storno", status bude WAITING_CONFIRM a my jen čekáme do timeoutu
-      await new Promise(r => setTimeout(r, waitMs));
-
-    } catch (err) {
-      console.error('Vote check error:', err);
-      // při chybě čekneme a zkusíme znovu
-      await new Promise(r => setTimeout(r, waitMs));
+      notify?.('error', data.error || i18n.txt.unknownErr);
+      return;
     }
+
+    if (data.status === 'REWARDED' || data.status === 'USED') {
+      notify?.('success', i18n.txt.rewarded);
+      await loadVoteSites();
+      if (typeof loadVoteBalance === 'function') loadVoteBalance();
+      return;
+    }
+
+    // MANUAL fallback – backend řekne WAITING_CONFIRM
+    if (data.status === 'WAITING_CONFIRM' && !askedConfirm) {
+      askedConfirm = true;
+      manualConfirm = confirm(i18n.txt.needConfirm);
+      // když dá Cancel, necháme manualConfirm=false a budeme jen čekat do timeoutu
+    }
+
+    await new Promise(r => setTimeout(r, waitMs));
   }
 
-  alert('Vote not detected yet. Please try again later.');
-  loadVoteSites();
+  notify?.('error', i18n.txt.pendingLater);
+  await loadVoteSites();
 }
 
 /* Kliknutí na vote */
@@ -914,8 +943,7 @@ document.addEventListener('click', (e) => {
   const id = parseInt(btn.dataset.id, 10);
   if (!id) return;
 
-  // rovnou startVote (attempt + otevření URL + ověření)
-  startVote(id);
+  startVote(id, btn);
 });
 
 /* inicializace */
