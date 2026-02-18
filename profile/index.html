@@ -869,54 +869,108 @@ async function loadVoteSites() {
   }
 }
 
-/* Kliknutí na vote */
-document.addEventListener('click', async (e) => {
-  const btn = e.target.closest('.vote-btn');
-  if (!btn) return;
+/* Spuštění vote (vytvoří attempt + otevře URL) */
+async function startVote(siteId) {
+  try {
+    const res = await fetch('/api/vote_start.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ site_id: siteId })
+    });
 
-  const id = btn.dataset.id;
-  const site = voteCache.find(s => s.id == id);
-  if (!site) return;
+    const data = await res.json();
 
-  /* otevřeme vote stránku */
-  window.open(site.url, '_blank');
+    if (!data.ok) {
+      if (data.error === 'COOLDOWN') {
+        const rem = typeof data.remaining === 'number' ? data.remaining : 0;
+        alert('Vote je v cooldownu. Zbývá: ' + rem + 's');
+        loadVoteSites();
+        return;
+      }
+      alert('Chyba: ' + (data.error || 'UNKNOWN'));
+      return;
+    }
 
-  /* malá pauza aby uživatel fakt odešel */
-  setTimeout(async () => {
+    // otevři vote stránku
+    window.open(data.vote_url, '_blank');
 
-    const confirmVote = confirm('Potvrdit hlasování?');
+    // po chvilce: manual confirm (fallback) + polling check
+    setTimeout(async () => {
+      const confirmVote = confirm('Potvrdit hlasování? (Odměna se připíše až po ověření / nebo manuálním potvrzení.)');
+      await pollVote(data.attempt_id, confirmVote);
+    }, 6000);
 
-    if (!confirmVote) return;
+  } catch (err) {
+    console.error('Vote start error:', err);
+    alert('Chyba při spuštění vote.');
+  }
+}
 
+/* Polling vote_check */
+async function pollVote(attemptId, manualConfirm) {
+  const start = Date.now();
+  const maxMs = 60000; // 60s
+  const waitMs = 5000; // 5s
+
+  while (Date.now() - start < maxMs) {
     try {
-      const res = await fetch('/api/vote_confirm.php', {
+      const res = await fetch('/api/vote_check.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ site_id: id })
+        body: JSON.stringify({ attempt_id: attemptId, confirm: manualConfirm })
       });
 
       const data = await res.json();
 
-      if (data.ok) {
-  alert('Vote Coin připsán!');
-  loadVoteSites();
-  loadVoteBalance();
-} else if (data.error === 'COOLDOWN') {
-        alert('Vote je v cooldownu.');
-      } else {
-        alert('Hlasování se nepodařilo.');
+      if (!data.ok) {
+        if (data.error === 'COOLDOWN') {
+          alert('Vote je v cooldownu.');
+          loadVoteSites();
+          return;
+        }
+        alert('Chyba: ' + (data.error || 'UNKNOWN'));
+        return;
       }
 
-    } catch (err) {
-      console.error('Vote confirm error:', err);
-    }
+      // hotovo
+      if (data.status === 'REWARDED' || data.status === 'USED') {
+        alert('Vote Coin připsán!');
+        loadVoteSites();
+        if (typeof loadVoteBalance === 'function') loadVoteBalance();
+        return;
+      }
 
-  }, 3000); // 3 sekundy čekání
+      // čekáme: POSTBACK pending / waiting_confirm
+      // pokud user dal "Storno", status bude WAITING_CONFIRM a my jen čekáme do timeoutu
+      await new Promise(r => setTimeout(r, waitMs));
+
+    } catch (err) {
+      console.error('Vote check error:', err);
+      // při chybě čekneme a zkusíme znovu
+      await new Promise(r => setTimeout(r, waitMs));
+    }
+  }
+
+  alert('Hlasování zatím nedetekováno. Zkus to později.');
+  loadVoteSites();
+}
+
+/* Kliknutí na vote */
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('.vote-btn');
+  if (!btn) return;
+
+  const id = parseInt(btn.dataset.id, 10);
+  if (!id) return;
+
+  // rovnou startVote (attempt + otevření URL + ověření)
+  startVote(id);
 });
 
 /* inicializace */
 document.addEventListener('DOMContentLoaded', loadVoteSites);
 </script>
+
 
 <script>
 async function loadVoteBalance() {
