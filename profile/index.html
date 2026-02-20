@@ -873,8 +873,8 @@ async function loadVoteSites() {
       const el = document.createElement('div');
 
       const status = site.remaining > 0
-        ? `${Math.ceil(site.remaining / 3600)}h`
-        : i18n.txt.ready;
+  ? `${Math.max(1, Math.floor(site.remaining / 3600))}h`
+  : i18n.txt.ready;
 
       const disabled = site.remaining > 0 ? 'disabled' : '';
 
