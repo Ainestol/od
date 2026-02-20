@@ -872,9 +872,16 @@ async function loadVoteSites() {
     voteCache.forEach(site => {
       const el = document.createElement('div');
 
-      const status = site.remaining > 0
-  ? `${Math.max(1, Math.floor(site.remaining / 3600))}h`
-  : i18n.txt.ready;
+      const status = (() => {
+  const rem = Number(site.remaining || 0);
+  if (rem <= 0) return i18n.txt.ready;
+
+  const h = Math.floor(rem / 3600);
+  const m = Math.floor((rem % 3600) / 60);
+
+  if (h <= 0) return `${m}m`;
+  return `${h}h ${m}m`;
+})();
 
       const disabled = site.remaining > 0 ? 'disabled' : '';
 
