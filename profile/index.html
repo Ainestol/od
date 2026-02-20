@@ -1181,7 +1181,7 @@ let shopProducts = [];
 let myGameAccounts = [];
 
 async function loadShop() {
-  const box = document.getElementById('shopBox');
+  const box = document.getElementById('shopPremium');
   if (!box) return;
 
   box.innerHTML = '<div class="muted">Načítám produkty…</div>';
@@ -1288,10 +1288,29 @@ document.addEventListener('click', async (e) => {
     btn.disabled = false;
   }
 });
+function initShopSubTabs() {
+  const btns = document.querySelectorAll('#shop [data-shop-tab]');
+  const panes = {
+    premium: document.getElementById('shopPremium'),
+    mounts: document.getElementById('shopMounts'),
+    cosmetic: document.getElementById('shopCosmetic')
+  };
 
+  btns.forEach(b => b.addEventListener('click', () => {
+    const key = b.dataset.shopTab;
+    btns.forEach(x => x.classList.toggle('active', x === b));
+    Object.entries(panes).forEach(([k, el]) => {
+      if (!el) return;
+      el.style.display = (k === key) ? '' : 'none';
+    });
+  }));
+}
 document.addEventListener('DOMContentLoaded', () => {
   // načti shop, až když uživatel přepne na tab (ušetříme requesty)
-  document.querySelector('[data-tab="shop"]')?.addEventListener('click', loadShop);
+  document.querySelector('[data-tab="shop"]')?.addEventListener('click', () => {
+  initShopSubTabs();
+  loadShop();
+});
 });
 </script>
 
