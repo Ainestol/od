@@ -163,12 +163,20 @@
     </section>
 
 <section id="shop" class="profile-card panel">
-  <h2>Shop</h2>
-  <p class="muted">Nákup za Dragon Coin (DC).</p>
+  <h2>Tržiště</h2>
+<p class="muted">Nákup za Dragon Coin (DC).</p>
 
-  <div id="shopBox" class="link-list">
-    <div class="muted">Načítám produkty…</div>
-  </div>
+<div class="profile-tabs" style="margin:10px 0 14px;">
+  <button type="button" class="tab active" data-shop-tab="premium">Premium</button>
+  <button type="button" class="tab" data-shop-tab="mounts">Mounty</button>
+  <button type="button" class="tab" data-shop-tab="cosmetic">Vzhled</button>
+</div>
+
+<div id="shopMsg" class="muted" style="margin-bottom:10px; display:none;"></div>
+
+<div id="shopPremium" class="link-list"></div>
+<div id="shopMounts" class="link-list" style="display:none;"></div>
+<div id="shopCosmetic" class="link-list" style="display:none;"></div>
 </section>
 
       <section id="donate" class="profile-card panel">
