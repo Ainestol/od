@@ -1059,7 +1059,10 @@ function notify(type, message, timeout = 3000) {
 
           <div style="display:flex; gap:10px; align-items:center; justify-content:flex-end;">
             ${selectHtml}
-            <span class="tag">${prod.price_dc} DC</span>
+            <span class="tag">
+  <img src="/img/dragon-coin.png" alt="DC" class="coin-icon coin-icon--tag">
+  ${prod.price_dc} DC
+</span>
             <button class="btn btn-small btn-primary shop-buy" data-id="${prod.id}">
               ${isEn ? 'Buy' : 'Koupit'}
             </button>
