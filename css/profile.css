@@ -376,3 +376,35 @@ body.auth-page.profile-page { overflow: auto; }
   gap: 8px;
   background: transparent !important; /* ať nic nebarví pozadí */
 }
+
+.profile-shell .profile-header{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:16px;
+  flex-wrap:wrap;
+  margin-bottom: 14px;
+}
+
+.profile-shell .wallet-top{
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+
+.profile-shell .wallet-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 10px;
+  border:1px solid rgba(212,175,55,.35);
+  background: rgba(0,0,0,.35);
+  border-radius:10px;
+  font-size:14px;
+}
+
+.profile-shell .coin-icon--top{
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+}
