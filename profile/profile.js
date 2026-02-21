@@ -1041,10 +1041,11 @@ if (data.ok) {
 
     box.innerHTML = `<div class="muted">${T.shopLoading}</div>`;
 
-    const [pRes, aRes] = await Promise.all([
-      fetch('/api/shop_list.php', { credentials: 'same-origin' }),
-      fetch('/api/list_game_accounts_min.php', { credentials: 'same-origin' })
-    ]);
+    const lang = (document.documentElement.lang || 'cs').toLowerCase();
+const [pRes, aRes] = await Promise.all([
+  fetch(`/api/shop_list.php?lang=${encodeURIComponent(lang)}`, { credentials: 'same-origin' }),
+  fetch('/api/list_game_accounts_min.php', { credentials: 'same-origin' })
+]);
 
     const pData = await pRes.json().catch(() => ({}));
     const aData = await aRes.json().catch(() => ({}));
