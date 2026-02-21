@@ -27,7 +27,23 @@
 </header>
 
 <main class="auth-container profile-shell">
-  <h1>Můj profil</h1>
+   <div class="profile-header">
+    <h1>Můj profil</h1>
+
+    <div class="wallet-top">
+      <div id="voteBalanceTop" class="wallet-pill">
+        <img src="/img/vote-coin.png" alt="" class="coin-icon coin-icon--top">
+        <span>VC</span>
+        <strong>0</strong>
+      </div>
+
+      <div id="dcBalanceTop" class="wallet-pill">
+        <img src="/img/dragon-coin.png" alt="" class="coin-icon coin-icon--top">
+        <span>DC</span>
+        <strong>0</strong>
+      </div>
+    </div>
+  </div>
 
   <div class="profile-tabs">
     <button type="button" class="tab active" data-tab="accounts">Herní účty</button>
@@ -118,15 +134,7 @@
 
     <section id="vote" class="profile-card panel">
       <h2>Hlasování pro server</h2>
-      <div id="voteBalance" class="wallet-balance">
-  <img src="/img/vote-coin.png" alt="Vote Coin" class="coin-icon">
-  Vote Coin: <strong>0</strong>
-</div>
-
-<div id="dcBalance" class="wallet-balance">
-  <img src="/img/dragon-coin.png" alt="Dragon Coin" class="coin-icon">
-  Dragon Coin: <strong>0</strong>
-</div>
+      
      <p class="muted">
   Klikni na web a odhlasuj. Seznam se načítá automaticky z databáze (všechny aktivní vote weby).
 </p>
