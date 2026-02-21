@@ -257,28 +257,8 @@
     });
   }
 
-  // ---------- init (část 1/3) ----------
-  document.addEventListener('DOMContentLoaded', async () => {
-    await initMeAndVipBox();
-    initProfileTabs();
-
-    // účty
-    initCreateAccountModal();
-    initDeleteModal();
-    await loadGameAccounts();
-    initResetPasswordModal();
-    initSetPrimaryAccount();
-    initBugReport();
-    initMyBugsList();
-    if (document.getElementById('vote') || document.getElementById('shop')) {
-    initPart3();
-}
-  });
-
-  // export pro další části (2/3 a 3/3)
+ 
   window.loadGameAccounts = loadGameAccounts;
-})();
-
 // ---------- část 2/3 ----------
 
 // NOTIFY (globální, aby ho mohly volat i další části)
@@ -1050,3 +1030,22 @@ function initPart3() {
   loadVoteBalance();
   loadDcBalance();
 }
+
+document.addEventListener('DOMContentLoaded', async () => {
+  await initMeAndVipBox();
+  initProfileTabs();
+
+  initCreateAccountModal();
+  initDeleteModal();
+  initResetPasswordModal();
+  initSetPrimaryAccount();
+  initBugReport();
+  initMyBugsList();
+
+  await loadGameAccounts();
+
+  if (document.getElementById('vote') || document.getElementById('shop')) {
+    initPart3();
+  }
+});
+})(); 
