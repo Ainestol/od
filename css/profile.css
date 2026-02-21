@@ -64,7 +64,7 @@ body.profile-page::before{
   position: fixed;
   inset: 0;
   background: url("/img/clan-emblem.png") center 35% / 70% no-repeat;
-  opacity: 0.10;
+  opacity: 0.40;
   pointer-events: none;
   z-index: 0;
 }
