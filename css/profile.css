@@ -413,3 +413,44 @@ body.auth-page.profile-page { overflow: auto; }
   position: relative;
 }
 
+/* VIP box – fantasy styl */
+.profile-vip-box{
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+
+  margin: 14px 0 18px;
+  padding: 14px 16px;
+
+  background: rgba(0,0,0,.55);
+  border: 1px solid rgba(212,175,55,.35); /* gold */
+  border-radius: 10px;
+
+  color: #d4af37; /* gold text */
+  box-shadow: 0 0 22px rgba(0,0,0,.45);
+  backdrop-filter: blur(2px);
+}
+
+/* malá ikonka draka */
+.profile-vip-box .vip-icon{
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  flex: 0 0 auto;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,.6));
+  opacity: .95;
+}
+
+/* text uvnitř */
+.profile-vip-box .vip-title{
+  font-weight: 800;
+  letter-spacing: .5px;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.profile-vip-box .vip-meta{
+  color: rgba(212,175,55,.85);
+  font-size: 14px;
+  line-height: 1.35;
+}
