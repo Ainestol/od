@@ -1434,19 +1434,3 @@ body.auth-page .auth-container {
   height: auto !important;
   max-height: none !important;
 }
-.coin-icon{
-  width: 300px;
-  height: 300px;
-  object-fit: contain;
-  vertical-align: middle;
-  filter: drop-shadow(0 2px 6px rgba(0,0,0,.35));
-  opacity: .95;
-}
-
-
-.coin-icon--tag{
-  width: 150px;
-  height: 150px;
-  margin-right: 6px;
-  opacity: .9;
-}
