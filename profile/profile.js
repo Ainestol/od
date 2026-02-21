@@ -1091,9 +1091,9 @@ async function loadShop() {
 
   try {
     [pRes, aRes] = await Promise.all([
-      fetch('/api/shop_list.php', { credentials: 'same-origin' }),
-      fetch('/api/list_game_accounts_min.php', { credentials: 'same-origin' })
-    ]);
+  fetch(`/api/shop_list.php?lang=${getLang()}`, { credentials: 'same-origin' }),
+  fetch('/api/list_game_accounts_min.php', { credentials: 'same-origin' })
+]);
 
     pData = await pRes.json().catch(() => ({}));
     aData = await aRes.json().catch(() => ({}));
