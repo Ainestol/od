@@ -398,7 +398,7 @@ body.auth-page.profile-page { overflow: auto; }
   gap:8px;
   padding:0;
   border:0;
-  background: rgba(0,0,0,.35);
+  background: transparent !important; /* bylo rgba(0,0,0,.35) */
   border-radius:0;
   font-size:14px;
 }
