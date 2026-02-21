@@ -1454,3 +1454,5 @@ body.auth-page .auth-container {
   margin-right: 6px;
   opacity: .9;
 }
+
+.coin-icon { background: transparent !important; }
