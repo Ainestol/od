@@ -1434,3 +1434,17 @@ body.auth-page .auth-container {
   height: auto !important;
   max-height: none !important;
 }
+.coin-icon{
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  vertical-align: middle;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,.35));
+  opacity: .95;
+}
+
+.wallet-balance{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
