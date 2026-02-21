@@ -600,7 +600,7 @@ function notify(type, message, timeout = 3000) {
         box.innerHTML = '';
         data.bugs.forEach(bug => {
           const row = document.createElement('a');
-          row.href = `/profile/bug_detail.html?id=${bug.id}`;
+          row.href = `/profile/bug_detail.html?id=${bug.id}&lang=${isEn ? 'en' : 'cs'}`;
           row.className = 'link-item';
           row.innerHTML = `
             <strong>[${String(bug.status || '').toUpperCase()}]</strong>
