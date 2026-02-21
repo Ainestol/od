@@ -1435,8 +1435,8 @@ body.auth-page .auth-container {
   max-height: none !important;
 }
 .coin-icon{
-  width: 22px;
-  height: 22px;
+  width: 32px;
+  height: 32px;
   object-fit: contain;
   vertical-align: middle;
   filter: drop-shadow(0 2px 6px rgba(0,0,0,.35));
@@ -1449,8 +1449,8 @@ body.auth-page .auth-container {
   gap: 8px;
 }
 .coin-icon--tag{
-  width: 16px;
-  height: 16px;
+  width: 32px;
+  height: 32px;
   margin-right: 6px;
   opacity: .9;
 }
