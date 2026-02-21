@@ -455,13 +455,9 @@ body.auth-page.profile-page { overflow: auto; }
   line-height: 1.35;
 }
 
-/* sjednotí pozadí hlavičky (levá i pravá část včetně coinů) */
 .profile-page .profile-shell .profile-header{
   background: rgba(0,0,0,0.55);
   border: 1px solid rgba(212,175,55,0.20);
   padding: 14px 18px;
   border-radius: 10px;
-}
-.profile-page .profile-shell .wallet-pill{
-  background: transparent !important;
 }
