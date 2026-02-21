@@ -968,8 +968,6 @@ async function loadVoteBalance() {
 if (data.ok) {
   modal.classList.add('hidden');
 
-  notify('success', T.vipOk); // ✅ tohle ti chybělo
-
   await loadVoteBalance();
   await loadDcBalance();
   await loadGameAccounts();
@@ -977,8 +975,10 @@ if (data.ok) {
   if (typeof window.refreshMeAndUi === 'function') {
     await window.refreshMeAndUi();
   }
-} else {
-  notify('error', data.error || T.vipErr); // ✅ místo alertu
+}
+
+else {
+  alert(data.error || 'Activation failed.');
 }
       } catch (err) {
         alert('Server error.');
