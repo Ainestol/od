@@ -853,20 +853,22 @@ function notify(type, message, timeout = 3000) {
   /* -----------------------------
    * balances
    * ----------------------------- */
-  async function loadVoteBalance() {
-    try {
-      const res = await fetch('/api/get_wallet_balance.php?currency=VOTE_COIN', {
-        credentials: 'same-origin'
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!data.ok) return;
+async function loadVoteBalance() {
+  try {
+    const res = await fetch('/api/get_wallet_balance.php?currency=VOTE_COIN');
+    const data = await res.json();
+    if (!data.ok) return;
 
-      const el = qs('#voteBalance strong');
-      if (el) el.textContent = data.balance;
-    } catch (err) {
-      console.error('Vote balance error:', err);
-    }
+    const el = document.querySelector('#voteBalance strong');
+    if (el) el.textContent = data.balance;
+
+    const top = document.querySelector('#voteBalanceTop strong');
+    if (top) top.textContent = data.balance;
+
+  } catch (err) {
+    console.error('Vote balance error:', err);
   }
+}
 
   async function loadDcBalance() {
     try {
