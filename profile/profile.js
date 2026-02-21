@@ -237,22 +237,24 @@ function notify(type, message, timeout = 3000) {
       if (isPrimary) row.classList.add('primary-account');
 
       const premiumTag = (() => {
-        if (acc.premium_days_left === null) {
-          return `<span class="tag muted">Premium: neaktivní</span>`;
-        }
-        const left = Number(acc.premium_days_left);
-        if (left < 0) return `<span class="tag danger">Premium: expirováno</span>`;
-        if (left <= 3) {
-          return `<span class="tag warning">Premium: ${left} dny</span>`;
-        }
-        return `<span class="tag success">Premium: ${left} dní</span>`;
-      })();
+  const tInactive = isEn ? 'Premium: inactive' : 'Premium: neaktivní';
+  const tExpired  = isEn ? 'Premium: expired'  : 'Premium: expirováno';
+  const tDays     = (n) => isEn ? `${n} days` : `${n} ${n === 1 ? 'den' : (n >= 2 && n <= 4 ? 'dny' : 'dní')}`;
+
+  if (acc.premium_days_left === null) {
+    return `<span class="tag muted">${tInactive}</span>`;
+  }
+  const left = Number(acc.premium_days_left);
+  if (left < 0) return `<span class="tag danger">${tExpired}</span>`;
+  if (left <= 3) return `<span class="tag warning">Premium: ${tDays(left)}</span>`;
+  return `<span class="tag success">Premium: ${tDays(left)}</span>`;
+})();
 
       row.innerHTML = `
         <div class="account-row" data-login="${acc.login}">
-          <strong>${isPrimary ? '⭐ ' : ''}Account:</strong> ${acc.login}
+          <strong>${isPrimary ? '⭐ ' : ''}${isEn ? 'Account' : 'Účet'}:</strong> ${acc.login}
 
-          <span class="tag">${acc.chars_count} characters</span>
+          <span class="tag">${acc.chars_count} ${isEn ? 'characters' : 'postav'}</span>
           ${premiumTag}
           ${
             acc.premium_end_at
@@ -358,7 +360,7 @@ function notify(type, message, timeout = 3000) {
     if (!modal || !input || !confirmBtn || !cancelBtn) return;
 
     let currentLogin = null;
-    const keyword = 'smazat';
+    const keyword = isEn ? 'delete' : 'smazat';
 
     document.addEventListener('click', (e) => {
       // only buttons with data-login inside account actions should open delete modal
