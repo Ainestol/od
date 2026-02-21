@@ -354,3 +354,25 @@ body.auth-page.profile-page { overflow: auto; }
   color: #0f2f1f;
   font-weight: bold;
 }
+/* Ikony mincí – bez jakéhokoli pozadí a bez "dlaždice" */
+.coin-icon{
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+
+/* menší varianta do tagu */
+.coin-icon--tag{
+  width: 14px;
+  height: 14px;
+}
+.wallet-balance{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent !important; /* ať nic nebarví pozadí */
+}
