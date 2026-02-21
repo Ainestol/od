@@ -404,7 +404,7 @@ body.auth-page.profile-page { overflow: auto; }
 }
 
 .profile-shell .coin-icon--top{
-  width: 102px;
-  height: 102px;
+  width: 88px;
+  height: 88px;
   object-fit: contain;
 }
