@@ -367,8 +367,8 @@ body.auth-page.profile-page { overflow: auto; }
 
 /* menší varianta do tagu */
 .coin-icon--tag{
-  width: 102px;
-  height: 102px;
+  width: 48px;
+  height: 48px;
 }
 .wallet-balance{
   display: flex;
