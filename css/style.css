@@ -1408,4 +1408,19 @@ body.auth-page.no-auth-line::after{
   width:auto;      /* zachová poměr stran */
   display:block;
 }
+/* --- AUTH pages: always allow vertical scroll --- */
+html, body {
+  height: auto;
+}
 
+body.auth-page {
+  min-height: 100vh;
+  overflow-y: auto;          /* povol scroll */
+  overflow-x: hidden;
+}
+
+/* auth-container se nesmí snažit vejít do 100vh za každou cenu */
+body.auth-page .auth-container {
+  height: auto;
+  max-height: none;
+}
