@@ -1,3 +1,4 @@
+console.log('profile.js LOADED');
 // /js/profile.js
 (() => {
   'use strict';
