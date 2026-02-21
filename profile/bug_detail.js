@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const confirmBox  = document.getElementById('confirmResolvedBox');
   const confirmBtn  = document.getElementById('confirmResolvedBtn');
   const backLink    = document.getElementById('backToProfile');
+  const logoutBtn   = document.getElementById('logoutBtn');
 
   // 1) lang – priorita: ?lang=en -> <html lang> -> cs
   const urlLang = (params.get('lang') || '').toLowerCase();
@@ -34,6 +35,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       loadingMsgs: 'Načítám zprávy…',
 
       back: '← Zpět na profil',
+      logout: 'Odhlásit se',
       waitingAdmin: 'Čeká se na odpověď administrátora.',
       sendError: 'Chyba při odesílání',
       tooLong: 'Zpráva může mít maximálně 1000 znaků.',
@@ -65,6 +67,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       loadingMsgs: 'Loading messages…',
 
       back: '← Back to profile',
+      logout: 'Log out',
       waitingAdmin: 'Waiting for admin response.',
       sendError: 'Error while sending message',
       tooLong: 'Message can have a maximum of 1000 characters.',
@@ -87,6 +90,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
 
   const t = i18n[lang];
+  if (logoutBtn) logoutBtn.textContent = t.logout;
 
   // 2) Překlad statického HTML (jednorázově)
   document.title = t.pageTitle;
