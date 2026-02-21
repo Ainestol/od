@@ -413,38 +413,3 @@ body.auth-page.profile-page { overflow: auto; }
   position: relative;
 }
 
-/* levá dekorace */
-.profile-shell::before{
-  content:"";
-  position:absolute;
-  top: 90px;              /* posuň podle toho, aby to nebylo přes header */
-  left: -180px;           /* “ven” mimo box */
-  width: 160px;
-  height: 520px;
-  background: url("/img/healer.png") no-repeat center/contain;
-  opacity: 1;
-  pointer-events: none;
-  filter: drop-shadow(0 10px 30px rgba(0,0,0,.55));
-}
-
-/* pravá dekorace */
-.profile-shell::after{
-  content:"";
-  position:absolute;
-  top: 90px;
-  right: -180px;
-  width: 160px;
-  height: 520px;
-  background: url("/img/bd.png") no-repeat center/contain;
-  opacity: 1;
-  pointer-events: none;
-  filter: drop-shadow(0 10px 30px rgba(0,0,0,.55));
-}
-
-/* na menších šířkách je schováme, ať to nepřekáží */
-@media (max-width: 1200px){
-  .profile-shell::before,
-  .profile-shell::after{
-    display:none;
-  }
-}
