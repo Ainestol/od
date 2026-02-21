@@ -1,4 +1,6 @@
-console.log('profile.js LOADED');
+console.log('[profile] loaded');
+window.addEventListener('error', (e) => console.error('[profile] JS error:', e.message, e.filename, e.lineno));
+window.addEventListener('unhandledrejection', (e) => console.error('[profile] Promise error:', e.reason));
 // /js/profile.js
 (() => {
   'use strict';
@@ -547,3 +549,4 @@ console.log('profile.js LOADED');
   window.notify = notify;
 
 })();
+console.log('[profile] end');
