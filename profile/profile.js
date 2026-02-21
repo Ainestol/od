@@ -871,20 +871,21 @@ async function loadVoteBalance() {
 }
 
   async function loadDcBalance() {
-    try {
-      const res = await fetch('/api/get_wallet_balance.php?currency=DC', {
-        credentials: 'same-origin'
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!data.ok) return;
+  try {
+    const res = await fetch('/api/get_wallet_balance.php?currency=DC');
+    const data = await res.json();
+    if (!data.ok) return;
 
-      const el = qs('#dcBalance strong');
-      if (el) el.textContent = data.balance;
-    } catch (err) {
-      console.error('DC balance error:', err);
-    }
+    const el = document.querySelector('#dcBalance strong');
+    if (el) el.textContent = data.balance;
+
+    const top = document.querySelector('#dcBalanceTop strong');
+    if (top) top.textContent = data.balance;
+
+  } catch (err) {
+    console.error('DC balance error:', err);
   }
-
+}
   window.loadVoteBalance = window.loadVoteBalance || loadVoteBalance;
   window.loadDcBalance = window.loadDcBalance || loadDcBalance;
 
