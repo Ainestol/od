@@ -101,13 +101,13 @@ function notify(type, message, timeout = 3000) {
   // expose notify if some legacy inline code expects it
   window.notify = window.notify || notify;
 
-  /* -----------------------------
+   /* -----------------------------
    * ME + redirect + VIP box + admin btn
    * ----------------------------- */
   let meCache = null;
 
-  async function fetchMe() {
-    if (meCache) return meCache;
+  async function fetchMe(force = false) {
+    if (meCache && !force) return meCache;
     const res = await fetch('/api/me.php', { credentials: 'same-origin' });
     const data = await res.json().catch(() => ({}));
     meCache = data;
@@ -118,42 +118,49 @@ function notify(type, message, timeout = 3000) {
     window.location.href = isEn ? '/auth/login-en.html' : '/auth/login.html';
   }
 
-  async function initMeAndUi() {
+  async function initMeAndUi(force = false) {
     try {
-      const me = await fetchMe();
+      const me = await fetchMe(force);
 
       if (!me || !me.ok) {
         redirectToLogin();
         return;
       }
 
-      // WEB VIP box (prepend to .auth-container)
-      if (me.web_vip) {
-        const container = qs('.auth-container');
-        if (container) {
+      const container = qs('.auth-container.profile-shell') || qs('.auth-container');
+      if (container) {
+        const old = container.querySelector('.profile-vip-box');
+        if (old) old.remove();
+
+        if (me.web_vip) {
           const vipBox = document.createElement('div');
           vipBox.className = 'profile-vip-box';
           vipBox.innerHTML = `
-            <strong>WEB VIP aktivní</strong><br>
-            Platí do: ${me.web_vip.end_at}<br>
-            Zbývá dní: ${me.web_vip.days_left}
+            <img class="vip-icon" src="/img/drak.png" alt="VIP">
+            <div>
+              <div class="vip-title">${isEn ? 'WEB VIP active' : 'WEB VIP aktivní'}</div>
+              <div class="vip-meta">
+                ${isEn ? 'Valid until' : 'Platí do'}: ${me.web_vip.end_at}<br>
+                ${isEn ? 'Days left' : 'Zbývá dní'}: ${me.web_vip.days_left}
+              </div>
+            </div>
           `;
           container.prepend(vipBox);
         }
       }
 
-      // admin button show
       if (me.role === 'admin') {
         const btn = document.getElementById('adminBtn');
         if (btn) btn.style.display = 'inline-flex';
       }
     } catch (e) {
-      // fallback – když to spadne, aspoň pošli na login
       redirectToLogin();
     }
   }
 
-  /* -----------------------------
+  window.refreshMeAndUi = window.refreshMeAndUi || (async () => initMeAndUi(true));
+
+   /* -----------------------------
    * tabs (main profile tabs)
    * ----------------------------- */
   function initTabs() {
@@ -955,13 +962,21 @@ async function loadVoteBalance() {
 
         const data = await res.json().catch(() => ({}));
 
-        if (data.ok) {
-          modal.classList.add('hidden');
-          loadVoteBalance();
-          loadDcBalance();
-        } else {
-          alert(data.error || 'Activation failed.');
-        }
+if (data.ok) {
+  modal.classList.add('hidden');
+
+  await loadVoteBalance();
+  await loadDcBalance();
+  await loadGameAccounts();
+
+  if (typeof window.refreshMeAndUi === 'function') {
+    await window.refreshMeAndUi();
+  }
+}
+
+else {
+  alert(data.error || 'Activation failed.');
+}
       } catch (err) {
         alert('Server error.');
       }
@@ -1161,9 +1176,11 @@ function ensureShopInit() {
 
   await loadDcBalance();
   await loadVoteBalance();
+  await loadGameAccounts(); // aby se přepočítalo premium u účtů
 
-  // ✅ refresh listu účtů (přepočítá premium_days_left a end_at)
-  await loadGameAccounts();
+  if (typeof window.refreshMeAndUi === 'function') {
+    await window.refreshMeAndUi(); // aby se aktualizoval VIP box nahoře
+  }
 
   return;
 }
