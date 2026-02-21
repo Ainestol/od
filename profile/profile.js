@@ -13,6 +13,8 @@
     serverConnErr: isEn ? 'Server connection error.' : 'Chyba spojení se serverem.',
     unableLoad: isEn ? 'Unable to load accounts.' : 'Nepodařilo se načíst účty.',
     noAccounts: isEn ? 'You have no game accounts yet.' : 'Zatím nemáš žádné herní účty.',
+    vipOk: isEn ? 'VIP activated' : 'VIP aktivováno',
+    vipErr: isEn ? 'VIP activation failed' : 'Aktivace VIP se nezdařila',
 
     // account actions
     accCreated: isEn ? 'Game account created' : 'Herní účet byl vytvořen',
@@ -68,6 +70,7 @@
     voteRewarded: isEn ? 'Vote Coin added!' : 'Vote Coin připsán!',
     votePending: isEn ? 'Not detected yet. Try again later.' : 'Zatím nedetekováno. Zkus to později.',
     unknownErr: isEn ? 'Unknown error.' : 'Neznámá chyba.'
+    
   };
 
   function qs(sel, root = document) { return root.querySelector(sel); }
@@ -965,6 +968,8 @@ async function loadVoteBalance() {
 if (data.ok) {
   modal.classList.add('hidden');
 
+  notify('success', T.vipOk); // ✅ tohle ti chybělo
+
   await loadVoteBalance();
   await loadDcBalance();
   await loadGameAccounts();
@@ -972,10 +977,8 @@ if (data.ok) {
   if (typeof window.refreshMeAndUi === 'function') {
     await window.refreshMeAndUi();
   }
-}
-
-else {
-  alert(data.error || 'Activation failed.');
+} else {
+  notify('error', data.error || T.vipErr); // ✅ místo alertu
 }
       } catch (err) {
         alert('Server error.');
