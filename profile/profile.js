@@ -1029,72 +1029,120 @@ else {
     });
   }
 
+
+
+
+function notify(type, message, timeout = 3000) {
+  const box = document.getElementById('notifications');
+  if (!box) return;
+
+  const el = document.createElement('div');
+  el.className = `notify ${type}`;
+  el.textContent = message;
+
+  box.appendChild(el);
+
+  setTimeout(() => {
+    el.style.opacity = '0';
+    setTimeout(() => el.remove(), 300);
+  }, timeout);
+}
+
+window.notify = notify; // ✅ důležité
+
   /* -----------------------------
    * shop
    * ----------------------------- */
   let shopProducts = [];
   let myGameAccounts = [];
 
-  async function loadShop() {
-    const box = document.getElementById('shopPremium');
-    if (!box) return;
+  function getLang() {
+  const l = (document.documentElement.lang || '').toLowerCase();
+  return l.startsWith('en') ? 'en' : 'cs';
+}
 
-    box.innerHTML = `<div class="muted">${T.shopLoading}</div>`;
+const I18N = {
+  cs: {
+    shopLoading: 'Načítám produkty…',
+    noProducts: 'Žádné produkty.',
+    pickAccount: 'Vyber herní účet',
+    buy: 'Koupit',
+    dc: 'DC'
+  },
+  en: {
+    shopLoading: 'Loading products…',
+    noProducts: 'No products.',
+    pickAccount: 'Select game account',
+    buy: 'BUY',
+    dc: 'DC'
+  }
+};
 
-    const [pRes, aRes] = await Promise.all([
+async function loadShop() {
+  const box = document.getElementById('shopPremium');
+  if (!box) return;
+
+  const T = I18N[getLang()];
+  box.innerHTML = `<div class="muted">${T.shopLoading}</div>`;
+
+  let pRes, aRes, pData, aData;
+
+  try {
+    [pRes, aRes] = await Promise.all([
       fetch('/api/shop_list.php', { credentials: 'same-origin' }),
       fetch('/api/list_game_accounts_min.php', { credentials: 'same-origin' })
     ]);
 
-    const pData = await pRes.json().catch(() => ({}));
-    const aData = await aRes.json().catch(() => ({}));
-
-    shopProducts = (pData.ok && Array.isArray(pData.products)) ? pData.products : [];
-    myGameAccounts = (aData.ok && Array.isArray(aData.accounts)) ? aData.accounts : [];
-
-    box.innerHTML = '';
-
-    if (!shopProducts.length) {
-      box.innerHTML = `<div class="muted">${T.shopNone}</div>`;
-      return;
-    }
-
-    shopProducts.forEach(prod => {
-      const row = document.createElement('div');
-      row.className = 'mini-row';
-
-      const needsGameAcc = prod.code === 'PREM_GAME_30D';
-
-      const selectHtml = needsGameAcc ? `
-        <select class="shop-acc" data-pid="${prod.id}">
-          ${myGameAccounts.map(a => `<option value="${a.id}">${a.login}</option>`).join('')}
-        </select>
-      ` : '';
-
-      row.innerHTML = `
-        <div class="mini-row">
-          <div>
-            <strong>${prod.name}</strong><br>
-            <span class="muted">${prod.description || ''}</span>
-          </div>
-
-          <div style="display:flex; gap:10px; align-items:center; justify-content:flex-end;">
-            ${selectHtml}
-            <span class="tag">
-  <img src="/img/dragon-coin.png" alt="" class="coin-icon coin-icon--tag">
-  ${prod.price_dc} DC
-</span>
-            <button class="btn btn-small btn-primary shop-buy" data-id="${prod.id}">
-              ${isEn ? 'Buy' : 'Koupit'}
-            </button>
-          </div>
-        </div>
-      `;
-
-      box.appendChild(row);
-    });
+    pData = await pRes.json().catch(() => ({}));
+    aData = await aRes.json().catch(() => ({}));
+  } catch (e) {
+    box.innerHTML = `<div class="form-error">Shop load failed.</div>`;
+    return;
   }
 
+  // ✅ bezpečné naplnění (když API vrátí něco jiného, UI nespadne)
+  shopProducts = (pData && pData.ok && Array.isArray(pData.products)) ? pData.products : [];
+  myGameAccounts = (aData && aData.ok && Array.isArray(aData.accounts)) ? aData.accounts : [];
+
+  box.innerHTML = '';
+
+  if (!shopProducts.length) {
+    box.innerHTML = `<div class="muted">${T.noProducts}</div>`;
+    return;
+  }
+
+  shopProducts.forEach(prod => {
+    const row = document.createElement('div');
+    row.className = 'mini-row';
+
+    const needsGameAcc = (prod.code === 'PREM_GAME_30D');
+
+    const selectHtml = needsGameAcc ? `
+      <select class="shop-acc" data-pid="${prod.id}">
+        ${myGameAccounts.map(a => `<option value="${a.id}">${a.login}</option>`).join('')}
+      </select>
+    ` : '';
+
+    row.innerHTML = `
+      <div class="mini-row">
+        <div>
+          <strong>${prod.name}</strong><br>
+          <span class="muted">${prod.description || ''}</span>
+        </div>
+
+        <div style="display:flex; gap:10px; align-items:center; justify-content:flex-end;">
+          ${selectHtml}
+          <span class="tag">${prod.price_dc} ${T.dc}</span>
+          <button class="btn btn-small btn-primary shop-buy" data-id="${prod.id}">
+            ${T.buy}
+          </button>
+        </div>
+      </div>
+    `;
+
+    box.appendChild(row);
+  });
+}
 let shopInited = false;
 
 function ensureShopInit() {
