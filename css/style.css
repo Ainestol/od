@@ -1443,16 +1443,10 @@ body.auth-page .auth-container {
   opacity: .95;
 }
 
-.wallet-balance{
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
+
 .coin-icon--tag{
   width: 32px;
   height: 32px;
   margin-right: 6px;
   opacity: .9;
 }
-
-.coin-icon { background: transparent !important; }
