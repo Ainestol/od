@@ -360,15 +360,15 @@ body.auth-page.profile-page { overflow: auto; }
   border: 0 !important;
   box-shadow: none !important;
   display: inline-block;
-  width: 64px;
-  height: 64px;
+  width: 102px;
+  height: 102px;
   object-fit: contain;
 }
 
 /* menší varianta do tagu */
 .coin-icon--tag{
-  width: 30px;
-  height: 30px;
+  width: 64px;
+  height: 64px;
 }
 .wallet-balance{
   display: flex;
