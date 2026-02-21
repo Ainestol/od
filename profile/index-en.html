@@ -31,6 +31,7 @@
     <button type="button" class="tab" data-tab="vote">Server vote</button>
     <button type="button" class="tab" data-tab="donate">Donate</button>
     <button type="button" class="tab" data-tab="support">Bug report</button>
+    <button type="button" class="tab" data-tab="shop">Market</button>
   </div>
 
   <div class="profile-panels">
@@ -157,6 +158,23 @@
   </div>
 </div>
     </section>
+
+    <section id="shop" class="profile-card panel">
+  <h2>Marketplace</h2>
+  <p class="muted">Purchase with Dragon Coin (DC).</p>
+
+  <div class="shop-tabs" style="margin:10px 0 14px;">
+    <button type="button" class="tab active" data-shop-tab="premium">Premium</button>
+    <button type="button" class="tab" data-shop-tab="mounts">Mounts</button>
+    <button type="button" class="tab" data-shop-tab="cosmetic">Cosmetics</button>
+  </div>
+
+  <div id="shopMsg" class="muted" style="margin-bottom:10px; display:none;"></div>
+
+  <div id="shopPremium" class="link-list"></div>
+  <div id="shopMounts" class="link-list" style="display:none;"></div>
+  <div id="shopCosmetic" class="link-list" style="display:none;"></div>
+</section>
 
     <section id="donate" class="profile-card panel">
       <h2>Donate</h2>
