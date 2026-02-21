@@ -1,44 +1,165 @@
-// profile.js (část 1/3)
+/* profile.js – shared for index.html + index-en.html */
 (() => {
   'use strict';
 
-  // ---------- helpers ----------
-  const isEn = () => (document.documentElement.lang || '').toLowerCase() === 'en';
+  /* -----------------------------
+   * helpers + i18n
+   * ----------------------------- */
+  const isEn = ((document.documentElement.lang || '').toLowerCase() === 'en');
 
-  // notify() nechávám jako externí (bude v části 2/3 nebo 3/3),
-  // ale kdyby ještě nebyl, ať to nespadne:
-  const safeNotify = (type, msg, t) => (window.notify ? window.notify(type, msg, t) : console.log(type, msg));
+  const T = {
+    // generic
+    loadingAccounts: isEn ? 'Loading game accounts…' : 'Načítám herní účty…',
+    serverConnErr: isEn ? 'Server connection error.' : 'Chyba spojení se serverem.',
+    unableLoad: isEn ? 'Unable to load accounts.' : 'Nepodařilo se načíst účty.',
+    noAccounts: isEn ? 'You have no game accounts yet.' : 'Zatím nemáš žádné herní účty.',
 
-  // ---------- auth + WEB VIP box ----------
-  async function initMeAndVipBox() {
+    // account actions
+    accCreated: isEn ? 'Game account created' : 'Herní účet byl vytvořen',
+    accCreateErr: isEn ? 'Failed to create account' : 'Chyba při vytváření účtu',
+
+    accDeleted: isEn ? 'Game account deleted' : 'Herní účet byl smazán',
+    accHasChars: isEn ? 'Account has active characters' : 'Účet má aktivní postavy',
+    accDeleteFail: isEn ? 'Failed to delete account' : 'Nepodařilo se smazat účet',
+
+    pwChanged: isEn ? 'Password changed' : 'Heslo bylo změněno',
+    pwResetFail: isEn ? 'Failed to reset password' : 'Nepodařilo se resetovat heslo',
+
+    primarySetOk: isEn ? 'Primary account set' : 'Primární účet nastaven',
+    primarySetFail: isEn ? 'Failed to set primary account' : 'Nastavení primárního účtu se nezdařilo',
+
+    // characters
+    loadingChars: isEn ? 'Loading characters…' : 'Načítám postavy…',
+    noChars: isEn ? 'No characters' : 'Žádné postavy',
+    charsLoadFail: isEn ? 'Failed to load characters' : 'Nepodařilo se načíst postavy',
+
+    // bug form
+    noBugs: isEn ? 'No reports' : 'Žádná hlášení',
+    bugSent: isEn ? 'Bug report sent' : 'Bug report odeslán',
+    bugSendErr: isEn ? 'Failed to send bug report' : 'Chyba při odesílání',
+    textTooLong: isEn ? 'Text is too long (max 1000 chars)' : 'Text je příliš dlouhý (max. 1000 znaků)',
+
+    // VIP modal
+    activating: isEn ? 'Activating...' : 'Aktivuji...',
+    activate: isEn ? 'Activate' : 'Aktivovat',
+
+    // conversion
+    convertConfirm: isEn ? 'Convert 4 Vote Coin into 1 Dragon Coin?' : 'Převést 4 Vote Coin na 1 Dragon Coin?',
+    processing: isEn ? 'Processing...' : 'Zpracovávám...',
+    convertLabel: isEn ? 'Convert 4 Vote Coin → 1 Dragon Coin' : 'Převést 4 Vote Coin → 1 Dragon Coin',
+
+    // shop
+    shopLoading: isEn ? 'Loading products…' : 'Načítám produkty…',
+    shopNone: isEn ? 'No products.' : 'Žádné produkty.',
+    buyOk: isEn ? 'Purchase complete' : 'Nákup dokončen',
+    buyErr: isEn ? 'Purchase failed' : 'Chyba nákupu',
+    needAcc: isEn ? 'Select game account' : 'Vyber herní účet',
+    insufficient: isEn ? 'Not enough DC' : 'Nedostatek DC',
+    alreadyBought: isEn ? 'Already purchased' : 'Už koupeno',
+
+    // vote
+    voteNoSites: isEn ? 'No active vote sites.' : 'Žádné aktivní vote weby.',
+    voteReady: 'READY',
+    voteCooldown: isEn ? 'Vote is on cooldown.' : 'Vote je v cooldownu.',
+    voteCooldownLeft: isEn ? 'Cooldown remaining: ' : 'Zbývá cooldown: ',
+    voteStartErr: isEn ? 'Failed to start vote.' : 'Nepodařilo se spustit vote.',
+    voteOpenHint: isEn ? 'Vote page opened. Waiting for verification…' : 'Vote stránka otevřena. Čekám na ověření…',
+    voteNeedConfirm: isEn ? 'Confirm you voted?' : 'Potvrdit, že jsi hlasoval?',
+    voteRewarded: isEn ? 'Vote Coin added!' : 'Vote Coin připsán!',
+    votePending: isEn ? 'Not detected yet. Try again later.' : 'Zatím nedetekováno. Zkus to později.',
+    unknownErr: isEn ? 'Unknown error.' : 'Neznámá chyba.'
+  };
+
+  function qs(sel, root = document) { return root.querySelector(sel); }
+  function qsa(sel, root = document) { return Array.from(root.querySelectorAll(sel)); }
+
+  /* -----------------------------
+   * notify
+   * ----------------------------- */
+function notify(type, message, timeout = 3000) {
+  let box = document.getElementById('notifications');
+
+  // když v HTML není, vytvoříme ho automaticky
+  if (!box) {
+    box = document.createElement('div');
+    box.id = 'notifications';
+    document.body.appendChild(box);
+  }
+
+  const el = document.createElement('div');
+  el.className = `notify ${type}`;
+  el.textContent = message;
+
+  box.appendChild(el);
+
+  setTimeout(() => {
+    el.style.opacity = '0';
+    setTimeout(() => el.remove(), 300);
+  }, timeout);
+}
+
+  // expose notify if some legacy inline code expects it
+  window.notify = window.notify || notify;
+
+  /* -----------------------------
+   * ME + redirect + VIP box + admin btn
+   * ----------------------------- */
+  let meCache = null;
+
+  async function fetchMe() {
+    if (meCache) return meCache;
+    const res = await fetch('/api/me.php', { credentials: 'same-origin' });
+    const data = await res.json().catch(() => ({}));
+    meCache = data;
+    return data;
+  }
+
+  function redirectToLogin() {
+    window.location.href = isEn ? '/auth/login-en.html' : '/auth/login.html';
+  }
+
+  async function initMeAndUi() {
     try {
-      const res = await fetch('/api/me.php', { credentials: 'same-origin' });
-      const data = await res.json();
+      const me = await fetchMe();
 
-      if (!data.ok) {
-        window.location.href = isEn() ? '/auth/login-en.html' : '/auth/login.html';
+      if (!me || !me.ok) {
+        redirectToLogin();
         return;
       }
 
-      if (data.web_vip) {
-        const vipBox = document.createElement('div');
-        vipBox.className = 'profile-vip-box';
-        vipBox.innerHTML = `
-          <strong>WEB VIP aktivní</strong><br>
-          Platí do: ${data.web_vip.end_at}<br>
-          Zbývá dní: ${data.web_vip.days_left}
-        `;
-        document.querySelector('.auth-container')?.prepend(vipBox);
+      // WEB VIP box (prepend to .auth-container)
+      if (me.web_vip) {
+        const container = qs('.auth-container');
+        if (container) {
+          const vipBox = document.createElement('div');
+          vipBox.className = 'profile-vip-box';
+          vipBox.innerHTML = `
+            <strong>WEB VIP aktivní</strong><br>
+            Platí do: ${me.web_vip.end_at}<br>
+            Zbývá dní: ${me.web_vip.days_left}
+          `;
+          container.prepend(vipBox);
+        }
+      }
+
+      // admin button show
+      if (me.role === 'admin') {
+        const btn = document.getElementById('adminBtn');
+        if (btn) btn.style.display = 'inline-flex';
       }
     } catch (e) {
-      window.location.href = '/auth/login.html';
+      // fallback – když to spadne, aspoň pošli na login
+      redirectToLogin();
     }
   }
 
-  // ---------- main tabs ----------
-  function initProfileTabs() {
-    const tabs = document.querySelectorAll('.profile-shell > .profile-tabs .tab');
-    const panels = document.querySelectorAll('.profile-panels .panel');
+  /* -----------------------------
+   * tabs (main profile tabs)
+   * ----------------------------- */
+  function initTabs() {
+    const tabs = qsa('.profile-shell > .profile-tabs .tab');
+    const panels = qsa('.profile-panels .panel');
+
     if (!tabs.length || !panels.length) return;
 
     const show = (key) => {
@@ -48,36 +169,38 @@
 
     tabs.forEach(t => t.addEventListener('click', () => show(t.dataset.tab)));
 
-    const first = document.querySelector('.profile-shell > .profile-tabs .tab.active') || tabs[0];
+    const first = qs('.profile-shell > .profile-tabs .tab.active') || tabs[0];
     if (first) show(first.dataset.tab);
 
     const params = new URLSearchParams(window.location.search);
     const tab = params.get('tab');
     if (tab) {
-      const btn = document.querySelector(`.profile-shell > .profile-tabs [data-tab="${tab}"]`);
+      const btn = qs(`.profile-shell > .profile-tabs [data-tab="${tab}"]`);
       if (btn) btn.click();
     }
   }
 
-  // ---------- game accounts list ----------
+  /* -----------------------------
+   * game accounts list
+   * ----------------------------- */
   async function loadGameAccounts() {
     const list = document.getElementById('gameAccountsList');
     const countEl = document.getElementById('accountsCount');
     if (!list) return;
 
-    list.innerHTML = '<div class="muted">Loading game accounts…</div>';
+    list.innerHTML = `<div class="muted">${T.loadingAccounts}</div>`;
 
     let res;
     try {
       res = await fetch('/api/list_game_accounts.php', { credentials: 'same-origin' });
     } catch (e) {
-      list.innerHTML = '<div class="form-error">Server connection error.</div>';
+      list.innerHTML = `<div class="form-error">${T.serverConnErr}</div>`;
       if (countEl) countEl.textContent = '(0 / 10)';
       return;
     }
 
     if (!res.ok) {
-      list.innerHTML = '<div class="form-error">Unable to load accounts.</div>';
+      list.innerHTML = `<div class="form-error">${T.unableLoad}</div>`;
       if (countEl) countEl.textContent = '(0 / 10)';
       return;
     }
@@ -92,7 +215,7 @@
     list.innerHTML = '';
 
     if (!data.ok || !Array.isArray(data.accounts) || !data.accounts.length) {
-      list.innerHTML = '<div class="muted">You have no game accounts yet.</div>';
+      list.innerHTML = `<div class="muted">${T.noAccounts}</div>`;
       return;
     }
 
@@ -104,26 +227,34 @@
       if (isPrimary) row.classList.add('primary-account');
 
       const premiumTag = (() => {
-        if (acc.premium_days_left === null) return `<span class="tag muted">Premium: neaktivní</span>`;
-        if (acc.premium_days_left < 0) return `<span class="tag danger">Premium: expirováno</span>`;
-        if (acc.premium_days_left <= 3) return `<span class="tag warning">Premium: ${acc.premium_days_left} dny</span>`;
-        return `<span class="tag success">Premium: ${acc.premium_days_left} dní</span>`;
+        if (acc.premium_days_left === null) {
+          return `<span class="tag muted">Premium: neaktivní</span>`;
+        }
+        const left = Number(acc.premium_days_left);
+        if (left < 0) return `<span class="tag danger">Premium: expirováno</span>`;
+        if (left <= 3) {
+          return `<span class="tag warning">Premium: ${left} dny</span>`;
+        }
+        return `<span class="tag success">Premium: ${left} dní</span>`;
       })();
 
       row.innerHTML = `
         <div class="account-row" data-login="${acc.login}">
           <strong>${isPrimary ? '⭐ ' : ''}Account:</strong> ${acc.login}
+
           <span class="tag">${acc.chars_count} characters</span>
           ${premiumTag}
-          ${acc.premium_end_at
-            ? `<span class="tag">${acc.premium_end_at}</span>`
-            : `<span class="tag">${acc.created_at}</span>`
+          ${
+            acc.premium_end_at
+              ? `<span class="tag">${acc.premium_end_at}</span>`
+              : `<span class="tag">${acc.created_at}</span>`
           }
 
           <div class="actions">
-            ${isPrimary
-              ? '<span class="tag primary">PRIMARY</span>'
-              : `<button class="btn btn-small" data-primary="${acc.login}">Set primary</button>`
+            ${
+              isPrimary
+                ? '<span class="tag primary">PRIMARY</span>'
+                : `<button class="btn btn-small" data-primary="${acc.login}">Set primary</button>`
             }
             <button class="btn btn-small btn-danger" data-login="${acc.login}">Delete</button>
             <button class="btn btn-small" data-reset="${acc.login}">Change password</button>
@@ -137,7 +268,12 @@
     });
   }
 
-  // ---------- create account modal ----------
+  // expose for other internal calls
+  window.loadGameAccounts = window.loadGameAccounts || loadGameAccounts;
+
+  /* -----------------------------
+   * create account modal
+   * ----------------------------- */
   function initCreateAccountModal() {
     const modal = document.getElementById('accModal');
     const openBtn = document.getElementById('createAccBtn');
@@ -146,9 +282,9 @@
     const msg = document.getElementById('accMsg');
 
     const login = document.getElementById('accLogin');
-    const pass  = document.getElementById('accPass');
+    const pass = document.getElementById('accPass');
 
-    if (!modal || !submitBtn) return;
+    if (!modal) return;
 
     const open = () => {
       modal.classList.remove('hidden');
@@ -158,23 +294,25 @@
 
     openBtn?.addEventListener('click', (e) => { e.preventDefault(); open(); });
     cancelBtn?.addEventListener('click', (e) => { e.preventDefault(); close(); });
-    modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
+    modal?.addEventListener('click', (e) => { if (e.target === modal) close(); });
 
-    submitBtn.addEventListener('click', async (e) => {
+    submitBtn?.addEventListener('click', async (e) => {
       e.preventDefault();
-      if (msg) msg.style.display = 'none';
+      if (!login || !pass || !submitBtn) return;
+
+      msg && (msg.style.display = 'none');
 
       const payload = {
-        login: (login?.value || '').trim(),
-        password: pass?.value || ''
+        login: login.value.trim(),
+        password: pass.value
       };
 
       submitBtn.disabled = true;
       try {
         const res = await fetch('/api/create_game_account.php', {
           method: 'POST',
-          credentials: 'same-origin',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
           body: JSON.stringify(payload)
         });
 
@@ -182,15 +320,15 @@
 
         if (data.ok) {
           modal.classList.add('hidden');
-          safeNotify('success', 'Herní účet byl vytvořen');
+          notify('success', T.accCreated);
 
-          if (pass) pass.value = '';
-          if (login) login.value = '';
+          pass.value = '';
+          login.value = '';
 
           await loadGameAccounts();
           setTimeout(() => modal.classList.add('hidden'), 800);
         } else {
-          safeNotify('error', data.error || 'Chyba při vytváření účtu');
+          notify('error', data.error || T.accCreateErr);
         }
       } finally {
         submitBtn.disabled = false;
@@ -198,25 +336,34 @@
     });
   }
 
-  // ---------- delete modal ----------
+  /* -----------------------------
+   * delete account modal (keyword confirm)
+   * ----------------------------- */
   function initDeleteModal() {
     const modal = document.getElementById('deleteModal');
     const input = document.getElementById('deleteConfirmInput');
     const confirmBtn = document.getElementById('deleteConfirm');
     const cancelBtn = document.getElementById('deleteCancel');
+
     if (!modal || !input || !confirmBtn || !cancelBtn) return;
 
     let currentLogin = null;
     const keyword = 'smazat';
 
     document.addEventListener('click', (e) => {
+      // only buttons with data-login inside account actions should open delete modal
       const btn = e.target.closest('button[data-login]');
       if (!btn) return;
 
+      // but avoid catching the "delete" open on other places if any:
+      // here we assume this is the delete button; ok.
+
       currentLogin = btn.dataset.login;
 
-      document.getElementById('deleteLogin')?.textContent = currentLogin;
-      document.getElementById('deleteKeyword')?.textContent = keyword;
+      const loginEl = document.getElementById('deleteLogin');
+      const keywordEl = document.getElementById('deleteKeyword');
+      if (loginEl) loginEl.textContent = currentLogin || '';
+      if (keywordEl) keywordEl.textContent = keyword;
 
       input.value = '';
       confirmBtn.disabled = true;
@@ -232,12 +379,14 @@
     });
 
     confirmBtn.addEventListener('click', async () => {
+      if (!currentLogin) return;
+
       confirmBtn.disabled = true;
 
       const res = await fetch('/api/delete_game_account.php', {
         method: 'POST',
-        credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
         body: JSON.stringify({ login: currentLogin })
       });
 
@@ -245,196 +394,185 @@
 
       if (data.ok) {
         modal.classList.add('hidden');
-        safeNotify('success', 'Herní účet byl smazán');
+        notify('success', T.accDeleted);
         await loadGameAccounts();
         return;
       }
 
-      if (data.error === 'ACCOUNT_HAS_ACTIVE_CHARACTERS') safeNotify('error', 'Účet má aktivní postavy');
-      else safeNotify('error', 'Nepodařilo se smazat účet');
+      if (data.error === 'ACCOUNT_HAS_ACTIVE_CHARACTERS') {
+        notify('error', T.accHasChars);
+      } else {
+        notify('error', T.accDeleteFail);
+      }
 
       confirmBtn.disabled = false;
     });
   }
 
- 
-  window.loadGameAccounts = loadGameAccounts;
-// ---------- část 2/3 ----------
+  /* -----------------------------
+   * reset password modal
+   * ----------------------------- */
+  function initResetPasswordModal() {
+    const modal = document.getElementById('resetModal');
+    const loginEl = document.getElementById('resetLogin');
+    const pass1 = document.getElementById('resetPass1');
+    const pass2 = document.getElementById('resetPass2');
+    const confirmBtn = document.getElementById('resetConfirm');
+    const cancelBtn = document.getElementById('resetCancel');
 
-// NOTIFY (globální, aby ho mohly volat i další části)
-function ensureNotificationsBox() {
-  let box = document.getElementById('notifications');
-  if (!box) {
-    box = document.createElement('div');
-    box.id = 'notifications';
-    document.body.appendChild(box);
-  }
-  return box;
-}
+    if (!modal || !loginEl || !pass1 || !pass2 || !confirmBtn || !cancelBtn) return;
 
-function notify(type, message, timeout = 3000) {
-  const box = ensureNotificationsBox();
-  const el = document.createElement('div');
-  el.className = `notify ${type}`;
-  el.textContent = message;
-  box.appendChild(el);
+    let currentLogin = null;
 
-  setTimeout(() => {
-    el.style.opacity = '0';
-    setTimeout(() => el.remove(), 300);
-  }, timeout);
-}
-window.notify = notify;
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-reset]');
+      if (!btn) return;
 
-// RESET PASSWORD modal
-function initResetPasswordModal() {
-  const modal = document.getElementById('resetModal');
-  const loginEl = document.getElementById('resetLogin');
-  const pass1 = document.getElementById('resetPass1');
-  const pass2 = document.getElementById('resetPass2');
-  const confirmBtn = document.getElementById('resetConfirm');
-  const cancelBtn = document.getElementById('resetCancel');
+      currentLogin = btn.dataset.reset;
+      loginEl.textContent = currentLogin || '';
+      pass1.value = '';
+      pass2.value = '';
+      confirmBtn.disabled = true;
 
-  if (!modal || !loginEl || !pass1 || !pass2 || !confirmBtn || !cancelBtn) return;
-
-  let currentLogin = null;
-
-  document.addEventListener('click', (e) => {
-    const btn = e.target.closest('button[data-reset]');
-    if (!btn) return;
-
-    currentLogin = btn.dataset.reset;
-    loginEl.textContent = currentLogin;
-    pass1.value = '';
-    pass2.value = '';
-    confirmBtn.disabled = true;
-
-    modal.classList.remove('hidden');
-  });
-
-  const validate = () => {
-    confirmBtn.disabled = pass1.value.length < 6 || pass1.value !== pass2.value;
-  };
-
-  pass1.addEventListener('input', validate);
-  pass2.addEventListener('input', validate);
-
-  cancelBtn.addEventListener('click', () => {
-    modal.classList.add('hidden');
-  });
-
-  confirmBtn.addEventListener('click', async () => {
-    confirmBtn.disabled = true;
-
-    const res = await fetch('/api/reset_game_password.php', {
-      method: 'POST',
-      credentials: 'same-origin',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        login: currentLogin,
-        password: pass1.value
-      })
+      modal.classList.remove('hidden');
     });
 
-    const data = await res.json().catch(() => ({}));
-
-    if (data.ok) {
-      modal.classList.add('hidden');
-      notify('success', 'Heslo bylo změněno');
-      return;
-    }
-
-    notify('error', data.error || 'Nepodařilo se resetovat heslo');
-    confirmBtn.disabled = false;
-  });
-}
-
-// SET PRIMARY account (delegovaný click)
-function initSetPrimaryAccount() {
-  document.addEventListener('click', async (e) => {
-    const btn = e.target.closest('button[data-primary]');
-    if (!btn) return;
-
-    const login = btn.dataset.primary;
-
-    const res = await fetch('/api/set_primary_account.php', {
-      method: 'POST',
-      credentials: 'same-origin',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ login })
-    });
-
-    const data = await res.json().catch(() => ({}));
-
-    if (data.ok) {
-      notify('success', 'Primární účet nastaven');
-      window.loadGameAccounts?.();
-    } else {
-      notify('error', 'Nastavení primárního účtu se nezdařilo');
-    }
-  });
-}
-
-// BUG: naplnění selectu herními účty + submit
-function initBugReport() {
-  const accountSelect = document.getElementById('bugAccount');
-  if (accountSelect) {
-    fetch('/api/list_game_accounts.php', { credentials: 'same-origin' })
-      .then(r => r.json())
-      .then(data => {
-        if (!data.ok || !Array.isArray(data.accounts)) return;
-        data.accounts.forEach(acc => {
-          const opt = document.createElement('option');
-          opt.value = acc.login;
-          opt.textContent = acc.login;
-          accountSelect.appendChild(opt);
-        });
-      })
-      .catch(() => {});
-  }
-
-  document.getElementById('bugForm')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const payload = {
-      game_account: document.getElementById('bugAccount')?.value || '',
-      category: document.getElementById('bugCategory')?.value || '',
-      title: (document.getElementById('bugTitle')?.value || '').trim(),
-      message: (document.getElementById('bugMessage')?.value || '').trim()
+    const validate = () => {
+      confirmBtn.disabled = pass1.value.length < 6 || pass1.value !== pass2.value;
     };
 
-    if (payload.message.length > 1000) {
-      notify('error', 'Text je příliš dlouhý (max. 1000 znaků)');
-      return;
-    }
+    pass1.addEventListener('input', validate);
+    pass2.addEventListener('input', validate);
 
-    const res = await fetch('/api/create_bug_report.php', {
-      method: 'POST',
-      credentials: 'same-origin',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+    cancelBtn.addEventListener('click', () => {
+      modal.classList.add('hidden');
     });
 
-    const data = await res.json().catch(() => ({}));
+    confirmBtn.addEventListener('click', async () => {
+      if (!currentLogin) return;
 
-    if (data.ok) {
-      notify('success', 'Bug report odeslán');
-      e.target.reset();
-    } else {
-      notify('error', data.error || 'Chyba při odesílání');
+      confirmBtn.disabled = true;
+
+      const res = await fetch('/api/reset_game_password.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({
+          login: currentLogin,
+          password: pass1.value
+        })
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (data.ok) {
+        modal.classList.add('hidden');
+        notify('success', T.pwChanged);
+        return;
+      }
+
+      notify('error', data.error || T.pwResetFail);
+      confirmBtn.disabled = false;
+    });
+  }
+
+  /* -----------------------------
+   * set primary account (delegated)
+   * ----------------------------- */
+  function initSetPrimary() {
+    document.addEventListener('click', async (e) => {
+      const btn = e.target.closest('button[data-primary]');
+      if (!btn) return;
+
+      const login = btn.dataset.primary;
+      if (!login) return;
+
+      const res = await fetch('/api/set_primary_account.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ login })
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (data.ok) {
+        notify('success', T.primarySetOk);
+        loadGameAccounts();
+      } else {
+        notify('error', T.primarySetFail);
+      }
+    });
+  }
+
+  /* -----------------------------
+   * bug account select + bug form submit
+   * ----------------------------- */
+  function initBugForm() {
+    const accountSelect = document.getElementById('bugAccount');
+    if (accountSelect) {
+      fetch('/api/list_game_accounts.php', { credentials: 'same-origin' })
+        .then(r => r.json())
+        .then(data => {
+          if (!data.ok || !Array.isArray(data.accounts)) return;
+          data.accounts.forEach(acc => {
+            const opt = document.createElement('option');
+            opt.value = acc.login;
+            opt.textContent = acc.login;
+            accountSelect.appendChild(opt);
+          });
+        })
+        .catch(() => {});
     }
-  });
 
-  // counter
-  (() => {
+    const bugForm = document.getElementById('bugForm');
+    bugForm?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const payload = {
+        game_account: document.getElementById('bugAccount')?.value || '',
+        category: document.getElementById('bugCategory')?.value || '',
+        title: (document.getElementById('bugTitle')?.value || '').trim(),
+        message: (document.getElementById('bugMessage')?.value || '').trim()
+      };
+
+      if (payload.message.length > 1000) {
+        notify('error', T.textTooLong);
+        return;
+      }
+
+      const res = await fetch('/api/create_bug_report.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (data.ok) {
+        notify('success', T.bugSent);
+        e.target.reset();
+      } else {
+        notify('error', data.error || T.bugSendErr);
+      }
+    });
+  }
+
+  /* -----------------------------
+   * bug message counter
+   * ----------------------------- */
+  function initBugCounter() {
     const textarea = document.getElementById('bugMessage');
-    const counter  = document.getElementById('bugCounter');
+    const counter = document.getElementById('bugCounter');
     const max = 1000;
+
     if (!textarea || !counter) return;
 
     const update = () => {
       const len = textarea.value.length;
       counter.textContent = `${len} / ${max}`;
+
       counter.classList.remove('warning', 'danger');
       if (len > 950) counter.classList.add('danger');
       else if (len > 800) counter.classList.add('warning');
@@ -442,493 +580,541 @@ function initBugReport() {
 
     textarea.addEventListener('input', update);
     update();
-  })();
-}
-
-// MY BUGS list
-function initMyBugsList() {
-  const box = document.getElementById('myBugs');
-  if (!box) return;
-
-  fetch('/api/list_my_bug_reports.php', { credentials: 'same-origin' })
-    .then(r => r.json())
-    .then(data => {
-      if (!data.ok || !Array.isArray(data.bugs)) {
-        box.innerHTML = '<div class="muted">Žádná hlášení</div>';
-        return;
-      }
-
-      box.innerHTML = '';
-      data.bugs.forEach(bug => {
-        const row = document.createElement('a');
-        row.href = `/profile/bug_detail.html?id=${bug.id}`;
-        row.className = 'link-item';
-        row.innerHTML = `<strong>[${String(bug.status).toUpperCase()}]</strong> ${bug.title}`;
-        box.appendChild(row);
-      });
-    })
-    .catch(() => {
-      box.innerHTML = '<div class="muted">Žádná hlášení</div>';
-    });
-}
-
-// VIP MAP helper (pro seznam postav u účtů)
-async function loadVipMap(login) {
-  const res = await fetch(`/api/list_characters_with_vip.php?account=${encodeURIComponent(login)}`, {
-    credentials: 'same-origin'
-  });
-  const data = await res.json().catch(() => ({}));
-
-  const map = {};
-  if (data.ok && Array.isArray(data.characters)) {
-    data.characters.forEach(ch => {
-      map[ch.charId] = {
-        hasVip: !!ch.has_vip,
-        endAt: ch.vip_end_at || null
-      };
-    });
   }
-  return map;
-}
-window.loadVipMap = loadVipMap;
 
-// ---------- část 3/3 ----------
-
-// rozbalování postav pod game účtem (account-row click)
-function initAccountRowCharactersToggle() {
-  document.addEventListener('click', async (e) => {
-    const row = e.target.closest('.account-row');
-    if (!row) return;
-
-    const login = row.dataset.login;
-    const box = document.getElementById('chars-' + login);
+  /* -----------------------------
+   * my bugs list
+   * ----------------------------- */
+  function initMyBugsList() {
+    const box = document.getElementById('myBugs');
     if (!box) return;
 
-    // toggle
-    if (!box.classList.contains('hidden')) {
-      box.classList.add('hidden');
-      box.innerHTML = '';
-      return;
-    }
+    fetch('/api/list_my_bug_reports.php', { credentials: 'same-origin' })
+      .then(r => r.json())
+      .then(data => {
+        if (!data.ok || !Array.isArray(data.bugs) || !data.bugs.length) {
+          box.innerHTML = `<div class="muted">${T.noBugs}</div>`;
+          return;
+        }
 
-    box.classList.remove('hidden');
-    box.innerHTML = '<div class="muted">Loading characters…</div>';
-
-    try {
-      // 1) VIP map
-      const vipMap = (typeof window.loadVipMap === 'function') ? await window.loadVipMap(login) : {};
-
-      // 2) postavy
-      const res = await fetch(`/api/list_characters.php?account=${encodeURIComponent(login)}`, {
-        credentials: 'same-origin'
+        box.innerHTML = '';
+        data.bugs.forEach(bug => {
+          const row = document.createElement('a');
+          row.href = `/profile/bug_detail.html?id=${bug.id}`;
+          row.className = 'link-item';
+          row.innerHTML = `
+            <strong>[${String(bug.status || '').toUpperCase()}]</strong>
+            ${bug.title}
+          `;
+          box.appendChild(row);
+        });
+      })
+      .catch(() => {
+        box.innerHTML = `<div class="muted">${T.noBugs}</div>`;
       });
-      const data = await res.json().catch(() => ({}));
-
-      if (!data.ok || !Array.isArray(data.characters) || !data.characters.length) {
-        box.innerHTML = '<div class="muted">No characters</div>';
-        return;
-      }
-
-      box.innerHTML = '';
-
-      data.characters.forEach(ch => {
-        const el = document.createElement('div');
-        el.className = 'char-row';
-
-        const vipData = vipMap?.[ch.charId];
-        const vipTag = (vipData && vipData.hasVip)
-          ? `<span class="tag vip">VIP do ${vipData.endAt}</span>`
-          : '';
-
-        el.innerHTML = `
-          <span><strong>${ch.char_name}</strong></span>
-          <span>Lv ${ch.level}</span>
-          <span class="${ch.online ? 'online' : 'offline'}">
-            ${ch.online ? 'ONLINE' : 'offline'}
-          </span>
-          ${vipTag}
-        `;
-
-        box.appendChild(el);
-      });
-
-    } catch (err) {
-      box.innerHTML = '<div class="form-error">Failed to load characters</div>';
-    }
-  });
-}
-
-// ---------------- VOTE ----------------
-let voteCache = [];
-let voteBusy = false;
-
-const i18nVote = (() => {
-  const en = (document.documentElement.lang || '').toLowerCase() === 'en';
-  return {
-    en,
-    txt: {
-      noSites: en ? 'No active vote sites.' : 'Žádné aktivní vote weby.',
-      ready: 'READY',
-      cooldown: en ? 'Vote is on cooldown.' : 'Vote je v cooldownu.',
-      cooldownLeft: en ? 'Cooldown remaining: ' : 'Zbývá cooldown: ',
-      startError: en ? 'Failed to start vote.' : 'Nepodařilo se spustit vote.',
-      openHint: en ? 'Vote page opened. Waiting for verification…' : 'Vote stránka otevřena. Čekám na ověření…',
-      needConfirm: en ? 'Confirm you voted?' : 'Potvrdit, že jsi hlasoval?',
-      rewarded: en ? 'Vote Coin added!' : 'Vote Coin připsán!',
-      pendingLater: en ? 'Not detected yet. Try again later.' : 'Zatím nedetekováno. Zkus to později.',
-      unknownErr: en ? 'Unknown error.' : 'Neznámá chyba.'
-    }
-  };
-})();
-
-async function loadVoteSites() {
-  try {
-    const res = await fetch('/api/vote_status.php', { credentials: 'same-origin' });
-    const data = await res.json().catch(() => ({}));
-    if (!data.ok) return;
-
-    voteCache = data.sites || [];
-
-    const box = document.querySelector('#vote .link-list');
-    if (!box) return;
-
-    box.innerHTML = '';
-
-    if (!voteCache.length) {
-      box.innerHTML = `<div class="muted">${i18nVote.txt.noSites}</div>`;
-      return;
-    }
-
-    voteCache.forEach(site => {
-      const el = document.createElement('div');
-
-      const status = (() => {
-        const rem = Number(site.remaining || 0);
-        if (rem <= 0) return i18nVote.txt.ready;
-
-        const h = Math.floor(rem / 3600);
-        const m = Math.floor((rem % 3600) / 60);
-        if (h <= 0) return `${m}m`;
-        return `${h}h ${m}m`;
-      })();
-
-      const disabled = site.remaining > 0 ? 'disabled' : '';
-
-      el.innerHTML = `
-        <button class="btn vote-btn" data-id="${site.id}" ${disabled}>
-          ${site.name} – ${status}
-        </button>
-      `;
-      box.appendChild(el);
-    });
-
-  } catch (err) {
-    console.error('Vote load error:', err);
-  }
-}
-
-async function startVote(siteId, btnEl) {
-  if (voteBusy) return;
-  voteBusy = true;
-
-  try {
-    if (btnEl) btnEl.disabled = true;
-
-    const res = await fetch('/api/vote_start.php', {
-      method: 'POST',
-      credentials: 'same-origin',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ site_id: siteId })
-    });
-
-    const data = await res.json().catch(() => ({}));
-
-    if (!data.ok) {
-      if (data.error === 'COOLDOWN') {
-        const rem = typeof data.remaining === 'number' ? data.remaining : 0;
-        window.notify?.('error', `${i18nVote.txt.cooldown} ${i18nVote.txt.cooldownLeft}${rem}s`);
-        await loadVoteSites();
-        return;
-      }
-      window.notify?.('error', `${i18nVote.txt.startError} ${data.error || ''}`.trim());
-      return;
-    }
-
-    window.open(data.vote_url, '_blank');
-    window.notify?.('success', i18nVote.txt.openHint, 3500);
-
-    await pollVote(data.attempt_id);
-
-  } catch (err) {
-    console.error('Vote start error:', err);
-    window.notify?.('error', i18nVote.txt.startError);
-  } finally {
-    voteBusy = false;
-    if (btnEl) btnEl.disabled = false;
-  }
-}
-
-async function pollVote(attemptId) {
-  const start = Date.now();
-  const maxMs = 90000;
-  const waitMs = 4000;
-  let manualConfirm = false;
-  let askedConfirm = false;
-
-  while (Date.now() - start < maxMs) {
-    const res = await fetch('/api/vote_check.php', {
-      method: 'POST',
-      credentials: 'same-origin',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ attempt_id: attemptId, confirm: manualConfirm })
-    });
-
-    const data = await res.json().catch(() => ({}));
-
-    if (!data.ok) {
-      if (data.error === 'COOLDOWN') {
-        window.notify?.('error', i18nVote.txt.cooldown);
-        await loadVoteSites();
-        return;
-      }
-      window.notify?.('error', data.error || i18nVote.txt.unknownErr);
-      return;
-    }
-
-    if (data.status === 'REWARDED' || data.status === 'USED') {
-      window.notify?.('success', i18nVote.txt.rewarded);
-      await loadVoteSites();
-      if (typeof loadVoteBalance === 'function') loadVoteBalance();
-      return;
-    }
-
-    if (data.status === 'WAITING_CONFIRM' && !askedConfirm) {
-      askedConfirm = true;
-      manualConfirm = confirm(i18nVote.txt.needConfirm);
-    }
-
-    await new Promise(r => setTimeout(r, waitMs));
   }
 
-  window.notify?.('error', i18nVote.txt.pendingLater);
-  await loadVoteSites();
-}
-
-// vote click delegace
-function initVoteClicks() {
-  document.addEventListener('click', (e) => {
-    const btn = e.target.closest('.vote-btn');
-    if (!btn) return;
-
-    const id = parseInt(btn.dataset.id, 10);
-    if (!id) return;
-
-    startVote(id, btn);
-  });
-}
-
-// ---------------- WALLET BALANCE ----------------
-async function loadVoteBalance() {
-  try {
-    const res = await fetch('/api/get_wallet_balance.php?currency=VOTE_COIN', { credentials: 'same-origin' });
-    const data = await res.json().catch(() => ({}));
-    if (!data.ok) return;
-
-    const el = document.querySelector('#voteBalance strong');
-    if (el) el.textContent = data.balance;
-  } catch (err) {
-    console.error('Vote balance error:', err);
-  }
-}
-
-async function loadDcBalance() {
-  try {
-    const res = await fetch('/api/get_wallet_balance.php?currency=DC', { credentials: 'same-origin' });
-    const data = await res.json().catch(() => ({}));
-    if (!data.ok) return;
-
-    const el = document.querySelector('#dcBalance strong');
-    if (el) el.textContent = data.balance;
-  } catch (err) {
-    console.error('DC balance error:', err);
-  }
-}
-
-// ---------------- VIP MODAL + CONVERT ----------------
-async function loadAllCharactersForVip() {
-  const select = document.getElementById('vipCharSelect');
-  if (!select) return;
-  select.innerHTML = '';
-
-  const resAcc = await fetch('/api/list_game_accounts.php', { credentials: 'same-origin' });
-  const dataAcc = await resAcc.json().catch(() => ({}));
-  if (!dataAcc.ok || !Array.isArray(dataAcc.accounts)) return;
-
-  for (const acc of dataAcc.accounts) {
-    const resChar = await fetch(`/api/list_characters.php?account=${encodeURIComponent(acc.login)}`, {
+  /* -----------------------------
+   * characters VIP map + expand list
+   * ----------------------------- */
+  async function loadVipMap(login) {
+    const res = await fetch(`/api/list_characters_with_vip.php?account=${encodeURIComponent(login)}`, {
       credentials: 'same-origin'
     });
-    const dataChar = await resChar.json().catch(() => ({}));
-    if (!dataChar.ok || !Array.isArray(dataChar.characters)) continue;
+    const data = await res.json().catch(() => ({}));
 
-    dataChar.characters.forEach(ch => {
-      const opt = document.createElement('option');
-      opt.value = ch.charId;
-      opt.textContent = `${ch.char_name} (Lv ${ch.level})`;
-      select.appendChild(opt);
+    const map = {};
+    if (data.ok && Array.isArray(data.characters)) {
+      data.characters.forEach(ch => {
+        map[ch.charId] = {
+          hasVip: !!ch.has_vip,
+          endAt: ch.vip_end_at || null
+        };
+      });
+    }
+    return map;
+  }
+
+  function initCharactersToggle() {
+    document.addEventListener('click', async (e) => {
+      const row = e.target.closest('.account-row');
+      if (!row) return;
+
+      // If click was on action buttons (delete/reset/primary), ignore toggle
+      if (e.target.closest('button')) return;
+
+      const login = row.dataset.login;
+      if (!login) return;
+
+      const box = document.getElementById('chars-' + login);
+      if (!box) return;
+
+      // toggle close
+      if (!box.classList.contains('hidden')) {
+        box.classList.add('hidden');
+        box.innerHTML = '';
+        return;
+      }
+
+      box.classList.remove('hidden');
+      box.innerHTML = `<div class="muted">${T.loadingChars}</div>`;
+
+      try {
+        const vipMap = await loadVipMap(login);
+        const res = await fetch(`/api/list_characters.php?account=${encodeURIComponent(login)}`, {
+          credentials: 'same-origin'
+        });
+        const data = await res.json().catch(() => ({}));
+
+        if (!data.ok || !Array.isArray(data.characters) || !data.characters.length) {
+          box.innerHTML = `<div class="muted">${T.noChars}</div>`;
+          return;
+        }
+
+        box.innerHTML = '';
+
+        data.characters.forEach(ch => {
+          const el = document.createElement('div');
+          el.className = 'char-row';
+
+          const vipData = vipMap[ch.charId];
+          let vipTag = '';
+          if (vipData && vipData.hasVip) {
+            vipTag = `<span class="tag vip">VIP do ${vipData.endAt}</span>`;
+          }
+
+          el.innerHTML = `
+            <span><strong>${ch.char_name}</strong></span>
+            <span>Lv ${ch.level}</span>
+            <span class="${ch.online ? 'online' : 'offline'}">
+              ${ch.online ? 'ONLINE' : 'offline'}
+            </span>
+            ${vipTag}
+          `;
+          box.appendChild(el);
+        });
+      } catch (err) {
+        box.innerHTML = `<div class="form-error">${T.charsLoadFail}</div>`;
+      }
     });
   }
-}
 
-function initVipModal() {
-  document.getElementById('openVipModal')?.addEventListener('click', async () => {
-    await loadAllCharactersForVip();
-    document.getElementById('vipModal')?.classList.remove('hidden');
-  });
+  /* -----------------------------
+   * vote (status/start/check)
+   * ----------------------------- */
+  let voteCache = [];
+  let voteBusy = false;
 
-  document.getElementById('vipCancel')?.addEventListener('click', () => {
-    document.getElementById('vipModal')?.classList.add('hidden');
-  });
-
-  document.getElementById('vipConfirm')?.addEventListener('click', async (e) => {
-    const btn = e.target;
-    if (!btn || btn.disabled) return;
-
-    const select = document.getElementById('vipCharSelect');
-    const currencyEl = document.getElementById('vipCurrency');
-    if (!select || !currencyEl) return;
-
-    btn.disabled = true;
-    const oldText = btn.textContent;
-    btn.textContent = 'Activating...';
-
+  async function loadVoteSites() {
     try {
-      const res = await fetch('/api/activate_vip_24h.php', {
+      const res = await fetch('/api/vote_status.php', { credentials: 'same-origin' });
+      const data = await res.json().catch(() => ({}));
+      if (!data.ok) return;
+
+      voteCache = data.sites || [];
+
+      const box = qs('#vote .link-list');
+      if (!box) return;
+
+      box.innerHTML = '';
+
+      if (!voteCache.length) {
+        box.innerHTML = `<div class="muted">${T.voteNoSites}</div>`;
+        return;
+      }
+
+      voteCache.forEach(site => {
+        const el = document.createElement('div');
+
+        const status = (() => {
+          const rem = Number(site.remaining || 0);
+          if (rem <= 0) return T.voteReady;
+
+          const h = Math.floor(rem / 3600);
+          const m = Math.floor((rem % 3600) / 60);
+
+          if (h <= 0) return `${m}m`;
+          return `${h}h ${m}m`;
+        })();
+
+        const disabled = Number(site.remaining || 0) > 0 ? 'disabled' : '';
+
+        el.innerHTML = `
+          <button class="btn vote-btn" data-id="${site.id}" ${disabled}>
+            ${site.name} – ${status}
+          </button>
+        `;
+        box.appendChild(el);
+      });
+    } catch (err) {
+      console.error('Vote load error:', err);
+    }
+  }
+
+  async function pollVote(attemptId) {
+    const start = Date.now();
+    const maxMs = 90000;
+    const waitMs = 4000;
+    let manualConfirm = false;
+    let askedConfirm = false;
+
+    while (Date.now() - start < maxMs) {
+      const res = await fetch('/api/vote_check.php', {
         method: 'POST',
         credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          char_id: select.value,
-          currency: currencyEl.value
-        })
+        body: JSON.stringify({ attempt_id: attemptId, confirm: manualConfirm })
       });
 
       const data = await res.json().catch(() => ({}));
 
-      if (data.ok) {
-        document.getElementById('vipModal')?.classList.add('hidden');
-        loadVoteBalance();
-        loadDcBalance();
-      } else {
-        alert(data.error || 'Activation failed.');
+      if (!data.ok) {
+        if (data.error === 'COOLDOWN') {
+          notify('error', T.voteCooldown);
+          await loadVoteSites();
+          return;
+        }
+        notify('error', data.error || T.unknownErr);
+        return;
       }
-    } catch (err) {
-      alert('Server error.');
+
+      if (data.status === 'REWARDED' || data.status === 'USED') {
+        notify('success', T.voteRewarded);
+        await loadVoteSites();
+        if (typeof window.loadVoteBalance === 'function') window.loadVoteBalance();
+        return;
+      }
+
+      if (data.status === 'WAITING_CONFIRM' && !askedConfirm) {
+        askedConfirm = true;
+        manualConfirm = confirm(T.voteNeedConfirm);
+      }
+
+      await new Promise(r => setTimeout(r, waitMs));
     }
 
-    btn.disabled = false;
-    btn.textContent = oldText || 'Activate';
-  });
-}
-
-function initConvertVcToDc() {
-  document.getElementById('convertVcToDc')?.addEventListener('click', async (e) => {
-    const btn = e.target;
-    if (!btn || btn.disabled) return;
-
-    if (!confirm('Convert 4 Vote Coin into 1 Dragon Coin?')) return;
-
-    btn.disabled = true;
-    const oldText = btn.textContent;
-    btn.textContent = 'Processing...';
-
-    try {
-      const res = await fetch('/api/convert_vc_to_dc.php', {
-        method: 'POST',
-        credentials: 'same-origin',
-        headers: { 'Content-Type': 'application/json' }
-      });
-
-      const data = await res.json().catch(() => ({}));
-
-      if (data.ok) {
-        loadVoteBalance();
-        loadDcBalance();
-      } else {
-        alert(data.error || 'Conversion failed.');
-      }
-    } catch (err) {
-      alert('Server error.');
-    }
-
-    btn.disabled = false;
-    btn.textContent = oldText || 'Convert 4 Vote Coin → 1 Dragon Coin';
-  });
-}
-
-// ---------------- SHOP ----------------
-let shopProducts = [];
-let myGameAccounts = [];
-let shopLoadedOnce = false;
-
-async function loadShop() {
-  const box = document.getElementById('shopPremium');
-  if (!box) return;
-
-  box.innerHTML = '<div class="muted">Načítám produkty…</div>';
-
-  const [pRes, aRes] = await Promise.all([
-    fetch('/api/shop_list.php', { credentials: 'same-origin' }),
-    fetch('/api/list_game_accounts_min.php', { credentials: 'same-origin' })
-  ]);
-
-  const pData = await pRes.json().catch(() => ({}));
-  const aData = await aRes.json().catch(() => ({}));
-
-  shopProducts = (pData.ok && Array.isArray(pData.products)) ? pData.products : [];
-  myGameAccounts = (aData.ok && Array.isArray(aData.accounts)) ? aData.accounts : [];
-
-  box.innerHTML = '';
-
-  if (!shopProducts.length) {
-    box.innerHTML = '<div class="muted">Žádné produkty.</div>';
-    return;
+    notify('error', T.votePending);
+    await loadVoteSites();
   }
 
-  shopProducts.forEach(prod => {
-    const row = document.createElement('div');
-    row.className = 'mini-row';
+  async function startVote(siteId, btnEl) {
+    if (voteBusy) return;
+    voteBusy = true;
 
-    const needsGameAcc = prod.code === 'PREM_GAME_30D';
+    try {
+      if (btnEl) btnEl.disabled = true;
 
-    const selectHtml = needsGameAcc ? `
-      <select class="shop-acc" data-pid="${prod.id}">
-        ${myGameAccounts.map(a => `<option value="${a.id}">${a.login}</option>`).join('')}
-      </select>
-    ` : '';
+      const res = await fetch('/api/vote_start.php', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ site_id: siteId })
+      });
 
-    row.innerHTML = `
-      <div class="mini-row">
-        <div>
-          <strong>${prod.name}</strong><br>
-          <span class="muted">${prod.description || ''}</span>
+      const data = await res.json().catch(() => ({}));
+
+      if (!data.ok) {
+        if (data.error === 'COOLDOWN') {
+          const rem = typeof data.remaining === 'number' ? data.remaining : 0;
+          notify('error', `${T.voteCooldown} ${T.voteCooldownLeft}${rem}s`);
+          await loadVoteSites();
+          return;
+        }
+        notify('error', `${T.voteStartErr} ${data.error || ''}`.trim());
+        return;
+      }
+
+      window.open(data.vote_url, '_blank');
+      notify('success', T.voteOpenHint, 3500);
+
+      await pollVote(data.attempt_id);
+
+    } catch (err) {
+      console.error('Vote start error:', err);
+      notify('error', T.voteStartErr);
+    } finally {
+      voteBusy = false;
+      if (btnEl) btnEl.disabled = false;
+    }
+  }
+
+  function initVote() {
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.vote-btn');
+      if (!btn) return;
+
+      const id = parseInt(btn.dataset.id, 10);
+      if (!id) return;
+
+      startVote(id, btn);
+    });
+  }
+
+  /* -----------------------------
+   * balances
+   * ----------------------------- */
+  async function loadVoteBalance() {
+    try {
+      const res = await fetch('/api/get_wallet_balance.php?currency=VOTE_COIN', {
+        credentials: 'same-origin'
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!data.ok) return;
+
+      const el = qs('#voteBalance strong');
+      if (el) el.textContent = data.balance;
+    } catch (err) {
+      console.error('Vote balance error:', err);
+    }
+  }
+
+  async function loadDcBalance() {
+    try {
+      const res = await fetch('/api/get_wallet_balance.php?currency=DC', {
+        credentials: 'same-origin'
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!data.ok) return;
+
+      const el = qs('#dcBalance strong');
+      if (el) el.textContent = data.balance;
+    } catch (err) {
+      console.error('DC balance error:', err);
+    }
+  }
+
+  window.loadVoteBalance = window.loadVoteBalance || loadVoteBalance;
+  window.loadDcBalance = window.loadDcBalance || loadDcBalance;
+
+  /* -----------------------------
+   * VIP 24h activation modal
+   * ----------------------------- */
+  async function loadAllCharactersForVip() {
+    const select = document.getElementById('vipCharSelect');
+    if (!select) return;
+
+    select.innerHTML = '';
+
+    const resAcc = await fetch('/api/list_game_accounts.php', { credentials: 'same-origin' });
+    const dataAcc = await resAcc.json().catch(() => ({}));
+    if (!dataAcc.ok || !Array.isArray(dataAcc.accounts)) return;
+
+    for (const acc of dataAcc.accounts) {
+      const resChar = await fetch(`/api/list_characters.php?account=${encodeURIComponent(acc.login)}`, {
+        credentials: 'same-origin'
+      });
+      const dataChar = await resChar.json().catch(() => ({}));
+      if (!dataChar.ok || !Array.isArray(dataChar.characters)) continue;
+
+      dataChar.characters.forEach(ch => {
+        const opt = document.createElement('option');
+        opt.value = ch.charId;
+        opt.textContent = `${ch.char_name} (Lv ${ch.level})`;
+        select.appendChild(opt);
+      });
+    }
+  }
+
+  function initVipModal() {
+    const openBtn = document.getElementById('openVipModal');
+    const cancelBtn = document.getElementById('vipCancel');
+    const confirmBtn = document.getElementById('vipConfirm');
+    const modal = document.getElementById('vipModal');
+
+    if (!modal) return;
+
+    openBtn?.addEventListener('click', async () => {
+      await loadAllCharactersForVip();
+      modal.classList.remove('hidden');
+    });
+
+    cancelBtn?.addEventListener('click', () => {
+      modal.classList.add('hidden');
+    });
+
+    confirmBtn?.addEventListener('click', async (e) => {
+      const btn = e.target;
+      if (btn.disabled) return;
+
+      btn.disabled = true;
+      btn.textContent = T.activating;
+
+      const charId = document.getElementById('vipCharSelect')?.value || '';
+      const currency = document.getElementById('vipCurrency')?.value || '';
+
+      try {
+        const res = await fetch('/api/activate_vip_24h.php', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ char_id: charId, currency })
+        });
+
+        const data = await res.json().catch(() => ({}));
+
+        if (data.ok) {
+          modal.classList.add('hidden');
+          loadVoteBalance();
+          loadDcBalance();
+        } else {
+          alert(data.error || 'Activation failed.');
+        }
+      } catch (err) {
+        alert('Server error.');
+      }
+
+      btn.disabled = false;
+      btn.textContent = T.activate;
+    });
+  }
+
+  /* -----------------------------
+   * convert VC->DC
+   * ----------------------------- */
+  function initConvert() {
+    const btn = document.getElementById('convertVcToDc');
+    if (!btn) return;
+
+    btn.addEventListener('click', async (e) => {
+      const b = e.target;
+      if (b.disabled) return;
+
+      if (!confirm(T.convertConfirm)) return;
+
+      b.disabled = true;
+      b.textContent = T.processing;
+
+      try {
+        const res = await fetch('/api/convert_vc_to_dc.php', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' }
+        });
+
+        const data = await res.json().catch(() => ({}));
+
+        if (data.ok) {
+          loadVoteBalance();
+          loadDcBalance();
+        } else {
+          alert(data.error || 'Conversion failed.');
+        }
+      } catch (err) {
+        alert('Server error.');
+      }
+
+      b.disabled = false;
+      b.textContent = T.convertLabel;
+    });
+  }
+
+  /* -----------------------------
+   * shop
+   * ----------------------------- */
+  let shopProducts = [];
+  let myGameAccounts = [];
+
+  async function loadShop() {
+    const box = document.getElementById('shopPremium');
+    if (!box) return;
+
+    box.innerHTML = `<div class="muted">${T.shopLoading}</div>`;
+
+    const [pRes, aRes] = await Promise.all([
+      fetch('/api/shop_list.php', { credentials: 'same-origin' }),
+      fetch('/api/list_game_accounts_min.php', { credentials: 'same-origin' })
+    ]);
+
+    const pData = await pRes.json().catch(() => ({}));
+    const aData = await aRes.json().catch(() => ({}));
+
+    shopProducts = (pData.ok && Array.isArray(pData.products)) ? pData.products : [];
+    myGameAccounts = (aData.ok && Array.isArray(aData.accounts)) ? aData.accounts : [];
+
+    box.innerHTML = '';
+
+    if (!shopProducts.length) {
+      box.innerHTML = `<div class="muted">${T.shopNone}</div>`;
+      return;
+    }
+
+    shopProducts.forEach(prod => {
+      const row = document.createElement('div');
+      row.className = 'mini-row';
+
+      const needsGameAcc = prod.code === 'PREM_GAME_30D';
+
+      const selectHtml = needsGameAcc ? `
+        <select class="shop-acc" data-pid="${prod.id}">
+          ${myGameAccounts.map(a => `<option value="${a.id}">${a.login}</option>`).join('')}
+        </select>
+      ` : '';
+
+      row.innerHTML = `
+        <div class="mini-row">
+          <div>
+            <strong>${prod.name}</strong><br>
+            <span class="muted">${prod.description || ''}</span>
+          </div>
+
+          <div style="display:flex; gap:10px; align-items:center; justify-content:flex-end;">
+            ${selectHtml}
+            <span class="tag">${prod.price_dc} DC</span>
+            <button class="btn btn-small btn-primary shop-buy" data-id="${prod.id}">
+              ${isEn ? 'Buy' : 'Koupit'}
+            </button>
+          </div>
         </div>
+      `;
 
-        <div style="display:flex; gap:10px; align-items:center; justify-content:flex-end;">
-          ${selectHtml}
-          <span class="tag">${prod.price_dc} DC</span>
-          <button class="btn btn-small btn-primary shop-buy" data-id="${prod.id}">
-            Koupit
-          </button>
-        </div>
-      </div>
-    `;
+      box.appendChild(row);
+    });
+  }
 
-    box.appendChild(row);
-  });
+let shopInited = false;
+
+function ensureShopInit() {
+  if (shopInited) return;
+  shopInited = true;
+  initShopSubTabs();
+  loadShop();
 }
 
-function initShopBuyClicks() {
+  function initShopSubTabs() {
+    const btns = qsa('#shop [data-shop-tab]');
+    if (!btns.length) return;
+
+    const panes = {
+      premium: document.getElementById('shopPremium'),
+      mounts: document.getElementById('shopMounts'),
+      cosmetic: document.getElementById('shopCosmetic')
+    };
+
+    btns.forEach(b => b.addEventListener('click', () => {
+      const key = b.dataset.shopTab;
+      btns.forEach(x => x.classList.toggle('active', x === b));
+      Object.entries(panes).forEach(([k, el]) => {
+        if (!el) return;
+        el.style.display = (k === key) ? '' : 'none';
+      });
+    }));
+  }
+
+ function initShop() {
+  const shopTabBtn = qs('[data-tab="shop"]');
+
+  // klik na hlavní tab
+  shopTabBtn?.addEventListener('click', ensureShopInit);
+
+  // pokud je shop už aktivní (např. přes ?tab=shop), nastartuj hned
+  const shopPanelActive = document.getElementById('shop')?.classList.contains('active');
+  const shopTabActive = shopTabBtn?.classList.contains('active');
+
+  if (shopPanelActive || shopTabActive) {
+    ensureShopInit();
+  }
+
+  // delegated buy click (tohle nech jak máš)
   document.addEventListener('click', async (e) => {
     const btn = e.target.closest('.shop-buy');
     if (!btn) return;
@@ -945,10 +1131,10 @@ function initShopBuyClicks() {
       const payload = { product_id: productId };
 
       if (prod.code === 'PREM_GAME_30D') {
-        const sel = document.querySelector(`.shop-acc[data-pid="${productId}"]`);
+        const sel = qs(`.shop-acc[data-pid="${productId}"]`);
         const gaId = parseInt(sel?.value || '0', 10);
         if (!gaId) {
-          window.notify?.('error', 'Vyber herní účet');
+          notify('error', T.needAcc);
           btn.disabled = false;
           return;
         }
@@ -965,87 +1151,62 @@ function initShopBuyClicks() {
       const data = await res.json().catch(() => ({}));
 
       if (data.ok) {
-        window.notify?.('success', 'Nákup dokončen');
+        notify('success', T.buyOk);
         loadDcBalance();
         loadVoteBalance();
         return;
       }
 
-      const err = data.error || 'Chyba nákupu';
-      if (err === 'INSUFFICIENT_FUNDS') window.notify?.('error', 'Nedostatek DC');
-      else if (err === 'ALREADY_PURCHASED') window.notify?.('error', 'Už koupeno');
-      else window.notify?.('error', err);
+      const err = data.error || T.buyErr;
+      if (err === 'INSUFFICIENT_FUNDS') notify('error', T.insufficient);
+      else if (err === 'ALREADY_PURCHASED') notify('error', T.alreadyBought);
+      else notify('error', err);
 
     } finally {
       btn.disabled = false;
     }
   });
 }
+  /* -----------------------------
+   * init
+   * ----------------------------- */
+  document.addEventListener('DOMContentLoaded', async () => {
+    // 1) user session + VIP + admin button + redirect if not logged in
+    await initMeAndUi();
 
-function initShopSubTabs() {
-  const btns = document.querySelectorAll('#shop [data-shop-tab]');
-  const panes = {
-    premium: document.getElementById('shopPremium'),
-    mounts: document.getElementById('shopMounts'),
-    cosmetic: document.getElementById('shopCosmetic')
-  };
+    // 2) tabs
+    initTabs();
 
-  btns.forEach(b => b.addEventListener('click', () => {
-    const key = b.dataset.shopTab;
-    btns.forEach(x => x.classList.toggle('active', x === b));
-    Object.entries(panes).forEach(([k, el]) => {
-      if (!el) return;
-      el.style.display = (k === key) ? '' : 'none';
-    });
-  }));
-}
+    // 3) accounts list
+    await loadGameAccounts();
 
-function initShopLoadOnTabClick() {
-  document.querySelector('[data-tab="shop"]')?.addEventListener('click', () => {
-    initShopSubTabs();
-    if (!shopLoadedOnce) {
-      shopLoadedOnce = true;
-      loadShop();
-    }
+    // 4) modals & actions
+    initCreateAccountModal();
+    initDeleteModal();
+    initResetPasswordModal();
+    initSetPrimary();
+
+    // 5) characters toggle (expand)
+    initCharactersToggle();
+
+    // 6) vote
+    initVote();
+    loadVoteSites();
+
+    // 7) balances
+    loadVoteBalance();
+    loadDcBalance();
+
+    // 8) vip modal + convert
+    initVipModal();
+    initConvert();
+
+    // 9) bug system
+    initBugForm();
+    initBugCounter();
+    initMyBugsList();
+
+    // 10) shop
+    initShop();
   });
-}
-
-// ---------- init hooks pro část 3/3 ----------
-function initPart3() {
-  initAccountRowCharactersToggle();
-
-  // vote
-  initVoteClicks();
-
-  // vip + convert
-  initVipModal();
-  initConvertVcToDc();
-
-  // shop
-  initShopBuyClicks();
-  initShopLoadOnTabClick();
-
-  // initial loads
-  loadVoteSites();
-  loadVoteBalance();
-  loadDcBalance();
-}
-
-document.addEventListener('DOMContentLoaded', async () => {
-  await initMeAndVipBox();
-  initProfileTabs();
-
-  initCreateAccountModal();
-  initDeleteModal();
-  initResetPasswordModal();
-  initSetPrimaryAccount();
-  initBugReport();
-  initMyBugsList();
-
-  await loadGameAccounts();
-
-  if (document.getElementById('vote') || document.getElementById('shop')) {
-    initPart3();
-  }
-});
-})(); 
+})();
