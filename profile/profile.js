@@ -1157,11 +1157,16 @@ function ensureShopInit() {
       const data = await res.json().catch(() => ({}));
 
       if (data.ok) {
-        notify('success', T.buyOk);
-        loadDcBalance();
-        loadVoteBalance();
-        return;
-      }
+  notify('success', T.buyOk);
+
+  await loadDcBalance();
+  await loadVoteBalance();
+
+  // ✅ refresh listu účtů (přepočítá premium_days_left a end_at)
+  await loadGameAccounts();
+
+  return;
+}
 
       const err = data.error || T.buyErr;
       if (err === 'INSUFFICIENT_FUNDS') notify('error', T.insufficient);
