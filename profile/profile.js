@@ -1101,8 +1101,34 @@ async function loadShop() {
   }
 
   // ✅ bezpečné naplnění (když API vrátí něco jiného, UI nespadne)
-  shopProducts = (pData && pData.ok && Array.isArray(pData.products)) ? pData.products : [];
-  myGameAccounts = (aData && aData.ok && Array.isArray(aData.accounts)) ? aData.accounts : [];
+   // --- DIAG + robust parse ---
+  const statusInfo = `shop_list=${pRes?.status} accounts=${aRes?.status}`;
+  if (!pRes?.ok) {
+    box.innerHTML = `<div class="form-error">Shop API error (${statusInfo}).</div>`;
+    console.error('shop_list bad response:', pRes?.status, pData);
+    return;
+  }
+  if (!aRes?.ok) {
+    box.innerHTML = `<div class="form-error">Accounts API error (${statusInfo}).</div>`;
+    console.error('accounts_min bad response:', aRes?.status, aData);
+    return;
+  }
+
+  const prods =
+    (pData && pData.ok && Array.isArray(pData.products) && pData.products) ||
+    (pData && pData.ok && Array.isArray(pData.items) && pData.items) ||
+    (pData && pData.ok && Array.isArray(pData.list) && pData.list) ||
+    [];
+
+  const accs =
+    (aData && aData.ok && Array.isArray(aData.accounts) && aData.accounts) ||
+    (aData && aData.ok && Array.isArray(aData.list) && aData.list) ||
+    [];
+
+  shopProducts = prods;
+  myGameAccounts = accs;
+
+  console.log('SHOP DEBUG:', { statusInfo, pData, aData, shopProducts, myGameAccounts });
 
   box.innerHTML = '';
 
