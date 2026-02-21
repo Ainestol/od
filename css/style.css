@@ -306,7 +306,7 @@ body.no-auth-emblem::before {
     border-radius: 6px;
 }
 .auth-page .auth-container {
-    max-width: 220px;
+    max-width: 500px;
     margin-top: 60px;
 
     background: linear-gradient(
