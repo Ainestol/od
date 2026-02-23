@@ -1081,37 +1081,53 @@ const I18N = {
 };
 
 async function loadShop() {
-  const box = document.getElementById('shopPremium');
-  if (!box) return;
+  const boxPremium = document.getElementById('shopPremium');
+  const boxMounts = document.getElementById('shopMounts');
+  const boxCosmetic = document.getElementById('shopCosmetic');
+  if (!boxPremium || !boxMounts || !boxCosmetic) return;
 
-  const T = I18N[getLang()];
-  box.innerHTML = `<div class="muted">${T.shopLoading}</div>`;
+  const L = getLang();
+  const TT = I18N[L] || I18N.cs;
+
+  // loading do všech panelů
+  boxPremium.innerHTML = `<div class="muted">${TT.shopLoading}</div>`;
+  boxMounts.innerHTML = `<div class="muted">${TT.shopLoading}</div>`;
+  boxCosmetic.innerHTML = `<div class="muted">${TT.shopLoading}</div>`;
 
   let pRes, aRes, pData, aData;
 
   try {
     [pRes, aRes] = await Promise.all([
-  fetch(`/api/shop_list.php?lang=${getLang()}`, { credentials: 'same-origin' }),
-  fetch('/api/list_game_accounts_min.php', { credentials: 'same-origin' })
-]);
+      fetch(`/api/shop_list.php?lang=${L}`, { credentials: 'same-origin' }),
+      fetch('/api/list_game_accounts_min.php', { credentials: 'same-origin' })
+    ]);
 
     pData = await pRes.json().catch(() => ({}));
     aData = await aRes.json().catch(() => ({}));
   } catch (e) {
-    box.innerHTML = `<div class="form-error">Shop load failed.</div>`;
+    const err = `<div class="form-error">Shop load failed.</div>`;
+    boxPremium.innerHTML = err;
+    boxMounts.innerHTML = err;
+    boxCosmetic.innerHTML = err;
     return;
   }
 
-  // ✅ bezpečné naplnění (když API vrátí něco jiného, UI nespadne)
-   // --- DIAG + robust parse ---
   const statusInfo = `shop_list=${pRes?.status} accounts=${aRes?.status}`;
+
   if (!pRes?.ok) {
-    box.innerHTML = `<div class="form-error">Shop API error (${statusInfo}).</div>`;
+    const err = `<div class="form-error">Shop API error (${statusInfo}).</div>`;
+    boxPremium.innerHTML = err;
+    boxMounts.innerHTML = err;
+    boxCosmetic.innerHTML = err;
     console.error('shop_list bad response:', pRes?.status, pData);
     return;
   }
+
   if (!aRes?.ok) {
-    box.innerHTML = `<div class="form-error">Accounts API error (${statusInfo}).</div>`;
+    const err = `<div class="form-error">Accounts API error (${statusInfo}).</div>`;
+    boxPremium.innerHTML = err;
+    boxMounts.innerHTML = err;
+    boxCosmetic.innerHTML = err;
     console.error('accounts_min bad response:', aRes?.status, aData);
     return;
   }
@@ -1130,26 +1146,40 @@ async function loadShop() {
   shopProducts = prods;
   myGameAccounts = accs;
 
-  console.log('SHOP DEBUG:', { statusInfo, pData, aData, shopProducts, myGameAccounts });
-
-  box.innerHTML = '';
+  // vyprázdnit panely
+  boxPremium.innerHTML = '';
+  boxMounts.innerHTML = '';
+  boxCosmetic.innerHTML = '';
 
   if (!shopProducts.length) {
-    box.innerHTML = `<div class="muted">${T.noProducts}</div>`;
+    const empty = `<div class="muted">${TT.noProducts}</div>`;
+    boxPremium.innerHTML = empty;
+    boxMounts.innerHTML = empty;
+    boxCosmetic.innerHTML = empty;
     return;
   }
 
-  shopProducts.forEach(prod => {
+  // 1) Načíst postavy (jen kvůli Mountům) – ze všech účtů
+  let allChars = [];
+  if (myGameAccounts.length) {
+    const charCalls = myGameAccounts.map(a =>
+      fetch(`/api/list_characters.php?account=${encodeURIComponent(a.login)}`, { credentials: 'same-origin' })
+        .then(r => r.json().catch(() => ({})))
+        .then(d => (d && d.ok && Array.isArray(d.characters)) ? d.characters : [])
+        .catch(() => [])
+    );
+    const charLists = await Promise.all(charCalls);
+    allChars = charLists.flat();
+  }
+
+  const charOptionsHtml = allChars.length
+    ? allChars.map(ch => `<option value="${ch.charId}">${ch.char_name} (Lv ${ch.level})</option>`).join('')
+    : `<option value="">${L === 'en' ? 'No characters' : 'Žádné postavy'}</option>`;
+
+  // helper render
+  function renderRow(prod, extraSelectHtml = '') {
     const row = document.createElement('div');
     row.className = 'mini-row';
-
-    const needsGameAcc = (prod.code === 'PREM_GAME_30D');
-
-    const selectHtml = needsGameAcc ? `
-      <select class="shop-acc" data-pid="${prod.id}">
-        ${myGameAccounts.map(a => `<option value="${a.id}">${a.login}</option>`).join('')}
-      </select>
-    ` : '';
 
     row.innerHTML = `
       <div class="mini-row">
@@ -1159,17 +1189,63 @@ async function loadShop() {
         </div>
 
         <div style="display:flex; gap:10px; align-items:center; justify-content:flex-end;">
-          ${selectHtml}
-          <span class="tag">${prod.price_dc} ${T.dc}</span>
+          ${extraSelectHtml}
+          <span class="tag">${prod.price_dc} ${TT.dc}</span>
           <button class="btn btn-small btn-primary shop-buy" data-id="${prod.id}">
-            ${T.buy}
+            ${TT.buy}
           </button>
         </div>
       </div>
     `;
+    return row;
+  }
 
-    box.appendChild(row);
+  // 2) Rozdělit podle category a vykreslit do správných boxů
+  let hasPremium = false, hasMounts = false, hasCos = false;
+
+  shopProducts.forEach(prod => {
+    const cat = String(prod.category || '').toUpperCase();
+
+    // VIP / Premium
+    if (cat === 'VIP') {
+      hasPremium = true;
+
+      const needsGameAcc = (prod.code === 'PREM_GAME_30D');
+      const selectAccHtml = needsGameAcc ? `
+        <select class="shop-acc" data-pid="${prod.id}">
+          ${myGameAccounts.map(a => `<option value="${a.id}">${a.login}</option>`).join('')}
+        </select>
+      ` : '';
+
+      boxPremium.appendChild(renderRow(prod, selectAccHtml));
+      return;
+    }
+
+    // Mounty
+    if (cat === 'MOUNT') {
+      hasMounts = true;
+
+      const selectCharHtml = `
+        <select class="shop-char" data-pid="${prod.id}">
+          ${charOptionsHtml}
+        </select>
+      `;
+
+      boxMounts.appendChild(renderRow(prod, selectCharHtml));
+      return;
+    }
+
+    // Cosmetic
+    if (cat === 'COSMETIC') {
+      hasCos = true;
+      boxCosmetic.appendChild(renderRow(prod));
+      return;
+    }
   });
+
+  if (!hasPremium) boxPremium.innerHTML = `<div class="muted">${TT.noProducts}</div>`;
+  if (!hasMounts)  boxMounts.innerHTML  = `<div class="muted">${TT.noProducts}</div>`;
+  if (!hasCos)     boxCosmetic.innerHTML = `<div class="muted">${TT.noProducts}</div>`;
 }
 let shopInited = false;
 
@@ -1240,7 +1316,16 @@ function ensureShopInit() {
         }
         payload.game_account_id = gaId;
       }
-
+if ((prod.category || '').toUpperCase() === 'MOUNT') {
+  const sel = qs(`.shop-char[data-pid="${productId}"]`);
+  const chId = parseInt(sel?.value || '0', 10);
+  if (!chId) {
+    notify('error', isEn ? 'Select character' : 'Vyber postavu');
+    btn.disabled = false;
+    return;
+  }
+  payload.char_id = chId;
+}
       const res = await fetch('/api/shop_buy.php', {
         method: 'POST',
         credentials: 'same-origin',
