@@ -454,4 +454,21 @@ body.auth-page.profile-page { overflow: auto; }
   font-size: 14px;
   line-height: 1.35;
 }
+.shop-row{
+  display:flex;
+  gap:14px;
+  align-items:center;
+}
 
+.shop-img{
+  width:64px;
+  height:64px;
+  object-fit:contain;
+  flex:0 0 64px;
+  /* zvýraznění a schování “zbytků pozadí” */
+  filter: drop-shadow(0 0 6px rgba(0,0,0,.85));
+}
+
+.shop-info{ flex:1; min-width:0; }
+.shop-actions{ flex:0 0 auto; }
+.shop-img{ filter: drop-shadow(0 0 6px rgba(0,0,0,.85)) contrast(1.1); }
