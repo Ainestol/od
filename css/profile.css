@@ -478,22 +478,3 @@ body.auth-page.profile-page { overflow: auto; }
 
 /*.shop-img{ filter: drop-shadow(0 0 6px rgba(0,0,0,.85)) contrast(1.1); } */
 
-#shopMounts .mini-row{
-  background: rgba(255,255,255,.06) !important; /* světle šedé sklo */
-  border: 1px solid rgba(255,255,255,.10) !important;
-  box-shadow: 0 6px 18px rgba(0,0,0,.25);
-  backdrop-filter: blur(3px);
-  -webkit-backdrop-filter: blur(3px);
-}
-
-#shopMounts .mini-row:hover{
-  background: rgba(255,255,255,.09) !important;
-  border-color: rgba(255,255,255,.14) !important;
-}
-#shopMounts .mini-row strong,
-#shopMounts .mini-row .muted{
-  color: rgba(255,255,255,.92) !important;
-}
-#shopMounts .mini-row .muted{
-  color: rgba(255,255,255,.72) !important;
-}
