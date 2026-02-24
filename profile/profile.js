@@ -1176,29 +1176,36 @@ async function loadShop() {
     ? allChars.map(ch => `<option value="${ch.charId}">${ch.char_name} (Lv ${ch.level})</option>`).join('')
     : `<option value="">${L === 'en' ? 'No characters' : 'Žádné postavy'}</option>`;
 
-  // helper render
-  function renderRow(prod, extraSelectHtml = '') {
-    const row = document.createElement('div');
-    row.className = 'mini-row';
+ // helper render
+function renderRow(prod, extraSelectHtml = '') {
+  const row = document.createElement('div');
+  row.className = 'mini-row';
 
-    row.innerHTML = `
-      <div class="mini-row">
-        <div>
-          <strong>${prod.name}</strong><br>
-          <span class="muted">${prod.description || ''}</span>
-        </div>
+  const isMount = String(prod.category || '').toUpperCase() === 'MOUNT';
+  const imgHtml = isMount
+    ? `<img class="shop-img" src="/img/shop/${prod.code}.png" alt="${prod.name}" loading="lazy">`
+    : '';
 
-        <div style="display:flex; gap:10px; align-items:center; justify-content:flex-end;">
-          ${extraSelectHtml}
-          <span class="tag">${prod.price_dc} ${TT.dc}</span>
-          <button class="btn btn-small btn-primary shop-buy" data-id="${prod.id}">
-            ${TT.buy}
-          </button>
-        </div>
+  row.innerHTML = `
+    <div class="mini-row shop-row">
+      ${imgHtml}
+
+      <div class="shop-info">
+        <strong>${prod.name}</strong><br>
+        <span class="muted">${prod.description || ''}</span>
       </div>
-    `;
-    return row;
-  }
+
+      <div class="shop-actions" style="display:flex; gap:10px; align-items:center; justify-content:flex-end;">
+        ${extraSelectHtml}
+        <span class="tag">${prod.price_dc} ${TT.dc}</span>
+        <button class="btn btn-small btn-primary shop-buy" data-id="${prod.id}">
+          ${TT.buy}
+        </button>
+      </div>
+    </div>
+  `;
+  return row;
+}
 
   // 2) Rozdělit podle category a vykreslit do správných boxů
   let hasPremium = false, hasMounts = false, hasCos = false;
