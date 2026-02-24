@@ -471,4 +471,9 @@ body.auth-page.profile-page { overflow: auto; }
 
 .shop-info{ flex:1; min-width:0; }
 .shop-actions{ flex:0 0 auto; }
-.shop-img{ filter: drop-shadow(0 0 6px rgba(0,0,0,.85)) contrast(1.1); }
+
+.shop-img{
+  filter: drop-shadow(0 0 6px rgba(0,0,0,.85)) contrast(1.1);
+}
+
+/*.shop-img{ filter: drop-shadow(0 0 6px rgba(0,0,0,.85)) contrast(1.1); } */
