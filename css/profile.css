@@ -461,8 +461,8 @@ body.auth-page.profile-page { overflow: auto; }
 }
 
 .shop-img{
-  width:150px;
-  height:150px;
+  width:350px;
+  height:350px;
   object-fit:contain;
   flex:0 0 64px;
   /* zvýraznění a schování “zbytků pozadí” */
