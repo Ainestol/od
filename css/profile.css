@@ -478,16 +478,22 @@ body.auth-page.profile-page { overflow: auto; }
 
 /*.shop-img{ filter: drop-shadow(0 0 6px rgba(0,0,0,.85)) contrast(1.1); } */
 
-/* Mount shop row – vyšší průhlednost pozadí */
 #shopMounts .mini-row{
-  background: rgba(0,0,0,.10) !important;  /* víc průhledné */
-  border: 1px solid rgba(255,215,0,.18) !important;
+  background: rgba(255,255,255,.06) !important; /* světle šedé sklo */
+  border: 1px solid rgba(255,255,255,.10) !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,.25);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
 }
+
 #shopMounts .mini-row:hover{
-  background: rgba(0,0,0,.06) !important;  /* ještě víc průhledné */
+  background: rgba(255,255,255,.09) !important;
+  border-color: rgba(255,255,255,.14) !important;
 }
-/* Mount image – potlačení bílých zbytků */
-#shopMounts .mini-row{
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
+#shopMounts .mini-row strong,
+#shopMounts .mini-row .muted{
+  color: rgba(255,255,255,.92) !important;
+}
+#shopMounts .mini-row .muted{
+  color: rgba(255,255,255,.72) !important;
 }
