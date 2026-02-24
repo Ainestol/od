@@ -477,3 +477,17 @@ body.auth-page.profile-page { overflow: auto; }
 }
 
 /*.shop-img{ filter: drop-shadow(0 0 6px rgba(0,0,0,.85)) contrast(1.1); } */
+
+/* Mount shop row – vyšší průhlednost pozadí */
+#shopMounts .mini-row{
+  background: rgba(0,0,0,.28) !important;  /* víc průhledné */
+  border: 1px solid rgba(255,215,0,.22) !important;
+}
+#shopMounts .mini-row:hover{
+  background: rgba(0,0,0,.20) !important;
+}
+/* Mount image – potlačení bílých zbytků */
+#shopMounts .shop-img{
+  opacity: .92;                   /* lehce průhledné */
+  filter: drop-shadow(0 0 6px rgba(0,0,0,.9)) brightness(.92) contrast(1.05);
+}
