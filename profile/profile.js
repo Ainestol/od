@@ -1083,8 +1083,9 @@ const I18N = {
 async function loadShop() {
   const boxPremium = document.getElementById('shopPremium');
   const boxMounts = document.getElementById('shopMounts');
+  const boxCloaks = document.getElementById('shopCloaks');
   const boxCosmetic = document.getElementById('shopCosmetic');
-  if (!boxPremium || !boxMounts || !boxCosmetic) return;
+  if (!boxPremium || !boxMounts || !boxCloaks || !boxCosmetic) return;
 
   const L = getLang();
   const TT = I18N[L] || I18N.cs;
@@ -1092,6 +1093,7 @@ async function loadShop() {
   // loading do všech panelů
   boxPremium.innerHTML = `<div class="muted">${TT.shopLoading}</div>`;
   boxMounts.innerHTML = `<div class="muted">${TT.shopLoading}</div>`;
+  boxCloaks.innerHTML = `<div class="muted">${TT.shopLoading}</div>`;
   boxCosmetic.innerHTML = `<div class="muted">${TT.shopLoading}</div>`;
 
   let pRes, aRes, pData, aData;
@@ -1108,6 +1110,7 @@ async function loadShop() {
     const err = `<div class="form-error">Shop load failed.</div>`;
     boxPremium.innerHTML = err;
     boxMounts.innerHTML = err;
+    boxCloaks.innerHTML = err;
     boxCosmetic.innerHTML = err;
     return;
   }
@@ -1118,6 +1121,7 @@ async function loadShop() {
     const err = `<div class="form-error">Shop API error (${statusInfo}).</div>`;
     boxPremium.innerHTML = err;
     boxMounts.innerHTML = err;
+    boxCloaks.innerHTML = err;
     boxCosmetic.innerHTML = err;
     console.error('shop_list bad response:', pRes?.status, pData);
     return;
@@ -1127,6 +1131,7 @@ async function loadShop() {
     const err = `<div class="form-error">Accounts API error (${statusInfo}).</div>`;
     boxPremium.innerHTML = err;
     boxMounts.innerHTML = err;
+    boxCloaks.innerHTML = err;
     boxCosmetic.innerHTML = err;
     console.error('accounts_min bad response:', aRes?.status, aData);
     return;
@@ -1149,12 +1154,14 @@ async function loadShop() {
   // vyprázdnit panely
   boxPremium.innerHTML = '';
   boxMounts.innerHTML = '';
+  boxCloaks.innerHTML = '';
   boxCosmetic.innerHTML = '';
 
   if (!shopProducts.length) {
     const empty = `<div class="muted">${TT.noProducts}</div>`;
     boxPremium.innerHTML = empty;
     boxMounts.innerHTML = empty;
+    boxCloaks.innerHTML = empty;
     boxCosmetic.innerHTML = empty;
     return;
   }
@@ -1181,10 +1188,10 @@ function renderRow(prod, extraSelectHtml = '') {
   const row = document.createElement('div');
   row.className = 'mini-row';
 
-  const isMount = String(prod.category || '').toUpperCase() === 'MOUNT';
-  const imgHtml = isMount
-    ? `<img class="shop-img" src="/img/shop/${prod.code}.png" alt="${prod.name}" loading="lazy">`
-    : '';
+  const isImg = ['MOUNT','COSMETIC'].includes(String(prod.category || '').toUpperCase());
+  const imgHtml = isImg
+  ? `<img class="shop-img" src="/img/shop/${prod.code}.png" alt="${prod.name}" loading="lazy">`
+  : '';
 
   row.innerHTML = `
     <div class="mini-row shop-row">
@@ -1208,7 +1215,7 @@ function renderRow(prod, extraSelectHtml = '') {
 }
 
   // 2) Rozdělit podle category a vykreslit do správných boxů
-  let hasPremium = false, hasMounts = false, hasCos = false;
+  let hasPremium = false, hasMounts = false, hasCloaks = false, hasCos = false;
 
   shopProducts.forEach(prod => {
     const cat = String(prod.category || '').toUpperCase();
@@ -1243,15 +1250,29 @@ function renderRow(prod, extraSelectHtml = '') {
     }
 
     // Cosmetic
-    if (cat === 'COSMETIC') {
-      hasCos = true;
-      boxCosmetic.appendChild(renderRow(prod));
-      return;
-    }
+   if (cat === 'COSMETIC') {
+  const codeUp = String(prod.code || '').toUpperCase();
+
+  const selectCharHtml = `
+    <select class="shop-char" data-pid="${prod.id}">
+      ${charOptionsHtml}
+    </select>
+  `;
+
+  if (codeUp.startsWith('CLOAK_')) {
+    hasCloaks = true;
+    boxCloaks.appendChild(renderRow(prod, selectCharHtml));
+  } else {
+    hasCos = true;
+    boxCosmetic.appendChild(renderRow(prod, selectCharHtml));
+  }
+  return;
+}
   });
 
   if (!hasPremium) boxPremium.innerHTML = `<div class="muted">${TT.noProducts}</div>`;
   if (!hasMounts)  boxMounts.innerHTML  = `<div class="muted">${TT.noProducts}</div>`;
+  if (!hasCloaks) boxCloaks.innerHTML = `<div class="muted">${TT.noProducts}</div>`;
   if (!hasCos)     boxCosmetic.innerHTML = `<div class="muted">${TT.noProducts}</div>`;
 }
 let shopInited = false;
@@ -1270,6 +1291,7 @@ function ensureShopInit() {
     const panes = {
       premium: document.getElementById('shopPremium'),
       mounts: document.getElementById('shopMounts'),
+      cloaks: document.getElementById('shopCloaks'),
       cosmetic: document.getElementById('shopCosmetic')
     };
 
@@ -1323,7 +1345,7 @@ function ensureShopInit() {
         }
         payload.game_account_id = gaId;
       }
-if ((prod.category || '').toUpperCase() === 'MOUNT') {
+if (['MOUNT','COSMETIC'].includes((prod.category || '').toUpperCase())) {
   const sel = qs(`.shop-char[data-pid="${productId}"]`);
   const chId = parseInt(sel?.value || '0', 10);
   if (!chId) {
