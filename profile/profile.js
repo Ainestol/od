@@ -1032,6 +1032,41 @@ else {
   }
 
 
+function showShopConfirm({ title, text, okLabel, cancelLabel }) {
+  return new Promise((resolve) => {
+    const modal = document.getElementById('shopConfirmModal');
+    const tEl = document.getElementById('shopConfirmTitle');
+    const msgEl = document.getElementById('shopConfirmText');
+    const btnOk = document.getElementById('shopConfirmOk');
+    const btnCancel = document.getElementById('shopConfirmCancel');
+
+    if (!modal || !tEl || !msgEl || !btnOk || !btnCancel) {
+      // fallback na system confirm, kdyby modal chyběl
+      resolve(confirm(text));
+      return;
+    }
+
+    tEl.textContent = title || '';
+    msgEl.textContent = text || '';
+    btnOk.textContent = okLabel || (isEn ? 'Buy' : 'Koupit');
+    btnCancel.textContent = cancelLabel || (isEn ? 'Cancel' : 'Zrušit');
+
+    const cleanup = (val) => {
+      modal.classList.add('hidden');
+      btnOk.onclick = null;
+      btnCancel.onclick = null;
+      modal.onclick = null;
+      resolve(val);
+    };
+
+    btnOk.onclick = () => cleanup(true);
+    btnCancel.onclick = () => cleanup(false);
+    modal.onclick = (e) => { if (e.target === modal) cleanup(false); };
+
+    modal.classList.remove('hidden');
+  });
+}
+
 
 
 function notify(type, message, timeout = 3000) {
@@ -1377,7 +1412,13 @@ function ensureShopInit() {
       ? `Buy "${name}" for ${price} DC?${extra}`
       : `Koupit "${name}" za ${price} DC?${extra}`;
 
-    if (!confirm(msg)) return;
+    const ok = await showShopConfirm({
+  title: isEn ? 'Confirm purchase' : 'Potvrdit nákup',
+  text: msg,
+  okLabel: isEn ? 'Buy' : 'Koupit',
+  cancelLabel: isEn ? 'Cancel' : 'Zrušit'
+});
+if (!ok) return;
 
     // teprve po potvrzení disable
     btn.disabled = true;
