@@ -249,7 +249,7 @@ function notify(type, message, timeout = 3000) {
 
       row.innerHTML = `
         <div class="account-row" data-login="${acc.login}">
-          <strong>${isEn ? 'Account' : 'Účet'}:</strong>
+          <strong>${isEn ? 'Account' : 'Účet'}:</strong> ${acc.login}
 
           <span class="tag">${acc.chars_count} ${isEn ? 'characters' : 'postav'}</span>
           ${premiumTag}
