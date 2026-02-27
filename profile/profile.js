@@ -1041,10 +1041,10 @@ function showShopConfirm({ title, text, okLabel, cancelLabel }) {
     const btnCancel = document.getElementById('shopConfirmCancel');
 
     if (!modal || !tEl || !msgEl || !btnOk || !btnCancel) {
-      // fallback na system confirm, kdyby modal chyběl
-      resolve(confirm(text));
-      return;
-    }
+  console.error('Shop confirm modal missing in HTML');
+  resolve(false);
+  return;
+}
 
     tEl.textContent = title || '';
     msgEl.textContent = text || '';
