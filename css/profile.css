@@ -519,3 +519,37 @@ body.auth-page.profile-page { overflow: auto; }
 .shop-subtabs .tab:active{
   transform: translateY(0px);
 }
+/* --- Modal buttons: stejná šířka jako u reset hesla --- */
+.modal .modal-actions{
+  display:flex;
+  gap:12px;
+}
+
+.modal .modal-actions .btn{
+  flex: 1 1 0;
+  min-width: 180px;
+  text-align:center;
+}
+/* --- Account action buttons (Delete / Change password) --- */
+.account-row .actions .btn.btn-small{
+  background: rgba(0,0,0,.35);
+  border: 1px solid rgba(212,175,55,.35);
+  color: rgba(255,255,255,.9);
+  padding: 5px 10px;
+  border-radius: 10px;
+  font-weight: 700;
+  letter-spacing: .2px;
+}
+
+.account-row .actions .btn.btn-small:hover{
+  border-color: rgba(212,175,55,.65);
+  background: rgba(0,0,0,.22);
+}
+
+.account-row .actions .btn.btn-small.btn-danger{
+  border-color: rgba(220,80,80,.55);
+}
+
+.account-row .actions .btn.btn-small.btn-danger:hover{
+  border-color: rgba(220,80,80,.85);
+}
