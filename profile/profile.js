@@ -233,9 +233,6 @@ function notify(type, message, timeout = 3000) {
       const row = document.createElement('div');
       row.className = 'mini-row';
 
-      const isPrimary = Number(acc.is_primary) === 1;
-      if (isPrimary) row.classList.add('primary-account');
-
       const premiumTag = (() => {
   const tInactive = isEn ? 'Premium: inactive' : 'Premium: neaktivní';
   const tExpired  = isEn ? 'Premium: expired'  : 'Premium: expirováno';
@@ -252,7 +249,7 @@ function notify(type, message, timeout = 3000) {
 
       row.innerHTML = `
         <div class="account-row" data-login="${acc.login}">
-          <strong>${isPrimary ? '⭐ ' : ''}${isEn ? 'Account' : 'Účet'}:</strong> ${acc.login}
+          <strong>${isEn ? 'Account' : 'Účet'}:</strong>
 
           <span class="tag">${acc.chars_count} ${isEn ? 'characters' : 'postav'}</span>
           ${premiumTag}
