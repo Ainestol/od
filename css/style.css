@@ -1434,3 +1434,23 @@ body.auth-page .auth-container {
   height: auto !important;
   max-height: none !important;
 }
+/* Delete modal – stejné rozměry obou tlačítek */
+#deleteModal .modal-actions{
+  display:flex;
+  gap:12px;
+}
+
+#deleteModal #deleteCancel,
+#deleteModal #deleteConfirm{
+  flex: 1 1 0;
+  min-width: 180px;
+  height: 42px;
+  padding: 10px 14px;
+  box-sizing: border-box;
+}
+
+/* i když je confirm disabled, rozměry zůstanou stejné */
+#deleteModal #deleteConfirm:disabled{
+  height: 42px;
+  padding: 10px 14px;
+}
