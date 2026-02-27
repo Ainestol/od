@@ -1321,94 +1321,97 @@ function ensureShopInit() {
 
   // delegated buy click (tohle nech jak máš)
   document.addEventListener('click', async (e) => {
-    const btn = e.target.closest('.shop-buy');
-    if (!btn) return;
+  const btn = e.target.closest('.shop-buy');
+  if (!btn) return;
 
-    const productId = parseInt(btn.dataset.id, 10);
-    if (!productId) return;
+  const productId = parseInt(btn.dataset.id, 10);
+  if (!productId) return;
 
-    const prod = shopProducts.find(p => Number(p.id) === productId);
-    if (!prod) return;
+  const prod = shopProducts.find(p => Number(p.id) === productId);
+  if (!prod) return;
 
-    // potvrzení nákupu (ochrana proti omylu/dvojkliku)
-const name = prod?.name || '';
-const price = prod?.price_dc ?? '?';
+  if (btn.disabled) return; // ochrana proti dvojkliku
 
-let extra = '';
-if (payload.char_id) {
-  const opt = qs(`.shop-char[data-pid="${productId}"] option:checked`);
-  const chName = opt ? opt.textContent : '';
-  if (chName) extra = isEn ? `\nCharacter: ${chName}` : `\nPostava: ${chName}`;
-}
-if (payload.game_account_id) {
-  const opt = qs(`.shop-acc[data-pid="${productId}"] option:checked`);
-  const accName = opt ? opt.textContent : '';
-  if (accName) extra = isEn ? `\nAccount: ${accName}` : `\nÚčet: ${accName}`;
-}
+  try {
+    const payload = { product_id: productId };
 
-const msg = isEn
-  ? `Buy "${name}" for ${price} DC?${extra}`
-  : `Koupit "${name}" za ${price} DC?${extra}`;
+    // GAME premium potřebuje vybrat účet
+    if (prod.code === 'PREM_GAME_30D') {
+      const sel = qs(`.shop-acc[data-pid="${productId}"]`);
+      const gaId = parseInt(sel?.value || '0', 10);
+      if (!gaId) {
+        notify('error', T.needAcc);
+        return;
+      }
+      payload.game_account_id = gaId;
+    }
 
-if (!confirm(msg)) return;
+    // MOUNT + COSMETIC potřebuje vybrat postavu
+    if (['MOUNT', 'COSMETIC'].includes((prod.category || '').toUpperCase())) {
+      const sel = qs(`.shop-char[data-pid="${productId}"]`);
+      const chId = parseInt(sel?.value || '0', 10);
+      if (!chId) {
+        notify('error', isEn ? 'Select character' : 'Vyber postavu');
+        return;
+      }
+      payload.char_id = chId;
+    }
 
+    // CONFIRM až teď (payload už existuje a víme postavu/účet)
+    const name = prod?.name || '';
+    const price = prod?.price_dc ?? '?';
+
+    let extra = '';
+    if (payload.char_id) {
+      const opt = qs(`.shop-char[data-pid="${productId}"] option:checked`);
+      const chName = opt ? opt.textContent : '';
+      if (chName) extra += isEn ? `\nCharacter: ${chName}` : `\nPostava: ${chName}`;
+    }
+    if (payload.game_account_id) {
+      const opt = qs(`.shop-acc[data-pid="${productId}"] option:checked`);
+      const accName = opt ? opt.textContent : '';
+      if (accName) extra += isEn ? `\nAccount: ${accName}` : `\nÚčet: ${accName}`;
+    }
+
+    const msg = isEn
+      ? `Buy "${name}" for ${price} DC?${extra}`
+      : `Koupit "${name}" za ${price} DC?${extra}`;
+
+    if (!confirm(msg)) return;
+
+    // teprve po potvrzení disable
     btn.disabled = true;
 
-    try {
-      const payload = { product_id: productId };
+    const res = await fetch('/api/shop_buy.php', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
 
-      if (prod.code === 'PREM_GAME_30D') {
-        const sel = qs(`.shop-acc[data-pid="${productId}"]`);
-        const gaId = parseInt(sel?.value || '0', 10);
-        if (!gaId) {
-          notify('error', T.needAcc);
-          btn.disabled = false;
-          return;
-        }
-        payload.game_account_id = gaId;
-      }
-if (['MOUNT','COSMETIC'].includes((prod.category || '').toUpperCase())) {
-  const sel = qs(`.shop-char[data-pid="${productId}"]`);
-  const chId = parseInt(sel?.value || '0', 10);
-  if (!chId) {
-    notify('error', isEn ? 'Select character' : 'Vyber postavu');
-    btn.disabled = false;
-    return;
-  }
-  payload.char_id = chId;
-}
-      const res = await fetch('/api/shop_buy.php', {
-        method: 'POST',
-        credentials: 'same-origin',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
+    const data = await res.json().catch(() => ({}));
 
-      const data = await res.json().catch(() => ({}));
-
-      if (data.ok) {
-  notify('success', T.buyOk);
-
-  await loadDcBalance();
-  await loadVoteBalance();
-  await loadGameAccounts(); // aby se přepočítalo premium u účtů
-
-  if (typeof window.refreshMeAndUi === 'function') {
-    await window.refreshMeAndUi(); // aby se aktualizoval VIP box nahoře
-  }
-
-  return;
-}
-
-      const err = data.error || T.buyErr;
-      if (err === 'INSUFFICIENT_FUNDS') notify('error', T.insufficient);
-      else if (err === 'ALREADY_PURCHASED') notify('error', T.alreadyBought);
-      else notify('error', err);
-
-    } finally {
-      btn.disabled = false;
+    if (data.ok) {
+      notify('success', T.buyOk);
+      await loadDcBalance();
+      await loadVoteBalance();
+      await loadGameAccounts();
+      if (typeof window.refreshMeAndUi === 'function') await window.refreshMeAndUi();
+      return;
     }
-  });
+
+    const err = data.error || T.buyErr;
+    if (err === 'INSUFFICIENT_FUNDS') notify('error', T.insufficient);
+    else if (err === 'ALREADY_PURCHASED') notify('error', T.alreadyBought);
+    else notify('error', err);
+
+  } catch (ex) {
+    console.error(ex);
+    notify('error', T.buyErr);
+  } finally {
+    btn.disabled = false;
+  }
+});
 }
   /* -----------------------------
    * init
