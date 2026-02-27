@@ -263,11 +263,6 @@ function notify(type, message, timeout = 3000) {
           }
 
           <div class="actions">
-            ${
-              isPrimary
-                ? '<span class="tag primary">PRIMARY</span>'
-                : `<button class="btn btn-small" data-primary="${acc.login}">Set primary</button>`
-            }
             <button class="btn btn-small btn-danger" data-login="${acc.login}">Delete</button>
             <button class="btn btn-small" data-reset="${acc.login}">Change password</button>
           </div>
@@ -488,35 +483,7 @@ function notify(type, message, timeout = 3000) {
     });
   }
 
-  /* -----------------------------
-   * set primary account (delegated)
-   * ----------------------------- */
-  function initSetPrimary() {
-    document.addEventListener('click', async (e) => {
-      const btn = e.target.closest('button[data-primary]');
-      if (!btn) return;
-
-      const login = btn.dataset.primary;
-      if (!login) return;
-
-      const res = await fetch('/api/set_primary_account.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'same-origin',
-        body: JSON.stringify({ login })
-      });
-
-      const data = await res.json().catch(() => ({}));
-
-      if (data.ok) {
-        notify('success', T.primarySetOk);
-        loadGameAccounts();
-      } else {
-        notify('error', T.primarySetFail);
-      }
-    });
-  }
-
+  
   /* -----------------------------
    * bug account select + bug form submit
    * ----------------------------- */
@@ -1471,8 +1438,7 @@ if (!ok) return;
     initCreateAccountModal();
     initDeleteModal();
     initResetPasswordModal();
-    initSetPrimary();
-
+    
     // 5) characters toggle (expand)
     initCharactersToggle();
 
