@@ -1330,6 +1330,28 @@ function ensureShopInit() {
     const prod = shopProducts.find(p => Number(p.id) === productId);
     if (!prod) return;
 
+    // potvrzení nákupu (ochrana proti omylu/dvojkliku)
+const name = prod?.name || '';
+const price = prod?.price_dc ?? '?';
+
+let extra = '';
+if (payload.char_id) {
+  const opt = qs(`.shop-char[data-pid="${productId}"] option:checked`);
+  const chName = opt ? opt.textContent : '';
+  if (chName) extra = isEn ? `\nCharacter: ${chName}` : `\nPostava: ${chName}`;
+}
+if (payload.game_account_id) {
+  const opt = qs(`.shop-acc[data-pid="${productId}"] option:checked`);
+  const accName = opt ? opt.textContent : '';
+  if (accName) extra = isEn ? `\nAccount: ${accName}` : `\nÚčet: ${accName}`;
+}
+
+const msg = isEn
+  ? `Buy "${name}" for ${price} DC?${extra}`
+  : `Koupit "${name}" za ${price} DC?${extra}`;
+
+if (!confirm(msg)) return;
+
     btn.disabled = true;
 
     try {
