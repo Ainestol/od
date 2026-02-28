@@ -78,7 +78,7 @@ try {
   /* ===============================
      L2 LOGIN DB – DELETE ACCOUNT
      =============================== */
-    $pdoLoginWrite->prepare(
+  ->prepare(
     "DELETE FROM accounts WHERE login = ?"
   )->execute([$login]);
 
