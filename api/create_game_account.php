@@ -87,7 +87,7 @@ try {
   $hash = base64_encode(sha1($pass, true));
 
   /* zalo�en� game ��tu */
-  $ins = $pdoGameWrite->prepare("
+  $ins = $pdoLoginWrite->prepare("
     INSERT INTO accounts (login, password, accessLevel, lastactive)
     VALUES (?, ?, 0, 0)
   ");
