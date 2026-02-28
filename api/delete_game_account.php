@@ -56,7 +56,7 @@ try {
      KONTROLA POSTAV (l2game)
      =============================== */
 
-  $st = $gamePdo->prepare(
+  $st = $pdoGame->prepare(
     "SELECT COUNT(*)
      FROM characters
      WHERE LOWER(account_name) = LOWER(?)
