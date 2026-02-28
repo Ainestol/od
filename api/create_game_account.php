@@ -75,7 +75,7 @@ $_SESSION['last_create_acc'] = $now;
 try {
 
   /* existuje u� ��et? */
-  $st = $pdoGameWrite->prepare("SELECT 1 FROM accounts WHERE login = ? LIMIT 1");
+  $st = $pdoLoginWrite->prepare("SELECT 1 FROM accounts WHERE login = ? LIMIT 1");
   $st->execute([$login]);
   if ($st->fetch()) {
     http_response_code(409);
