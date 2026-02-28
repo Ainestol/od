@@ -4,10 +4,12 @@ error_reporting(E_ALL);
 
 header('Content-Type: application/json; charset=utf-8');
 session_start();
+require_once __DIR__ . '/../config/db_game.php';
+require_once __DIR__ . '/../config/db_game_write.php';
 require_once __DIR__ . '/../config/db.php'; // web DB => $pdo
 $webPdo = $pdo;
 
-/* musí být pøihlášen */
+/* musï¿½ bï¿½t pï¿½ihlï¿½en */
 if (empty($_SESSION['web_user_id'])) {
   http_response_code(401);
   echo json_encode(["error" => "Unauthorized"]);
@@ -21,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
   exit;
 }
 
-/* naètení JSON vstupu */
+/* naï¿½tenï¿½ JSON vstupu */
 $input = json_decode(file_get_contents('php://input'), true);
 if (!is_array($input)) {
   http_response_code(400);
@@ -55,7 +57,7 @@ $count = (int)$cnt->fetchColumn();
 if ($count >= 10) {
   http_response_code(400);
   echo json_encode([
-    'error' => 'Dosáhl jsi maximálního poètu 10 herních úètù.'
+    'error' => 'Dosï¿½hl jsi maximï¿½lnï¿½ho poï¿½tu 10 hernï¿½ch ï¿½ï¿½tï¿½.'
   ]);
   exit;
 }
@@ -69,30 +71,11 @@ if (!empty($_SESSION['last_create_acc']) && ($now - $_SESSION['last_create_acc']
 }
 $_SESSION['last_create_acc'] = $now;
 
-/* DB (login server) */
-$dsn    = "mysql:host=127.0.0.1;dbname=l2login;charset=utf8mb4";
-$dbUser = "webuserp";
-$dbPass = "@Heslojeheslo10";
 
 try {
-  /* L2 login DB */
-    $l2Pdo = new PDO($dsn, $dbUser, $dbPass, [
-  PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-  PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-]);
 
-// ?? pøipojení na L2 GAME DB (pro premium)
-$pdoGame = new PDO(
-  "mysql:host=127.0.0.1;dbname=l2game;charset=utf8mb4",
-  $dbUser,
-  $dbPass,
-  [
-    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-  ]
-);
-  /* existuje už úèet? */
-  $st = $l2Pdo->prepare("SELECT 1 FROM accounts WHERE login = ? LIMIT 1");
+  /* existuje uï¿½ ï¿½ï¿½et? */
+  $st = $pdoGameWrite->prepare("SELECT 1 FROM accounts WHERE login = ? LIMIT 1");
   $st->execute([$login]);
   if ($st->fetch()) {
     http_response_code(409);
@@ -103,14 +86,14 @@ $pdoGame = new PDO(
   /* hash hesla (L2 styl) */
   $hash = base64_encode(sha1($pass, true));
 
-  /* založení game úètu */
-  $ins = $l2Pdo->prepare("
+  /* zaloï¿½enï¿½ game ï¿½ï¿½tu */
+  $ins = $pdoGameWrite->prepare("
     INSERT INTO accounts (login, password, accessLevel, lastactive)
     VALUES (?, ?, 0, 0)
   ");
   $ins->execute([$login, $hash]);
 
-  /* vazba na web úèet */
+  /* vazba na web ï¿½ï¿½et */
   $webIns = $webPdo->prepare(
     "INSERT IGNORE INTO game_accounts (web_user_id, login) VALUES (?, ?)"
   );
