@@ -26,6 +26,7 @@ if ($login === '' || strlen($pass) < 6) {
 
 require_once __DIR__ . '/../config/db.php';
 $webPdo = $pdo;
+require_once __DIR__ . '/../config/db_game_write.php';
 
 /* ověření, že účet patří uživateli */
 $st = $webPdo->prepare(
@@ -39,20 +40,10 @@ if (!$st->fetch()) {
   exit;
 }
 
-/* připojení k L2 login DB */
-$l2Pdo = new PDO(
-  "mysql:host=127.0.0.1;dbname=l2login;charset=utf8mb4",
-  "l2_writer",
-  "@Heslojeheslo09",
-  [
-    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-  ]
-);
-
 /* hash hesla (stejný jako při create) */
 $hash = base64_encode(sha1($pass, true));
 
-$upd = $l2Pdo->prepare(
+$upd = $pdoGameWrite->prepare(
   "UPDATE accounts SET password = ? WHERE login = ?"
 );
 $upd->execute([$hash, $login]);
