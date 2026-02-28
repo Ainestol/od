@@ -1,7 +1,41 @@
 /* profile.js – shared for index.html + index-en.html */
 (() => {
-  'use strict';
+'use strict';
 
+let CSRF_READY = false;
+
+async function initCsrf() {
+  const res = await fetch('/api/csrf_token.php', { credentials: 'same-origin' });
+  const data = await res.json().catch(() => ({}));
+
+  if (data.ok) {
+    window.CSRF_TOKEN = data.token;
+    CSRF_READY = true;
+  } else {
+    console.error('Failed to load CSRF token');
+  }
+}
+
+/* 🔥 ZABLOKUJ start dokud není token */
+(async function bootstrap() {
+  await initCsrf();
+})();
+  /* ---- GLOBAL FETCH WRAPPER (CSRF) ---- */
+const _origFetch = window.fetch;
+
+window.fetch = function (url, options = {}) {
+  if (options.method && options.method.toUpperCase() === 'POST') {
+
+    if (!window.CSRF_TOKEN) {
+      console.error('CSRF token not ready');
+    }
+
+    options.headers = options.headers || {};
+    options.headers['X-CSRF-TOKEN'] = window.CSRF_TOKEN || '';
+  }
+
+  return _origFetch(url, options);
+};
   /* -----------------------------
    * helpers + i18n
    * ----------------------------- */
@@ -1422,6 +1456,7 @@ if (!ok) return;
    * init
    * ----------------------------- */
   document.addEventListener('DOMContentLoaded', async () => {
+    await initCsrf();
     // 1) user session + VIP + admin button + redirect if not logged in
     await initMeAndUi();
 
