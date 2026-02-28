@@ -1,127 +1,115 @@
 document.addEventListener('DOMContentLoaded', () => {
-    setupTabs();
     loadWebUsers();
 });
 
 async function loadWebUsers() {
     const res = await apiFetch('/api/admin/users_list.php');
-    const tbody = document.getElementById('webUsersBody');
-    tbody.innerHTML = '';
+    const container = document.getElementById('webUsersTree');
+    container.innerHTML = '';
 
-    res.data.forEach(u => {
-        const tr = document.createElement('tr');
-        tr.className = 'web-row';
-        tr.innerHTML = `
-            <td>
-              <button onclick="toggleGameAccounts(${u.id}, this)">▶</button>
-              ${u.email}
-              <small style="color:#999">#${u.id}</small>
-            </td>
-            <td>${u.role}</td>
-            <td>
-              <button onclick="openVip('WEB', ${u.id})">VIP</button>
-            </td>
+    res.data.forEach(user => {
+        const webBox = document.createElement('div');
+        webBox.className = 'tree-web';
+
+        webBox.innerHTML = `
+            <div class="tree-header">
+                <button class="toggle-btn">▶</button>
+                <span class="tree-title">${user.email}</span>
+                <span class="tree-id">#${user.id}</span>
+                <span class="tree-role">${user.role}</span>
+                <button class="btn btn-small"
+                    onclick="openVip('WEB', ${user.id})">VIP</button>
+            </div>
+            <div class="tree-children hidden"></div>
         `;
-        tbody.appendChild(tr);
+
+        const toggleBtn = webBox.querySelector('.toggle-btn');
+        const childrenContainer = webBox.querySelector('.tree-children');
+
+        toggleBtn.addEventListener('click', () =>
+            toggleGameAccounts(user.id, toggleBtn, childrenContainer)
+        );
+
+        container.appendChild(webBox);
     });
 }
 
-function setupTabs() {
-    document.querySelectorAll('.tabs button').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.tab').forEach(t => t.classList.add('hidden'));
-
-            btn.classList.add('active');
-            document.getElementById('tab-' + btn.dataset.tab).classList.remove('hidden');
-        });
-    });
-}
-async function toggleGameAccounts(webUserId, btn) {
-    const tr = btn.closest('tr');
-    document.addEventListener('DOMContentLoaded', () => {
-    setupTabs();
-    loadWebUsers();
-});
-
-
-    // zavřít pokud už otevřené
-    if (tr.nextElementSibling?.classList.contains('child-row')) {
-        tr.nextElementSibling.remove();
+async function toggleGameAccounts(webUserId, btn, container) {
+    if (!container.classList.contains('hidden')) {
+        container.classList.add('hidden');
+        container.innerHTML = '';
         btn.textContent = '▶';
         return;
     }
 
     btn.textContent = '▼';
+    container.classList.remove('hidden');
 
     const res = await apiFetch(
         `/api/admin/game_accounts_list.php?webUserId=${webUserId}`
     );
 
-    const child = document.createElement('tr');
-    child.className = 'child-row';
-    child.innerHTML = `
-        <td colspan="3">
-            <table class="nested">
-                ${res.data.map(g => `
-                    <tr>
-                        <td>
-                          <button onclick="toggleCharacters(${g.id}, this)">▶</button>
-                          ${g.login}
-                          <small>#${g.id}</small>
-                        </td>
-                        <td colspan="2">
-                          <button onclick="openVip('GAME', ${g.id})">VIP</button>
-                        </td>
-                    </tr>
-                `).join('')}
-            </table>
-        </td>
-    `;
-document.querySelectorAll('.child-row').forEach(r => r.remove());
+    container.innerHTML = '';
 
-    tr.after(child);
+    res.data.forEach(game => {
+        const gameBox = document.createElement('div');
+        gameBox.className = 'tree-game';
+
+        gameBox.innerHTML = `
+            <div class="tree-header">
+                <button class="toggle-btn">▶</button>
+                <span class="tree-title">${game.login}</span>
+                <span class="tree-id">#${game.id}</span>
+                <button class="btn btn-small"
+                    onclick="openVip('GAME', ${game.id})">VIP</button>
+            </div>
+            <div class="tree-children hidden"></div>
+        `;
+
+        const toggleBtn = gameBox.querySelector('.toggle-btn');
+        const childrenContainer = gameBox.querySelector('.tree-children');
+
+        toggleBtn.addEventListener('click', () =>
+            toggleCharacters(game.id, toggleBtn, childrenContainer)
+        );
+
+        container.appendChild(gameBox);
+    });
 }
 
-async function toggleCharacters(gameAccountId, btn) {
-    const tr = btn.closest('tr');
-    document.addEventListener('DOMContentLoaded', () => {
-    setupTabs();
-    loadWebUsers();
-});
-
-
-    if (tr.nextElementSibling?.classList.contains('child-row')) {
-        tr.nextElementSibling.remove();
+async function toggleCharacters(gameAccountId, btn, container) {
+    if (!container.classList.contains('hidden')) {
+        container.classList.add('hidden');
+        container.innerHTML = '';
         btn.textContent = '▶';
         return;
     }
 
     btn.textContent = '▼';
+    container.classList.remove('hidden');
 
     const res = await apiFetch(
         `/api/admin/characters_list.php?gameAccountId=${gameAccountId}`
     );
 
-    const child = document.createElement('tr');
-child.className = 'child-row';
-child.innerHTML = `
-    <td colspan="3">
-        <ul>
-          ${res.data.map(c => `
-            <li>
-              ${c.char_name}
-              <small>#${c.charId}</small>
-              <button onclick="openVip('CHAR', ${c.charId})">VIP</button>
-            </li>
-          `).join('')}
-        </ul>
-    </td>
-`;
+    container.innerHTML = '';
 
-    tr.after(child);
+    res.data.forEach(char => {
+        const charBox = document.createElement('div');
+        charBox.className = 'tree-char';
+
+        charBox.innerHTML = `
+            <span class="tree-title">${char.char_name}</span>
+            <span class="tree-id">#${char.charId}</span>
+            <button class="btn btn-small"
+                onclick="openVip('CHAR', ${char.charId})">VIP</button>
+        `;
+
+        container.appendChild(charBox);
+    });
 }
+
 function openVip(scope, id) {
     window.location.href =
-      `/admin/vip.html?scope=${scope}&targetId=${id}`;
+        `/admin/vip.html?scope=${scope}&targetId=${id}`;
 }
