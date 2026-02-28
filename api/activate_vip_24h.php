@@ -10,6 +10,7 @@ if (empty($_SESSION['web_user_id'])) {
 }
 
 require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../config/db_game_write.php';
 
 $userId = (int)$_SESSION['web_user_id'];
 $data = json_decode(file_get_contents('php://input'), true);
@@ -121,16 +122,8 @@ try {
     ")->execute([$userId, $currency, -$cost]);
 /* 🎮 4️⃣ Sync do L2 – nastavení VIP_CHAR */
 
-$pdoGame = new PDO(
-    'mysql:host=localhost;dbname=l2game;charset=utf8mb4',
-    'premium_user',
-    '@Heslojeheslo55',
-    [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-    ]
-);
 
-$pdoGame->prepare("
+$pdoPremium->prepare("
     INSERT INTO character_variables (charId, var, val)
     VALUES (?, 'VIP_CHAR', 'true')
     ON DUPLICATE KEY UPDATE val = 'true'
