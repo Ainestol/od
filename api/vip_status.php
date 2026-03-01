@@ -6,7 +6,8 @@ header('Content-Type: application/json; charset=utf-8');
 
 require_once __DIR__ . '/../lib/rate_limit.php';
 require_once __DIR__ . '/../lib/vip_resolve.php';
-require_once __DIR__ . '/../config/db_game_write.php';
+require_once __DIR__ . '/../config/db.php';              // $pdo (web DB)
+require_once __DIR__ . '/../config/db_game_write.php';   // $pdoPremium
 
 try {
     if (empty($_GET['charId']) || !ctype_digit($_GET['charId'])) {
@@ -17,21 +18,12 @@ try {
 
     $charId = (int)$_GET['charId'];
 
-    // PDO – premium_user
-    $pdoWeb = new PDO(
-        'mysql:host=localhost;dbname=ordodraconis_web;charset=utf8mb4',
-        'premium_user',
-        '@Heslojeheslo55',
-        [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-        ]
-    );
+ 
 $ip = client_ip();
-rate_limit($pdoWeb, "vip_status:$ip", 60, 60); // 60/min/IP
+rate_limit($pdo, "vip_status:$ip", 60, 60); // 60/min/IP
 
 
-     $res = vip_get_effective_for_character($pdoWeb, $pdoPremium, $charId);
+     $res = vip_get_effective_for_character($pdo, $pdoPremium, $charId);
 
     echo json_encode(['ok' => true, 'data' => $res], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 
