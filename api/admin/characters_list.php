@@ -3,19 +3,9 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 header('Content-Type: application/json; charset=utf-8');
-
+require_once __DIR__ . '/../../config/db_game_write.php'; // $pdoPremium
 require_once __DIR__ . '/_bootstrap.php';
 assert_admin();
-
-$pdoGame = new PDO(
-    'mysql:host=localhost;dbname=l2game;charset=utf8mb4',
-    'premium_user',
-    '@Heslojeheslo55',
-    [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-    ]
-);
 
 $gameAccountId = $_GET['gameAccountId'] ?? null;
 
@@ -36,7 +26,7 @@ if ($gameAccountId) {
     }
 
     // 2️⃣ pak taháme postavy z L2 DB
-    $stmt = $pdoGame->prepare("
+    $stmt = $pdoPremium->prepare("
         SELECT charId, char_name
         FROM characters
         WHERE account_name = ?
@@ -47,7 +37,7 @@ if ($gameAccountId) {
 } else {
 
     // fallback – všechny postavy
-    $stmt = $pdoGame->query("
+    $stmt = $pdoPremium->query("
         SELECT charId, char_name, account_name
         FROM characters
         ORDER BY charId DESC
