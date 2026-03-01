@@ -14,6 +14,7 @@ require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../config/db_game.php';        // reader (SELECT)
 require_once __DIR__ . '/../config/db_game_write.php';  // writer (INSERT)
 require_once __DIR__ . '/../lib/wallet.php';
+require_once __DIR__ . '/../lib/logger.php';
 
 $userId = (int)$_SESSION['web_user_id'];
 $input = $_POST ?: json_decode(file_get_contents('php://input'), true);
@@ -177,25 +178,22 @@ try {
   }
 
   $pdo->commit();
-// ADMIN AUDIT LOG - SUCCESS
-$logStmt = $pdo->prepare("
-  INSERT INTO admin_audit_log
-  (account, character_name, action_type, item_id, item_name, amount, currency, price, status, ip_address)
-  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-");
-
-$logStmt->execute([
-  $_SESSION['web_user_id'],
-  $charId ?: null,
+system_log(
+  $pdo,
+  'SHOP',
   'SHOP_PURCHASE',
-  $p['item_id'] ?? null,
-  $code,
-  1,
-  'DC',
-  $price,
+  $userId,
+  $orderId,
   'SUCCESS',
-  $_SERVER['REMOTE_ADDR'] ?? null
-]);
+  [
+    'product_id' => $productId,
+    'code' => $code,
+    'category' => $category,
+    'price' => $price,
+    'char_id' => $charId ?: null,
+    'game_account_id' => $gameAccountId ?: null
+  ]
+);
   echo json_encode([
     'ok' => true,
     'order_id' => $orderId,
@@ -210,29 +208,17 @@ $logStmt->execute([
   }
 
   $msg = $e->getMessage();
-// ADMIN AUDIT LOG - FAIL
-try {
-  $logStmt = $pdo->prepare("
-    INSERT INTO admin_audit_log
-    (account, character_name, action_type, item_id, item_name, amount, currency, price, status, ip_address)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  ");
-
-  $logStmt->execute([
-    $_SESSION['web_user_id'] ?? null,
-    $charId ?? null,
-    'SHOP_PURCHASE',
-    $productId ?? null,
-    'UNKNOWN',
-    1,
-    'DC',
-    $price ?? 0,
-    'FAIL: ' . $msg,
-    $_SERVER['REMOTE_ADDR'] ?? null
-  ]);
-} catch (Throwable $logError) {
-  // log failure nesmí rozbít response
-}
+system_log(
+  $pdo,
+  'SHOP',
+  'SHOP_PURCHASE',
+  $_SESSION['web_user_id'] ?? null,
+  $productId ?? null,
+  'FAIL',
+  [
+    'error' => $msg
+  ]
+);
   $known = [
     'INSUFFICIENT_FUNDS',
     'PRODUCT_NOT_FOUND',
