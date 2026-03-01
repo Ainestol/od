@@ -4,8 +4,8 @@ error_reporting(E_ALL);
 
 header('Content-Type: application/json; charset=utf-8');
 
-require_once __DIR__ . '/_bootstrap.php';
-require_once __DIR__ . '/../../config/db_game.php';
+require_once __DIR__ . '/_bootstrap.php'; // $pdo
+require_once __DIR__ . '/../../config/db_game.php'; // $pdoPremium
 require_once __DIR__ . '/../../lib/vip.php'; // ✅ nové helpery (extend + sync)
 
 try {
@@ -46,11 +46,11 @@ try {
     // ✅ WEB DB – VIP GRANT (extend nebo create)
     // + následně sync do GAME DB (WEB/GAME)
     // ================================
-    $pdoWeb->beginTransaction();
+    $pdo->beginTransaction();
 
     // 1) extend/create grant (NE reset)
     $vipGrantId = vip_grant_extend_or_create(
-        $pdoWeb,
+        $pdo,
         $scope,
         $targetId,
         $levelId,
@@ -63,7 +63,7 @@ try {
     // 2) CHAR scope -> VIP flag do character_variables (bez account_premium sync)
     if ($scope === 'CHAR') {
 
-        $stmt = $pdoGame->prepare("
+        $stmt = $pdoPremium->prepare("
             INSERT INTO character_variables (charId, var, val)
             VALUES (:charId, 'VIP_CHAR', 'true')
             ON DUPLICATE KEY UPDATE val = 'true'
@@ -72,10 +72,10 @@ try {
 
     } else {
         // 3) WEB/GAME scope -> sync do account_premium podle grant end_at
-        vip_sync_account_premium($pdoWeb, $pdoGame, $scope, $targetId, $vipGrantId);
+        vip_sync_account_premium($pdo, $pdoPremium, $scope, $targetId, $vipGrantId);
     }
 
-    $pdoWeb->commit();
+    $pdo->commit();
 
     echo json_encode([
         'ok' => true,
@@ -84,8 +84,8 @@ try {
 
 } catch (Throwable $e) {
 
-    if (isset($pdoWeb) && $pdoWeb instanceof PDO && $pdoWeb->inTransaction()) {
-        $pdoWeb->rollBack();
+    if (isset($pdo) && $pdo instanceof PDO && $pdo->inTransaction()) {
+        $pdo->rollBack();
     }
 
     http_response_code(500);
