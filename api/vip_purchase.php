@@ -10,6 +10,8 @@ require_once __DIR__ . '/../lib/rate_limit.php';
 require_once __DIR__ . '/../lib/vip.php';
 require_once __DIR__ . '/../lib/wallet.php';
 require_once __DIR__ . '/../lib/vip_guard.php';
+require_once __DIR__ . '/../config/db.php';              // $pdo
+require_once __DIR__ . '/../config/db_game_write.php';   // $pdoPremium
 try {
     $input = $_POST ?: json_decode(file_get_contents('php://input'), true);
 
@@ -33,41 +35,21 @@ try {
         exit;
     }
 
-    // PDO – premium_user
-    $pdoWeb = new PDO(
-        'mysql:host=localhost;dbname=ordodraconis_web;charset=utf8mb4',
-        'premium_user',
-        '@Heslojeheslo55',
-        [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-        ]
-    );
-// druhé PDO jen pro čtení charů
-$pdoGame = new PDO(
-    'mysql:host=localhost;dbname=l2game;charset=utf8mb4',
-    'premium_user',
-    '@Heslojeheslo55',
-    [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-    ]
-);
-$ip = client_ip();
-rate_limit($pdoWeb, "vip_purchase:$ip", 5, 300); // 5/5 min/IP
+ $ip = client_ip();
+rate_limit($pdo, "vip_purchase:$ip", 5, 300); // 5/5 min/IP
 
 
 // Ověření vlastnictví
 vip_assert_ownership(
-    $pdoWeb,
-    $pdoGame,
+    $pdo,
+    $pdoPremium,
     $webUserId,
     $scope,
     $targetId
 );
 
     $grantId = vip_purchase(
-        $pdoWeb,
+        $pdo,
         $webUserId,
         $scope,
         $targetId,
