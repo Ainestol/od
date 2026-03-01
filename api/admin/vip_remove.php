@@ -1,10 +1,15 @@
 <?php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
 header('Content-Type: application/json; charset=utf-8');
 
 require_once __DIR__ . '/_bootstrap.php';
-require_once __DIR__ . '/../../config/db_game.php';
+require_once __DIR__ . '/../../config/db.php';              // $pdo (WEB DB)
+require_once __DIR__ . '/../../config/db_game_write.php';   // $pdoPremium
+require_once __DIR__ . '/../../lib/vip.php';
 
-assert_admin($pdoWeb);
+assert_admin();
 
 $input = $_POST ?: json_decode(file_get_contents('php://input'), true);
 
@@ -17,7 +22,7 @@ if (empty($input['vipGrantId'])) {
 $vipGrantId = (int)$input['vipGrantId'];
 
 // 1️⃣ zjisti scope + target_id
-$stmt = $pdoWeb->prepare("
+$stmt = $pdo->prepare("
     SELECT scope, target_id
     FROM vip_grants
     WHERE id = ?
@@ -36,7 +41,7 @@ $scope    = $grant['scope'];
 $targetId = (int)$grant['target_id'];
 
 // 2️⃣ ukonči VIP
-$stmt = $pdoWeb->prepare("
+$stmt = $pdo->prepare("
     UPDATE vip_grants
     SET end_at = NOW()
     WHERE id = ?
