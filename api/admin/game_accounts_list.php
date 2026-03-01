@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/_bootstrap.php';
-assert_admin($pdoWeb);
+assert_admin($pdo);
 
 $webUserId = (int)($_GET['webUserId'] ?? 0);
 
@@ -12,7 +12,7 @@ if (!$webUserId) {
     exit;
 }
 
-$stmt = $pdoWeb->prepare("
+$stmt = $pdo->prepare("
     SELECT ga.id, ga.login, ga.web_user_id
     FROM game_accounts ga
     WHERE ga.web_user_id = ?
