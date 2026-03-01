@@ -10,6 +10,7 @@ session_set_cookie_params([
 session_start();
 
 require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../lib/logger.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -17,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-/* pøijmi JSON i klasický POST */
+/* pï¿½ijmi JSON i klasickï¿½ POST */
 $input = json_decode(file_get_contents('php://input'), true);
 if (!is_array($input)) $input = $_POST;
 
@@ -50,12 +51,34 @@ $st->execute([$email]);
 $user = $st->fetch();
 
 if (!$user) {
+
+    system_log(
+        $pdo,
+        'SECURITY',
+        'LOGIN_ATTEMPT',
+        null,
+        null,
+        'FAIL',
+        ['email' => $email, 'reason' => 'USER_NOT_FOUND']
+    );
+
     http_response_code(401);
     echo json_encode(["error" => "Invalid credentials"]);
     exit;
 }
 
 if (!password_verify($pass, $user['password_hash'])) {
+
+    system_log(
+        $pdo,
+        'SECURITY',
+        'LOGIN_ATTEMPT',
+        (int)$user['id'],
+        null,
+        'FAIL',
+        ['email' => $email, 'reason' => 'INVALID_PASSWORD']
+    );
+
     http_response_code(401);
     echo json_encode(["error" => "Invalid credentials"]);
     exit;
@@ -72,7 +95,15 @@ $_SESSION['web_user_id'] = (int)$user['id'];
 $_SESSION['web_email']  = $user['email'];
 $_SESSION['lang']       = ($lang === 'en') ? 'en' : 'cs';
 $_SESSION['role']       = $user['role'];
-
+system_log(
+    $pdo,
+    'SECURITY',
+    'LOGIN_SUCCESS',
+    (int)$user['id'],
+    null,
+    'SUCCESS',
+    ['email' => $email]
+);
 $redirect = ($_SESSION['lang'] === 'en')
     ? "/profile/index-en.html"
     : "/profile/index.html";
