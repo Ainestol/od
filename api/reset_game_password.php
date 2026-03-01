@@ -24,12 +24,11 @@ if ($login === '' || strlen($pass) < 6) {
   exit;
 }
 
-require_once __DIR__ . '/../config/db.php';
-$webPdo = $pdo;
-require_once __DIR__ . '/../config/db_game_write.php';
+require_once '../config/db.php';          // $pdo (web)
+require_once '../config/db_game_write.php'; // $l2Pdo
 
 /* ověření, že účet patří uživateli */
-$st = $webPdo->prepare(
+$st = $Pdo->prepare(
   "SELECT 1 FROM game_accounts WHERE web_user_id = ? AND login = ?"
 );
 $st->execute([$_SESSION['web_user_id'], $login]);
@@ -43,7 +42,7 @@ if (!$st->fetch()) {
 /* hash hesla (stejný jako při create) */
 $hash = base64_encode(sha1($pass, true));
 
-$upd = $pdoGameWrite->prepare(
+$upd = $l2Pdo->prepare(
   "UPDATE accounts SET password = ? WHERE login = ?"
 );
 $upd->execute([$hash, $login]);
