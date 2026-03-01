@@ -50,7 +50,7 @@ $stmt->execute([$vipGrantId]);
 
 // 3️⃣ pokud to byl CHAR, smaž VIP flag z postavy
 if ($scope === 'CHAR') {
-    $stmt = $pdoGame->prepare("
+    $stmt = $pdoPremium->prepare("
         DELETE FROM character_variables
         WHERE charId = :charId
           AND var = 'VIP_CHAR'
