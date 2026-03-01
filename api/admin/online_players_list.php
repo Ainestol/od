@@ -1,23 +1,8 @@
 <?php
 require_once __DIR__ . '/_bootstrap.php';
-assert_admin($pdoWeb);
+assert_admin();
 
-/* Připojení na game DB */
-$pdoGame = new PDO(
-    'mysql:host=localhost;dbname=l2game;charset=utf8mb4',
-    'premium_user',
-    '@Heslojeheslo55',
-    [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-    ]
-);
-
-/*
-   Propojení:
-   users → game_accounts → characters
-*/
-$stmt = $pdoWeb->query("
+$stmt = $pdo->query("
     SELECT 
         u.email,
         ga.login AS game_account,
