@@ -177,7 +177,25 @@ try {
   }
 
   $pdo->commit();
+// ADMIN AUDIT LOG - SUCCESS
+$logStmt = $pdo->prepare("
+  INSERT INTO admin_audit_log
+  (account, character_name, action_type, item_id, item_name, amount, currency, price, status, ip_address)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+");
 
+$logStmt->execute([
+  $_SESSION['web_user_id'],
+  $charId ?: null,
+  'SHOP_PURCHASE',
+  $p['item_id'] ?? null,
+  $code,
+  1,
+  'DC',
+  $price,
+  'SUCCESS',
+  $_SERVER['REMOTE_ADDR'] ?? null
+]);
   echo json_encode([
     'ok' => true,
     'order_id' => $orderId,
@@ -192,7 +210,29 @@ try {
   }
 
   $msg = $e->getMessage();
+// ADMIN AUDIT LOG - FAIL
+try {
+  $logStmt = $pdo->prepare("
+    INSERT INTO admin_audit_log
+    (account, character_name, action_type, item_id, item_name, amount, currency, price, status, ip_address)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  ");
 
+  $logStmt->execute([
+    $_SESSION['web_user_id'] ?? null,
+    $charId ?? null,
+    'SHOP_PURCHASE',
+    $productId ?? null,
+    'UNKNOWN',
+    1,
+    'DC',
+    $price ?? 0,
+    'FAIL: ' . $msg,
+    $_SERVER['REMOTE_ADDR'] ?? null
+  ]);
+} catch (Throwable $logError) {
+  // log failure nesmí rozbít response
+}
   $known = [
     'INSUFFICIENT_FUNDS',
     'PRODUCT_NOT_FOUND',
