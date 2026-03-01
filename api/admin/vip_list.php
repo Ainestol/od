@@ -10,7 +10,7 @@ try {
 
     if ($showExpired) {
         // všechno (aktivní + expirované)
-        $stmt = $pdoWeb->query("
+        $stmt = $pdo->query("
             SELECT id, scope, target_id, level_id, end_at
             FROM vip_grants
             ORDER BY end_at DESC
@@ -18,7 +18,7 @@ try {
         ");
     } else {
         // jen aktivní
-        $stmt = $pdoWeb->query("
+        $stmt = $pdo->query("
             SELECT id, scope, target_id, level_id, end_at
             FROM vip_grants
             WHERE end_at > NOW()
