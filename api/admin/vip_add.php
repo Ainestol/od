@@ -5,7 +5,7 @@ error_reporting(E_ALL);
 header('Content-Type: application/json; charset=utf-8');
 
 require_once __DIR__ . '/_bootstrap.php'; // $pdo
-require_once __DIR__ . '/../../config/db_game.php'; // $pdoPremium
+require_once __DIR__ . '/../../config/db_game_write.php'; // $pdoPremium
 require_once __DIR__ . '/../../lib/vip.php'; // ✅ nové helpery (extend + sync)
 
 try {
