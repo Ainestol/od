@@ -1,6 +1,8 @@
-document.addEventListener('DOMContentLoaded', () => {
-    
- const params = new URLSearchParams(window.location.search);
+document.addEventListener('DOMContentLoaded', async () => {
+
+    await initCsrf();   // ← PŘIDÁNO
+
+    const params = new URLSearchParams(window.location.search);
     const scope = params.get('scope');
     const targetId = params.get('targetId');
 
