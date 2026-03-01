@@ -3,8 +3,9 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 header('Content-Type: application/json; charset=utf-8');
+require_once __DIR__ . '/_bootstrap.php'; // $pdo
 require_once __DIR__ . '/../../config/db_game_write.php'; // $pdoPremium
-require_once __DIR__ . '/_bootstrap.php';
+
 assert_admin();
 
 $gameAccountId = $_GET['gameAccountId'] ?? null;
@@ -12,7 +13,7 @@ $gameAccountId = $_GET['gameAccountId'] ?? null;
 if ($gameAccountId) {
 
     // 1️⃣ nejdřív zjistíme LOGIN z WEB DB
-    $stmtLogin = $pdoWeb->prepare("
+    $stmtLogin = $pdo->prepare("
         SELECT login
         FROM game_accounts
         WHERE id = ?
