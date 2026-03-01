@@ -1,8 +1,8 @@
 <?php
 require_once __DIR__ . '/_bootstrap.php';
-assert_admin($pdoWeb);
+assert_admin();
 
-$stmt = $pdoWeb->query("
+$stmt = $pdo->query("
     SELECT id, email, role
     FROM users
     ORDER BY id DESC
