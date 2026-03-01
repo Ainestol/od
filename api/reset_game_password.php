@@ -1,4 +1,7 @@
 <?php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
 header('Content-Type: application/json; charset=utf-8');
 session_start();
 
@@ -28,7 +31,7 @@ require_once '../config/db.php';          // $pdo (web)
 require_once '../config/db_game_write.php'; // $l2Pdo
 
 /* ověření, že účet patří uživateli */
-$st = $Pdo->prepare(
+$st = $pdo->prepare(
   "SELECT 1 FROM game_accounts WHERE web_user_id = ? AND login = ?"
 );
 $st->execute([$_SESSION['web_user_id'], $login]);
