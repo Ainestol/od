@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../config/db_game.php';
 header('Content-Type: application/json; charset=utf-8');
 session_start();
 
@@ -11,15 +12,9 @@ if (empty($_SESSION['web_user_id']) || ($_SESSION['role'] ?? '') !== 'admin') {
 
 try {
     /* ===== STEJNÉ PŘIPOJENÍ JAKO status.php ===== */
-    $pdo = new PDO(
-        "mysql:host=localhost;dbname=l2game;charset=utf8",
-        "webuser",
-        "@Heslojeheslo20",
-        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-    );
-
+ 
     /* ===== DOTAZ NA ONLINE HRÁČE ===== */
-    $stmt = $pdo->query("
+    $stmt = $pdoGameStatus->query("
         SELECT
             c.char_name,
             c.level,
