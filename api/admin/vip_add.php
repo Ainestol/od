@@ -7,7 +7,7 @@ header('Content-Type: application/json; charset=utf-8');
 require_once __DIR__ . '/_bootstrap.php'; // $pdo
 require_once __DIR__ . '/../../config/db_game_write.php'; // $pdoPremium
 require_once __DIR__ . '/../../lib/vip.php'; // ✅ nové helpery (extend + sync)
-
+require_once __DIR__ . '/../../lib/logger.php';
 try {
     // ===== ADMIN AUTH =====
     assert_admin();
@@ -77,12 +77,40 @@ try {
 
     $pdo->commit();
 
+system_log(
+    $pdo,
+    'ADMIN',
+    'ADMIN_ADD_VIP',
+    $adminId,
+    $targetId,
+    'SUCCESS',
+    [
+        'scope' => $scope,
+        'levelId' => $levelId,
+        'days' => $days,
+        'vip_grant_id' => $vipGrantId
+    ]
+);
+
     echo json_encode([
         'ok' => true,
         'vip_grant_id' => $vipGrantId
     ]);
 
 } catch (Throwable $e) {
+
+    system_log(
+    $pdo,
+    'ADMIN',
+    'ADMIN_ADD_VIP',
+    $_SESSION['web_user_id'] ?? null,
+    $targetId ?? null,
+    'FAIL',
+    [
+        'error' => $e->getMessage(),
+        'scope' => $scope ?? null
+    ]
+);
 
     if (isset($pdo) && $pdo instanceof PDO && $pdo->inTransaction()) {
         $pdo->rollBack();
