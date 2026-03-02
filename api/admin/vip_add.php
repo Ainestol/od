@@ -99,18 +99,24 @@ system_log(
 
 } catch (Throwable $e) {
 
-    system_log(
-    $pdo,
-    'ADMIN',
-    'ADMIN_ADD_VIP',
-    $_SESSION['web_user_id'] ?? null,
-    $targetId ?? null,
-    'FAIL',
-    [
-        'error' => $e->getMessage(),
-        'scope' => $scope ?? null
-    ]
-);
+    if (isset($pdo) && $pdo instanceof PDO) {
+        try {
+            system_log(
+                $pdo,
+                'ADMIN',
+                'ADMIN_ADD_VIP',
+                $_SESSION['web_user_id'] ?? null,
+                $targetId ?? null,
+                'FAIL',
+                [
+                    'error' => $e->getMessage(),
+                    'scope' => $scope ?? null
+                ]
+            );
+        } catch (Throwable $logError) {
+            // log nesmí rozbít response
+        }
+    }
 
     if (isset($pdo) && $pdo instanceof PDO && $pdo->inTransaction()) {
         $pdo->rollBack();
@@ -119,9 +125,7 @@ system_log(
     http_response_code(500);
     echo json_encode([
         'ok' => false,
-        'error' => $e->getMessage(),
-        'file' => $e->getFile(),
-        'line' => $e->getLine()
+        'error' => $e->getMessage()
     ]);
     exit;
 }
