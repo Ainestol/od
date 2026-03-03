@@ -125,6 +125,19 @@ try {
 );
 } catch (Throwable $e) {
   if ($pdo->inTransaction()) $pdo->rollBack();
+   system_log(
+      $pdo,
+      'SECURITY',
+      'PASSWORD_RESET_FAIL',
+      (int)$row['user_id'] ?? null,
+      null,
+      'ERROR',
+      [
+          'reason' => 'SERVER_EXCEPTION',
+          'message' => $e->getMessage(),
+          'ip' => $_SERVER['REMOTE_ADDR'] ?? null
+      ]
+  );
   http_response_code(500);
   echo json_encode(["error" => "SERVER_ERROR"]);
   exit;
