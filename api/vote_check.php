@@ -9,6 +9,7 @@ if (empty($_SESSION['web_user_id'])) {
 }
 
 require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../lib/logger.php';
 
 $userId = (int)$_SESSION['web_user_id'];
 $data = json_decode(file_get_contents('php://input'), true);
@@ -89,6 +90,18 @@ try {
   if ($method === 'POSTBACK') {
     if (empty($a['verified_at'])) {
       $pdo->commit();
+        system_log(
+        $pdo,
+        'VOTE',
+        'VOTE_PENDING',
+        $userId,
+        (int)$a['vote_site_id'],
+        'INFO',
+        [
+            'attempt_id' => $attemptId,
+            'reason' => 'POSTBACK_WAITING_VERIFICATION'
+        ]
+    );
       echo json_encode(['ok' => true, 'status' => 'PENDING']);
       exit;
     }
@@ -119,6 +132,18 @@ try {
       $j = http_get_json($url, 8);
       if (!$j) {
         $pdo->commit();
+          system_log(
+        $pdo,
+        'VOTE',
+        'VOTE_PENDING',
+        $userId,
+        (int)$a['vote_site_id'],
+        'INFO',
+        [
+            'attempt_id' => $attemptId,
+            'reason' => 'POSTBACK_WAITING_VERIFICATION'
+        ]
+    );
         echo json_encode(['ok' => true, 'status' => 'PENDING']);
         exit;
       }
@@ -135,6 +160,19 @@ try {
       $j = http_get_json($url, 8);
       if (!$j) {
         $pdo->commit();
+          system_log(
+        $pdo,
+        'VOTE',
+        'VOTE_PENDING',
+        $userId,
+        (int)$a['vote_site_id'],
+        'INFO',
+        [
+            'attempt_id' => $attemptId,
+            'reason' => 'POSTBACK_WAITING_VERIFICATION'
+        ]
+    );
+
         echo json_encode(['ok' => true, 'status' => 'PENDING']);
         exit;
       }
@@ -183,6 +221,19 @@ try {
 
       if ($raw === false) {
         $pdo->commit();
+          system_log(
+        $pdo,
+        'VOTE',
+        'VOTE_PENDING',
+        $userId,
+        (int)$a['vote_site_id'],
+        'INFO',
+        [
+            'attempt_id' => $attemptId,
+            'reason' => 'POSTBACK_WAITING_VERIFICATION'
+        ]
+    );
+
         echo json_encode(['ok' => true, 'status' => 'PENDING']);
         exit;
       }
@@ -234,6 +285,19 @@ elseif ($provider === 'HOTSERVERS') {
   $j = http_get_json($url, 8);
   if (!$j) {
     $pdo->commit();
+      system_log(
+        $pdo,
+        'VOTE',
+        'VOTE_PENDING',
+        $userId,
+        (int)$a['vote_site_id'],
+        'INFO',
+        [
+            'attempt_id' => $attemptId,
+            'reason' => 'POSTBACK_WAITING_VERIFICATION'
+        ]
+    );
+
     echo json_encode(['ok' => true, 'status' => 'PENDING']);
     exit;
   }
@@ -278,6 +342,19 @@ elseif ($provider === 'L2TOP') {
   $j = http_get_json($url, 8);
   if (!$j) {
     $pdo->commit();
+      system_log(
+        $pdo,
+        'VOTE',
+        'VOTE_PENDING',
+        $userId,
+        (int)$a['vote_site_id'],
+        'INFO',
+        [
+            'attempt_id' => $attemptId,
+            'reason' => 'POSTBACK_WAITING_VERIFICATION'
+        ]
+    );
+
     echo json_encode(['ok' => true, 'status' => 'PENDING']);
     exit;
   }
@@ -285,6 +362,19 @@ elseif ($provider === 'L2TOP') {
   // očekávané: {"error":0,"result":{"is_voted":true,"vote_time":156..., "server_time":...}}
   if (isset($j['error']) && (int)$j['error'] !== 0) {
     $pdo->commit();
+      system_log(
+        $pdo,
+        'VOTE',
+        'VOTE_PENDING',
+        $userId,
+        (int)$a['vote_site_id'],
+        'INFO',
+        [
+            'attempt_id' => $attemptId,
+            'reason' => 'POSTBACK_WAITING_VERIFICATION'
+        ]
+    );
+
     echo json_encode(['ok' => true, 'status' => 'PENDING']);
     exit;
   }
@@ -306,6 +396,19 @@ elseif ($provider === 'L2TOP') {
 
     if (!$voted) {
       $pdo->commit();
+        system_log(
+        $pdo,
+        'VOTE',
+        'VOTE_PENDING',
+        $userId,
+        (int)$a['vote_site_id'],
+        'INFO',
+        [
+            'attempt_id' => $attemptId,
+            'reason' => 'POSTBACK_WAITING_VERIFICATION'
+        ]
+    );
+
       echo json_encode(['ok' => true, 'status' => 'PENDING']);
       exit;
     }
@@ -340,9 +443,42 @@ elseif ($provider === 'L2TOP') {
   $pdo->prepare("UPDATE vote_attempts SET used_at = NOW() WHERE id = ?")->execute([$attemptId]);
 
   $pdo->commit();
-  echo json_encode(['ok' => true, 'status' => 'REWARDED']);
+
+system_log(
+    $pdo,
+    'VOTE',
+    'VOTE_REWARD',
+    $userId,
+    (int)$a['vote_site_id'],
+    'SUCCESS',
+    [
+        'attempt_id' => $attemptId,
+        'currency' => 'VOTE_COIN',
+        'amount' => 1,
+        'provider' => $a['api_provider'] ?? null
+    ]
+);
+
+echo json_encode(['ok' => true, 'status' => 'REWARDED']);
 
 } catch (Throwable $e) {
+
   if ($pdo->inTransaction()) $pdo->rollBack();
+
+  try {
+      system_log(
+          $pdo,
+          'VOTE',
+          'VOTE_FAIL',
+          $userId ?? null,
+          null,
+          'FAIL',
+          [
+              'attempt_id' => $attemptId ?? null,
+              'error' => $e->getMessage()
+          ]
+      );
+  } catch (Throwable $ignore) {}
+
   echo json_encode(['ok' => false, 'error' => $e->getMessage()]);
 }
