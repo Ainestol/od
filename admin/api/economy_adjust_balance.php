@@ -3,10 +3,12 @@ header('Content-Type: application/json; charset=utf-8');
 session_start();
 
 require_once __DIR__ . '/../../config/db.php';
+require_once __DIR__ . '/../../lib/logger.php';
 
 if ($_SESSION['role'] !== 'admin') {
     echo json_encode(['ok'=>false]);
     exit;
+    $adminId = (int)($_SESSION['web_user_id'] ?? 0);
 }
 
 $data = json_decode(file_get_contents('php://input'), true);
@@ -38,11 +40,53 @@ try {
     ");
     $st->execute([$userId, $currency, $amount]);
 
-    $pdo->commit();
+   $pdo->commit();
 
-    echo json_encode(['ok'=>true]);
+$action = '';
+if ($currency === 'DC') {
+    $action = $amount > 0 ? 'ADMIN_ADD_DC' : 'ADMIN_REMOVE_DC';
+} elseif ($currency === 'VC') {
+    $action = $amount > 0 ? 'ADMIN_ADD_VC' : 'ADMIN_REMOVE_VC';
+} else {
+    $action = 'ADMIN_ADJUST_BALANCE';
+}
+
+system_log(
+    $pdo,
+    'ADMIN',
+    $action,
+    $adminId,
+    $userId,
+    'SUCCESS',
+    [
+        'currency' => $currency,
+        'amount' => $amount
+    ]
+);
+
+echo json_encode(['ok'=>true]);
 
 } catch (Throwable $e) {
-    $pdo->rollBack();
+
+    if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+
+    try {
+        system_log(
+            $pdo,
+            'ADMIN',
+            'ADMIN_ADJUST_BALANCE',
+            $_SESSION['web_user_id'] ?? null,
+            $userId ?? null,
+            'FAIL',
+            [
+                'currency' => $currency ?? null,
+                'amount' => $amount ?? null,
+                'error' => $e->getMessage()
+            ]
+        );
+    } catch (Throwable $ignore) {}
+
     echo json_encode(['ok'=>false]);
 }
