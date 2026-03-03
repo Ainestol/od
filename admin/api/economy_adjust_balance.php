@@ -8,8 +8,9 @@ require_once __DIR__ . '/../../lib/logger.php';
 if ($_SESSION['role'] !== 'admin') {
     echo json_encode(['ok'=>false]);
     exit;
-    $adminId = (int)($_SESSION['web_user_id'] ?? 0);
-}
+    }
+
+$adminId = (int)($_SESSION['web_user_id'] ?? 0);
 
 $data = json_decode(file_get_contents('php://input'), true);
 
