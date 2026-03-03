@@ -4,6 +4,7 @@ header('Content-Type: application/json; charset=utf-8');
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../config/mail.php';
 require_once __DIR__ . '/_smtp_mail.php';
+require_once __DIR__ . '/../lib/logger.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
   http_response_code(405);
@@ -65,7 +66,22 @@ $lastTs = $st->fetchColumn();
 
 if ($lastTs) {
   $delta = time() - (int)$lastTs;
+  
   if ($delta < 120) {
+    
+system_log(
+    $pdo,
+    'SECURITY',
+    'PASSWORD_RESET_RATE_LIMIT',
+    $userId,
+    null,
+    'BLOCKED',
+    [
+        'reason' => 'COOLDOWN_120S',
+        'ip' => $ip
+    ]
+);
+
     error_log("RESET_REQ_STOP reason=rate_cooldown_120s user_id={$userId} delta={$delta} ip={$ip}");
     echo json_encode(["status" => "ok"]);
     exit;
@@ -83,6 +99,19 @@ $st->execute([$userId]);
 $cntUser = (int)$st->fetchColumn();
 
 if ($cntUser >= 3) {
+
+ system_log(
+      $pdo,
+      'SECURITY',
+      'PASSWORD_RESET_RATE_LIMIT',
+      $userId,
+      null,
+      'BLOCKED',
+      [
+          'reason' => 'MAX_3_PER_10_MIN',
+          'ip' => $ip
+      ]
+  );
   error_log("RESET_REQ_STOP reason=rate_user_3_per_10m user_id={$userId} cnt={$cntUser} ip={$ip}");
   echo json_encode(["status" => "ok"]);
   exit;
@@ -101,6 +130,20 @@ if ($ip !== '') {
   $cntIp = (int)$st->fetchColumn();
 
   if ($cntIp >= 20) {
+
+    system_log(
+      $pdo,
+      'SECURITY',
+      'PASSWORD_RESET_RATE_LIMIT',
+      null,
+      null,
+      'BLOCKED',
+      [
+          'reason' => 'IP_20_PER_10_MIN',
+          'ip' => $ip
+      ]
+  );
+
     error_log("RESET_REQ_STOP reason=rate_ip_20_per_10m ip={$ip} cnt={$cntIp}");
     echo json_encode(["status" => "ok"]);
     exit;

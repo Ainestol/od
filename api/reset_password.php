@@ -2,6 +2,7 @@
 header('Content-Type: application/json; charset=utf-8');
 
 require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../lib/logger.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
   http_response_code(405);
@@ -45,12 +46,36 @@ $stmt->execute([$tokenHash]);
 $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$row) {
+  system_log(
+      $pdo,
+      'SECURITY',
+      'PASSWORD_RESET_FAIL',
+      null,
+      null,
+      'FAIL',
+      [
+          'reason' => 'INVALID_TOKEN',
+          'ip' => $_SERVER['REMOTE_ADDR'] ?? null
+      ]
+  );
   http_response_code(400);
   echo json_encode(["error" => "INVALID_TOKEN"]);
   exit;
 }
 
 if ($row['used_at'] !== null) {
+   system_log(
+      $pdo,
+      'SECURITY',
+      'PASSWORD_RESET_FAIL',
+      (int)$row['user_id'],
+      null,
+      'FAIL',
+      [
+          'reason' => 'TOKEN_ALREADY_USED',
+          'ip' => $_SERVER['REMOTE_ADDR'] ?? null
+      ]
+  );
   http_response_code(400);
   echo json_encode(["error" => "TOKEN_USED"]);
   exit;
@@ -59,6 +84,18 @@ if ($row['used_at'] !== null) {
 $now = new DateTime();
 $exp = new DateTime($row['expires_at']);
 if ($now > $exp) {
+   system_log(
+      $pdo,
+      'SECURITY',
+      'PASSWORD_RESET_FAIL',
+      (int)$row['user_id'],
+      null,
+      'FAIL',
+      [
+          'reason' => 'TOKEN_EXPIRED',
+          'ip' => $_SERVER['REMOTE_ADDR'] ?? null
+      ]
+  );
   http_response_code(400);
   echo json_encode(["error" => "TOKEN_EXPIRED"]);
   exit;
@@ -75,6 +112,17 @@ try {
       ->execute([(int)$row['id']]);
 
   $pdo->commit();
+  system_log(
+    $pdo,
+    'SECURITY',
+    'PASSWORD_RESET_SUCCESS',
+    (int)$row['user_id'],
+    null,
+    'SUCCESS',
+    [
+        'ip' => $_SERVER['REMOTE_ADDR'] ?? null
+    ]
+);
 } catch (Throwable $e) {
   if ($pdo->inTransaction()) $pdo->rollBack();
   http_response_code(500);
