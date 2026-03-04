@@ -40,16 +40,18 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     exit;
 }
 
-// ===== RATE LIMIT =====
-$st = $pdo->prepare("
+// ================================
+// IP RATE LIMIT (10 / 5 min)
+// ================================
+$stIp = $pdo->prepare("
     SELECT COUNT(*)
     FROM system_logs
     WHERE action IN ('LOGIN_ATTEMPT','LOGIN_RATE_LIMIT')
       AND created_at > (NOW() - INTERVAL 5 MINUTE)
       AND JSON_UNQUOTE(JSON_EXTRACT(meta, '$.ip')) = ?
 ");
-$st->execute([$ip]);
-$ipAttempts = (int)$st->fetchColumn();
+$stIp->execute([$ip]);
+$ipAttempts = (int)$stIp->fetchColumn();
 
 if ($ipAttempts >= 10) {
     system_log(
@@ -59,19 +61,56 @@ if ($ipAttempts >= 10) {
         null,
         null,
         'BLOCKED',
-        ['ip' => $ip]
+        ['ip' => $ip, 'reason' => 'IP_LIMIT']
     );
     http_response_code(429);
     echo json_encode(["error" => "Too many attempts"]);
     exit;
 }
 
-// ===== SELECT USER =====
-$st = $pdo->prepare(
-    "SELECT id, email, password_hash, role, is_verified FROM users WHERE email = ? LIMIT 1"
+// ================================
+// EMAIL RATE LIMIT (5 / 5 min)
+// ================================
+$stEmail = $pdo->prepare("
+    SELECT COUNT(*)
+    FROM system_logs
+    WHERE action IN ('LOGIN_ATTEMPT','LOGIN_RATE_LIMIT')
+      AND created_at > (NOW() - INTERVAL 5 MINUTE)
+      AND JSON_UNQUOTE(JSON_EXTRACT(meta, '$.email')) = ?
+");
+$stEmail->execute([$email]);
+$emailAttempts = (int)$stEmail->fetchColumn();
+
+if ($emailAttempts >= 5) {
+    system_log(
+        $pdo,
+        'SECURITY',
+        'LOGIN_RATE_LIMIT',
+        null,
+        null,
+        'BLOCKED',
+        [
+            'email' => $email,
+            'ip' => $ip,
+            'reason' => 'EMAIL_LIMIT'
+        ]
+    );
+    http_response_code(429);
+    echo json_encode(["error" => "Too many attempts"]);
+    exit;
+}
+
+// ================================
+// SELECT USER
+// ================================
+$stUser = $pdo->prepare(
+    "SELECT id, email, password_hash, role, is_verified 
+     FROM users 
+     WHERE email = ? 
+     LIMIT 1"
 );
-$st->execute([$email]);
-$user = $st->fetch();
+$stUser->execute([$email]);
+$user = $stUser->fetch();
 
 // ===== kontrola délky hesla až teď =====
 if (strlen($pass) < 6) {
