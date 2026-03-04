@@ -759,7 +759,8 @@ a.btn:active {
 }
 
 .rate-card.open .rate-detail {
-  max-height: 200px;   /* bohatě stačí na pár řádků */
+  max-height: 200px;
+  min-height: 70px;
   opacity: 1;
   transform: translateY(0);
 }
