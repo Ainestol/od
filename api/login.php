@@ -40,7 +40,7 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     exit;
 }
 
-// ===== IP RATE LIMIT =====
+// ===== RATE LIMIT =====
 $st = $pdo->prepare("
     SELECT COUNT(*)
     FROM system_logs
@@ -66,26 +66,19 @@ if ($ipAttempts >= 10) {
     exit;
 }
 
-// ===== až teď SELECT USER =====
+// ===== SELECT USER =====
 $st = $pdo->prepare(
     "SELECT id, email, password_hash, role, is_verified FROM users WHERE email = ? LIMIT 1"
 );
 $st->execute([$email]);
 $user = $st->fetch();
 
-    http_response_code(429);
-    echo json_encode(["error" => "Too many attempts"]);
-    exit;
-
-
+// ===== kontrola délky hesla až teď =====
 if (strlen($pass) < 6) {
     http_response_code(400);
     echo json_encode(["error" => "Password too short"]);
     exit;
 }
-
-$st->execute([$email]);
-$user = $st->fetch();
 
 if (!$user) {
 
