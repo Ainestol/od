@@ -12,7 +12,8 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  overflow: hidden;
+  overflow-y: hidden;
+  overflow-x: auto;
 }
 body {
   margin: 0;
@@ -23,8 +24,7 @@ body {
 
 
 .hero-bg {
-  flex: 1;
-  max-width: 42%;
+  flex: 0 0 750px;
   height: 100vh;
   background: url("../img/war.webp") center top / cover no-repeat;
   position: relative;
@@ -175,15 +175,15 @@ nav a:hover {
 }
 .layout {
   display: flex;
-  width: 100vw;
+  min-width: 1800px;
   height: 100vh;
 }
 
-
 .right {
-  width: min(1100px, 52vw);
+  width: 1100px;
+  flex-shrink: 0;
   padding: 40px 40px;
-  position: relative; /* DŮLEŽITÉ */
+  position: relative;
   display: flex;
   flex-direction: column;
 }
@@ -587,6 +587,7 @@ a.btn:active {
   align-items: center;
   gap: 8px;
   margin-top: 20px;
+  margin-left: 160px;
   font-size: 13px;
   color: #bfb8a0;
 }
@@ -1228,7 +1229,8 @@ body.profile-page.admin-content .auth-container {
 }
 /* ===== SCROLL ONLY RIGHT PANEL (GDPR/RULES) ===== */
 body.scroll-right {
-  overflow: hidden; /* žádný scroll celé stránky */
+   overflow-y: auto;
+  overflow-x: auto;
 }
 
 body.scroll-right .layout {
