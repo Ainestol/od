@@ -39,23 +39,19 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     echo json_encode(["error" => "Invalid email"]);
     exit;
 }
-$st = $pdo->prepare(
-    "SELECT id, email, password_hash, role, is_verified FROM users WHERE email = ? LIMIT 1"
-);
 
-// ===== IP RATE LIMIT (max 10 pokusů za 5 minut) =====
+// ===== IP RATE LIMIT =====
 $st = $pdo->prepare("
     SELECT COUNT(*)
     FROM system_logs
     WHERE action='LOGIN_ATTEMPT'
       AND created_at > (NOW() - INTERVAL 5 MINUTE)
-      AND JSON_EXTRACT(meta, '$.ip') = ?
+      AND JSON_UNQUOTE(JSON_EXTRACT(meta, '$.ip')) = ?
 ");
 $st->execute([$ip]);
 $ipAttempts = (int)$st->fetchColumn();
 
 if ($ipAttempts >= 10) {
-
     system_log(
         $pdo,
         'SECURITY',
@@ -65,11 +61,22 @@ if ($ipAttempts >= 10) {
         'BLOCKED',
         ['ip' => $ip]
     );
-
     http_response_code(429);
     echo json_encode(["error" => "Too many attempts"]);
     exit;
 }
+
+// ===== až teď SELECT USER =====
+$st = $pdo->prepare(
+    "SELECT id, email, password_hash, role, is_verified FROM users WHERE email = ? LIMIT 1"
+);
+$st->execute([$email]);
+$user = $st->fetch();
+
+    http_response_code(429);
+    echo json_encode(["error" => "Too many attempts"]);
+    exit;
+
 
 if (strlen($pass) < 6) {
     http_response_code(400);
