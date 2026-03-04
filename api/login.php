@@ -8,6 +8,8 @@ session_set_cookie_params([
 ]);
 
 session_start();
+$ip = $_SERVER['REMOTE_ADDR'] ?? null;
+$ua = substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 255);
 
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../lib/logger.php';
@@ -37,6 +39,37 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     echo json_encode(["error" => "Invalid email"]);
     exit;
 }
+$st = $pdo->prepare(
+    "SELECT id, email, password_hash, role, is_verified FROM users WHERE email = ? LIMIT 1"
+);
+
+// ===== IP RATE LIMIT (max 10 pokusů za 5 minut) =====
+$st = $pdo->prepare("
+    SELECT COUNT(*)
+    FROM system_logs
+    WHERE action='LOGIN_ATTEMPT'
+      AND created_at > (NOW() - INTERVAL 5 MINUTE)
+      AND JSON_EXTRACT(meta, '$.ip') = ?
+");
+$st->execute([$ip]);
+$ipAttempts = (int)$st->fetchColumn();
+
+if ($ipAttempts >= 10) {
+
+    system_log(
+        $pdo,
+        'SECURITY',
+        'LOGIN_RATE_LIMIT',
+        null,
+        null,
+        'BLOCKED',
+        ['ip' => $ip]
+    );
+
+    http_response_code(429);
+    echo json_encode(["error" => "Too many attempts"]);
+    exit;
+}
 
 if (strlen($pass) < 6) {
     http_response_code(400);
@@ -44,9 +77,6 @@ if (strlen($pass) < 6) {
     exit;
 }
 
-$st = $pdo->prepare(
-    "SELECT id, email, password_hash, role, is_verified FROM users WHERE email = ? LIMIT 1"
-);
 $st->execute([$email]);
 $user = $st->fetch();
 
@@ -59,7 +89,12 @@ if (!$user) {
         null,
         null,
         'FAIL',
-        ['email' => $email, 'reason' => 'USER_NOT_FOUND']
+        [
+    'email' => $email,
+    'reason' => 'USER_NOT_FOUND',
+    'ip' => $ip,
+    'ua' => $ua
+]
     );
 
     http_response_code(401);
@@ -76,7 +111,12 @@ if (!password_verify($pass, $user['password_hash'])) {
         (int)$user['id'],
         null,
         'FAIL',
-        ['email' => $email, 'reason' => 'INVALID_PASSWORD']
+        [
+    'email' => $email,
+    'reason' => 'INVALID_PASSWORD',
+    'ip' => $ip,
+    'ua' => $ua
+]
     );
 
     http_response_code(401);
@@ -102,7 +142,11 @@ system_log(
     (int)$user['id'],
     null,
     'SUCCESS',
-    ['email' => $email]
+    [
+    'email' => $email,
+    'ip' => $ip,
+    'ua' => $ua
+]
 );
 $redirect = ($_SESSION['lang'] === 'en')
     ? "/profile/index-en.html"
