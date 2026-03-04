@@ -44,7 +44,7 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 $st = $pdo->prepare("
     SELECT COUNT(*)
     FROM system_logs
-    WHERE action='LOGIN_ATTEMPT'
+    WHERE action IN ('LOGIN_ATTEMPT','LOGIN_RATE_LIMIT')
       AND created_at > (NOW() - INTERVAL 5 MINUTE)
       AND JSON_UNQUOTE(JSON_EXTRACT(meta, '$.ip')) = ?
 ");
