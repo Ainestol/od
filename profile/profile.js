@@ -24,6 +24,8 @@ async function initCsrf() {
 const _origFetch = window.fetch;
 
 window.fetch = function (url, options = {}) {
+   options.credentials = options.credentials || 'same-origin';
+   options.cache = 'no-store';
   if (options.method && options.method.toUpperCase() === 'POST') {
 
     if (!window.CSRF_TOKEN) {
@@ -865,7 +867,9 @@ function notify(type, message, timeout = 3000) {
    * ----------------------------- */
 async function loadVoteBalance() {
   try {
-    const res = await fetch('/api/get_wallet_balance.php?currency=VOTE_COIN');
+    const res = await fetch('/api/get_wallet_balance.php?currency=VOTE_COIN', {
+    credentials: 'same-origin'
+    });
     const data = await res.json();
     if (!data.ok) return;
 
@@ -882,7 +886,9 @@ async function loadVoteBalance() {
 
   async function loadDcBalance() {
   try {
-    const res = await fetch('/api/get_wallet_balance.php?currency=DC');
+    const res = await fetch('/api/get_wallet_balance.php?currency=DC', {
+  credentials: 'same-origin'
+});
     const data = await res.json();
     if (!data.ok) return;
 
