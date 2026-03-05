@@ -30,7 +30,7 @@ if (!is_array($input) || empty($input)) {
     exit;
 }
 
-$email = trim($input['email'] ?? '');
+$email = strtolower(trim($input['email'] ?? ''));
 $pass  = (string)($input['password'] ?? '');
 $lang  = ($input['lang'] ?? ($_GET['lang'] ?? 'cs'));
 
@@ -67,7 +67,19 @@ if ($ipAttempts >= 10) {
     echo json_encode(["error" => "Too many attempts"]);
     exit;
 }
+// ================================
+// EXPONENTIAL DELAY (brute force slowdown)
+// ================================
+$delayMs = 0;
 
+if ($ipAttempts >= 3)  $delayMs = 500;
+if ($ipAttempts >= 5)  $delayMs = 1000;
+if ($ipAttempts >= 7)  $delayMs = 2000;
+if ($ipAttempts >= 9)  $delayMs = 4000;
+
+if ($delayMs > 0) {
+    usleep($delayMs * 1000); // převod ms → mikrosekundy
+}
 // ================================
 // EMAIL RATE LIMIT (5 / 5 min)
 // ================================
@@ -90,7 +102,7 @@ if ($emailAttempts >= 5) {
         null,
         'BLOCKED',
         [
-            'email' => $email,
+            'email' => $email ?: 'NO_EMAIL',
             'ip' => $ip,
             'reason' => 'EMAIL_LIMIT'
         ]
@@ -129,7 +141,7 @@ if (!$user) {
         null,
         'FAIL',
         [
-    'email' => $email,
+    'email' => $email ?: 'NO_EMAIL',
     'reason' => 'USER_NOT_FOUND',
     'ip' => $ip,
     'ua' => $ua
@@ -151,7 +163,7 @@ if (!password_verify($pass, $user['password_hash'])) {
         null,
         'FAIL',
         [
-    'email' => $email,
+    'email' => $email ?: 'NO_EMAIL',
     'reason' => 'INVALID_PASSWORD',
     'ip' => $ip,
     'ua' => $ua
@@ -182,7 +194,7 @@ system_log(
     null,
     'SUCCESS',
     [
-    'email' => $email,
+    'email' => $email ?: 'NO_EMAIL',
     'ip' => $ip,
     'ua' => $ua
 ]
