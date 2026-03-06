@@ -31,11 +31,10 @@ async function loadLogs() {
      log.user_id ?? "-",
      log.target_id ?? "-",
      log.status,
-     `<pre>${meta}</pre>`
+     meta
    ];
 
  });
-
 
  const table = $('#logsTable').DataTable({
 
@@ -69,7 +68,7 @@ async function loadLogs() {
            const val = $.fn.dataTable.util.escapeRegex($(this).val());
 
            column
-             .search(val ? '^' + val + '$' : '', true, false)
+             .search(val ? '^'+val+'$' : '', true, false)
              .draw();
 
          });
@@ -88,7 +87,6 @@ async function loadLogs() {
 
 }
 
-
 function updateFilters(api) {
 
  api.columns().every(function () {
@@ -100,30 +98,23 @@ function updateFilters(api) {
 
    select.empty().append('<option value="">All</option>');
 
-   column
-     .data({ search: 'applied' })
-     .unique()
-     .sort()
-     .each(function (d) {
+   const data = api
+     .rows({ search: 'applied' })
+     .data()
+     .toArray();
 
-       select.append(`<option value="${d}">${d}</option>`);
+   const colIndex = column.index();
 
-     });
+   const unique = [...new Set(data.map(row => row[colIndex]))];
+
+   unique.sort().forEach(val => {
+     select.append(`<option value="${val}">${val}</option>`);
+   });
 
    select.val(current);
 
  });
 
 }
-
-
-/* tlačítko refresh */
-
-function refreshLogs() {
- loadLogs();
-}
-
-
-/* start */
 
 document.addEventListener("DOMContentLoaded", loadLogs);
