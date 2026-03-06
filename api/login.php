@@ -176,6 +176,9 @@ if ((int)($user['is_verified'] ?? 0) !== 1) {
 }
 
 /* session OK */
+
+session_regenerate_id(true);
+
 $_SESSION['web_user_id'] = (int)$user['id'];
 $_SESSION['web_email']  = $user['email'];
 $_SESSION['lang']       = ($lang === 'en') ? 'en' : 'cs';
