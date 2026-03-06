@@ -55,7 +55,11 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
       <p>Přehled WEB → GAME → CHAR</p>
       <a href="/admin/users.html" class="btn btn-primary">Otevřít</a>
     </div>
-
+ <div class="admin-card">
+      <h3>Přehled všech akcí</h3>
+      <p>Logy, výpisy</p>
+      <a href="/admin/logs.html" class="btn btn-primary">Otevřít</a>
+    </div>
   </div>
 
 </main>
