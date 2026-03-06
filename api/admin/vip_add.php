@@ -86,9 +86,11 @@ system_log(
     'SUCCESS',
     [
         'scope' => $scope,
+        'target_user_id' => $targetId,
         'levelId' => $levelId,
         'days' => $days,
-        'vip_grant_id' => $vipGrantId
+        'vip_grant_id' => $vipGrantId,
+        'admin_ip' => $_SERVER['REMOTE_ADDR'] ?? null
     ]
 );
 
@@ -109,9 +111,11 @@ system_log(
                 $targetId ?? null,
                 'FAIL',
                 [
-                    'error' => $e->getMessage(),
-                    'scope' => $scope ?? null
-                ]
+ 'error' => $e->getMessage(),
+ 'scope' => $scope ?? null,
+ 'target_user_id' => $targetId ?? null,
+ 'admin_ip' => $_SERVER['REMOTE_ADDR'] ?? null
+]
             );
         } catch (Throwable $logError) {
             // log nesmí rozbít response
