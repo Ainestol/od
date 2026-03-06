@@ -9,7 +9,7 @@ csrf_check();
 
 require_once __DIR__ . '/../../lib/rate_limit.php';
 require_once __DIR__ . '/../../config/db.php'; // $pdo (web DB)
-
+require_once __DIR__ . '/../../lib/admin_audit.php';
 // === ADMIN AUTH ===
 function assert_admin(): void
 {

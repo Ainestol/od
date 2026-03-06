@@ -40,7 +40,7 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 $stIp = $pdo->prepare("
     SELECT COUNT(*)
     FROM system_logs
-    WHERE action IN ('LOGIN_ATTEMPT','LOGIN_RATE_LIMIT')
+    WHERE action IN ('LOGIN_FAIL','LOGIN_RATE_LIMIT')
       AND created_at > (NOW() - INTERVAL 5 MINUTE)
       AND JSON_UNQUOTE(JSON_EXTRACT(meta, '$.ip')) = ?
 ");
@@ -80,7 +80,7 @@ if ($delayMs > 0) {
 $stEmail = $pdo->prepare("
     SELECT COUNT(*)
     FROM system_logs
-    WHERE action IN ('LOGIN_ATTEMPT','LOGIN_RATE_LIMIT')
+    WHERE action IN ('LOGIN_FAIL','LOGIN_RATE_LIMIT')
       AND created_at > (NOW() - INTERVAL 5 MINUTE)
       AND JSON_UNQUOTE(JSON_EXTRACT(meta, '$.email')) = ?
 ");
@@ -130,7 +130,7 @@ if (!$user) {
     system_log(
         $pdo,
         'SECURITY',
-        'LOGIN_ATTEMPT',
+        'LOGIN_FAIL',
         null,
         null,
         'FAIL',
@@ -152,7 +152,7 @@ if (!password_verify($pass, $user['password_hash'])) {
     system_log(
         $pdo,
         'SECURITY',
-        'LOGIN_ATTEMPT',
+        'LOGIN_FAIL',
         (int)$user['id'],
         null,
         'FAIL',
