@@ -22,7 +22,7 @@ async function loadLogs() {
     <td>${log.user_id ?? '-'}</td>
     <td>${log.target_id ?? '-'}</td>
     <td>${log.status}</td>
-    <td><pre>${log.meta}</pre></td>
+    <td><pre>${JSON.stringify(log.meta, null, 2)}</pre></td>
   `;
 
   tbody.appendChild(row);
@@ -32,3 +32,4 @@ async function loadLogs() {
 }
 
 document.addEventListener('DOMContentLoaded', loadLogs);
+setInterval(loadLogs, 10000);
