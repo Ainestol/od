@@ -1,10 +1,17 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
+
 <meta charset="UTF-8">
 <title>Admin – System Logs</title>
 
 <link rel="stylesheet" href="/css/admin.css">
+
+<!-- DataTables -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
 
 <script src="/api/js/api.js" defer></script>
 <script src="/admin/js/logs_admin.js" defer></script>
@@ -22,53 +29,11 @@
 <h2>System Logs</h2>
 
 <div class="admin-actions">
-<button onclick="loadLogs()">🔄 Obnovit</button>
+<button class="btn" onclick="loadLogs()">🔄 Obnovit</button>
 <a href="/admin/index.php" class="btn">⬅ Zpět</a>
 </div>
 
-<div class="admin-actions">
-
-<select id="actionFilter" class="admin-input">
-<option value="">Všechny akce</option>
-<option value="LOGIN_SUCCESS">LOGIN_SUCCESS</option>
-<option value="LOGIN_FAIL">LOGIN_FAIL</option>
-<option value="VIP_24H_ACTIVATE">VIP_24H_ACTIVATE</option>
-<option value="VIP_24H_EXTEND">VIP_24H_EXTEND</option>
-<option value="ADMIN_ADD_VIP">ADMIN_ADD_VIP</option>
-<option value="SHOP_PURCHASE">SHOP_PURCHASE</option>
-</select>
-
-<input id="userFilter" class="admin-input" placeholder="User ID">
-
-<select id="limitFilter" class="admin-input">
-<option value="50">50</option>
-<option value="100">100</option>
-<option value="200">200</option>
-</select>
-
-<button class="btn" onclick="loadLogs()">🔎 Filtrovat</button>
-<button class="btn" onclick="resetFilters()">Reset</button>
-
-</div>
-
-<table class="admin-table">
-
-<thead>
-<tr>
-<th>Time</th>
-<th>Action</th>
-<th>User</th>
-<th>Target</th>
-<th>Status</th>
-<th>Meta</th>
-</tr>
-</thead>
-
-<tbody id="logs">
-<!-- plní logs_admin.js -->
-</tbody>
-
-</table>
+<table id="logsTable" class="admin-table"></table>
 
 </section>
 
@@ -82,7 +47,6 @@ fetch('/admin/partials/admin_header.html')
 
  document.getElementById('adminHeader').innerHTML = html;
 
- // zvýraznění aktivní stránky
  const links = document.querySelectorAll('.admin-nav a');
  const currentFile = window.location.pathname.split("/").pop();
 
