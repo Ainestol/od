@@ -15,9 +15,19 @@
 
 <div id="adminHeader"></div>
 
-<h1>System Logs</h1>
+<main class="auth-container">
+
+<section class="admin-card">
+
+<h2>System Logs</h2>
+
+<div class="admin-actions">
+<button onclick="loadLogs()">🔄 Obnovit</button>
+<a href="/admin/index.php" class="btn">⬅ Zpět</a>
+</div>
 
 <table class="admin-table">
+
 <thead>
 <tr>
 <th>Time</th>
@@ -29,9 +39,41 @@
 </tr>
 </thead>
 
-<tbody id="logs"></tbody>
+<tbody id="logs">
+<!-- plní logs_admin.js -->
+</tbody>
 
 </table>
+
+</section>
+
+</main>
+
+<script>
+
+fetch('/admin/partials/admin_header.html')
+.then(r => r.text())
+.then(html => {
+
+ document.getElementById('adminHeader').innerHTML = html;
+
+ // zvýraznění aktivní stránky
+ const links = document.querySelectorAll('.admin-nav a');
+ const currentFile = window.location.pathname.split("/").pop();
+
+ links.forEach(link => {
+
+   const linkFile = link.getAttribute('href').split("/").pop();
+
+   if (currentFile === linkFile) {
+     link.classList.add('active');
+   }
+
+ });
+
+});
+
+</script>
 
 </body>
 </html>
