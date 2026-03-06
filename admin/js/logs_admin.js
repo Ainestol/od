@@ -34,19 +34,50 @@ async function loadLogs(){
  });
 
  $('#logsTable').DataTable({
-   destroy:true,
-   data:rows,
-   columns:[
-     {title:"Time"},
-     {title:"Action"},
-     {title:"User"},
-     {title:"Target"},
-     {title:"Status"},
-     {title:"Meta"}
-   ],
-   pageLength:50,
-   order:[[0,"desc"]]
- });
+
+ destroy:true,
+ data:rows,
+
+ columns:[
+   {title:"Time"},
+   {title:"Action"},
+   {title:"User"},
+   {title:"Target"},
+   {title:"Status"},
+   {title:"Meta"}
+ ],
+
+ pageLength:50,
+ order:[[0,"desc"]],
+
+ initComplete:function(){
+
+   this.api().columns().every(function(){
+
+     const column = this;
+     const select = $('<select><option value="">All</option></select>')
+       .appendTo($(column.header()).empty())
+       .on('change', function(){
+
+         const val = $.fn.dataTable.util.escapeRegex($(this).val());
+
+         column
+           .search(val ? '^'+val+'$' : '', true, false)
+           .draw();
+
+       });
+
+     column.data().unique().sort().each(function(d){
+
+       select.append('<option value="'+d+'">'+d+'</option>');
+
+     });
+
+   });
+
+ }
+
+});
 
 }
 
