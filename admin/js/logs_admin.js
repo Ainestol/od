@@ -1,84 +1,129 @@
-async function loadLogs(){
+async function loadLogs() {
 
- const res = await fetch('/admin/api/logs_list.php?limit=500', {
+ const res = await fetch('/admin/api/logs_list.php?limit=1000', {
    credentials: 'same-origin'
  });
 
  const data = await res.json();
 
- if(!data.ok) return;
+ if (!data.ok) {
+   console.error("Logs error:", data);
+   return;
+ }
 
  const rows = data.logs.map(log => {
 
-  let meta = "";
+   let meta = "";
 
-  try{
-   meta = JSON.stringify(
-     typeof log.meta === "string" ? JSON.parse(log.meta) : log.meta,
-     null,
-     2
-   );
-  }catch(e){
-   meta = log.meta;
-  }
+   try {
+     meta = JSON.stringify(
+       typeof log.meta === "string" ? JSON.parse(log.meta) : log.meta,
+       null,
+       2
+     );
+   } catch(e) {
+     meta = log.meta;
+   }
 
-  return [
-   log.created_at,
-   log.action,
-   log.user_id ?? "-",
-   log.target_id ?? "-",
-   log.status,
-   `<pre>${meta}</pre>`
-  ];
+   return [
+     log.created_at,
+     log.action,
+     log.user_id ?? "-",
+     log.target_id ?? "-",
+     log.status,
+     `<pre>${meta}</pre>`
+   ];
 
  });
 
- $('#logsTable').DataTable({
 
- destroy:true,
- data:rows,
+ const table = $('#logsTable').DataTable({
 
- columns:[
-   {title:"Time"},
-   {title:"Action"},
-   {title:"User"},
-   {title:"Target"},
-   {title:"Status"},
-   {title:"Meta"}
- ],
+   destroy: true,
+   data: rows,
 
- pageLength:50,
- order:[[0,"desc"]],
+   columns: [
+     { title: "Time" },
+     { title: "Action" },
+     { title: "User" },
+     { title: "Target" },
+     { title: "Status" },
+     { title: "Meta" }
+   ],
 
- initComplete:function(){
+   pageLength: 50,
+   order: [[0, "desc"]],
 
-   this.api().columns().every(function(){
+   initComplete: function () {
 
-     const column = this;
-     const select = $('<select><option value="">All</option></select>')
-       .appendTo($(column.header()).empty())
-       .on('change', function(){
+     const api = this.api();
 
-         const val = $.fn.dataTable.util.escapeRegex($(this).val());
+     api.columns().every(function () {
 
-         column
-           .search(val ? '^'+val+'$' : '', true, false)
-           .draw();
+       const column = this;
 
-       });
+       const select = $('<select><option value="">All</option></select>')
+         .appendTo($(column.header()).empty())
+         .on('change', function () {
 
-     column.data().unique().sort().each(function(d){
+           const val = $.fn.dataTable.util.escapeRegex($(this).val());
 
-       select.append('<option value="'+d+'">'+d+'</option>');
+           column
+             .search(val ? '^' + val + '$' : '', true, false)
+             .draw();
+
+         });
 
      });
 
-   });
+     updateFilters(api);
 
- }
+     api.on('draw', function () {
+       updateFilters(api);
+     });
 
-});
+   }
+
+ });
 
 }
+
+
+function updateFilters(api) {
+
+ api.columns().every(function () {
+
+   const column = this;
+   const select = $('select', column.header());
+
+   const current = select.val();
+
+   select.empty().append('<option value="">All</option>');
+
+   column
+     .data({ search: 'applied' })
+     .unique()
+     .sort()
+     .each(function (d) {
+
+       select.append(`<option value="${d}">${d}</option>`);
+
+     });
+
+   select.val(current);
+
+ });
+
+}
+
+
+/* tlačítko refresh */
+
+function refreshLogs() {
+ loadLogs();
+}
+
+
+/* start */
 
 document.addEventListener("DOMContentLoaded", loadLogs);
