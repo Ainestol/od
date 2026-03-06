@@ -1,28 +1,41 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
 
-require_once __DIR__ . '/_bootstrap.php';
+require_once __DIR__ . '/../../api/admin/_bootstrap.php';
 
-assert_admin();
+try {
 
-$limit = min((int)($_GET['limit'] ?? 50), 200);
+    assert_admin();
 
-$stmt = $pdo->prepare("
-SELECT 
-created_at,
-action,
-user_id,
-target_id,
-status,
-meta
-FROM system_logs
-ORDER BY created_at DESC
-LIMIT ?
-");
+    $limit = min((int)($_GET['limit'] ?? 50), 200);
 
-$stmt->execute([$limit]);
+    $stmt = $pdo->prepare("
+        SELECT 
+            created_at,
+            action,
+            user_id,
+            target_id,
+            status,
+            meta
+        FROM system_logs
+        ORDER BY created_at DESC
+        LIMIT ?
+    ");
 
-echo json_encode([
-  'ok' => true,
-  'logs' => $stmt->fetchAll(PDO::FETCH_ASSOC)
-]);
+    $stmt->execute([$limit]);
+
+    echo json_encode([
+        "ok" => true,
+        "logs" => $stmt->fetchAll(PDO::FETCH_ASSOC)
+    ]);
+
+} catch (Throwable $e) {
+
+    http_response_code(500);
+
+    echo json_encode([
+        "ok" => false,
+        "error" => $e->getMessage()
+    ]);
+
+}
