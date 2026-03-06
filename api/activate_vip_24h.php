@@ -92,13 +92,24 @@ try {
     $existingVip = $st->fetch(PDO::FETCH_ASSOC);
 
     if ($existingVip) {
-
         // prodloužíme
         $pdo->prepare("
             UPDATE vip_grants
             SET end_at = DATE_ADD(end_at, INTERVAL 1 DAY)
             WHERE id=?
         ")->execute([$existingVip['id']]);
+system_log(
+        $pdo,
+        'ECONOMY',
+        'VIP_24H_EXTEND',
+        $userId,
+        $charId,
+        'SUCCESS',
+        [
+            'currency' => $currency,
+            'cost' => $cost
+        ]
+    );
 
     } else {
 
@@ -109,7 +120,19 @@ try {
             VALUES
             ('CHAR', ?, 1, NOW(), DATE_ADD(NOW(), INTERVAL 1 DAY), 'PURCHASE', ?)
         ")->execute([$charId, $userId]);
-    }
+    system_log(
+        $pdo,
+        'ECONOMY',
+        'VIP_24H_ACTIVATE',
+        $userId,
+        $charId,
+        'SUCCESS',
+        [
+            'currency' => $currency,
+            'cost' => $cost
+        ]
+    );
+}
 
 // 🔄 SYNC do L2GAME - nastav VIP_CHAR=true
 
@@ -134,7 +157,18 @@ $pdoPremium->prepare("
     echo json_encode(['ok'=>true]);
 
 } catch (Throwable $e) {
-
+system_log(
+    $pdo,
+    'ECONOMY',
+    'VIP_24H_ACTIVATE',
+    $userId ?? null,
+    $charId ?? null,
+    'FAIL',
+    [
+        'currency' => $currency ?? null,
+        'error' => $e->getMessage()
+    ]
+);
     if ($pdo->inTransaction()) {
         $pdo->rollBack();
     }
