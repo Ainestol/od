@@ -3,7 +3,7 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 header('Content-Type: application/json; charset=utf-8');
-session_start();
+require_once __DIR__ . '/_bootstrap.php';
 require_once __DIR__ . '/../config/db_game.php';
 require_once __DIR__ . '/../config/db_game_write.php';
 require_once __DIR__ . '/../config/db.php'; // web DB => $pdo

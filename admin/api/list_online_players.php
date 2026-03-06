@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../../config/db_game.php';
 header('Content-Type: application/json; charset=utf-8');
-session_start();
+require_once __DIR__ . '/_bootstrap.php';
 
 /* ===== ADMIN CHECK ===== */
 if (empty($_SESSION['web_user_id']) || ($_SESSION['role'] ?? '') !== 'admin') {

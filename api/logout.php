@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/_bootstrap.php';
 $lang = $_GET['lang'] ?? ($_SESSION['lang'] ?? 'cs');
 
 session_unset();
