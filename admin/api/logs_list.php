@@ -9,7 +9,7 @@ try {
 
     $limit = min((int)($_GET['limit'] ?? 50), 200);
 
-    $stmt = $pdo->prepare("
+    $sql = "
         SELECT 
             created_at,
             action,
@@ -19,10 +19,10 @@ try {
             meta
         FROM system_logs
         ORDER BY created_at DESC
-        LIMIT ?
-    ");
+        LIMIT $limit
+    ";
 
-    $stmt->execute([$limit]);
+    $stmt = $pdo->query($sql);
 
     echo json_encode([
         "ok" => true,
@@ -37,5 +37,4 @@ try {
         "ok" => false,
         "error" => $e->getMessage()
     ]);
-
 }
