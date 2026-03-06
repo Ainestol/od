@@ -26,6 +26,31 @@
 <a href="/admin/index.php" class="btn">⬅ Zpět</a>
 </div>
 
+<div class="admin-actions">
+
+<select id="actionFilter" class="admin-input">
+<option value="">Všechny akce</option>
+<option value="LOGIN_SUCCESS">LOGIN_SUCCESS</option>
+<option value="LOGIN_FAIL">LOGIN_FAIL</option>
+<option value="VIP_24H_ACTIVATE">VIP_24H_ACTIVATE</option>
+<option value="VIP_24H_EXTEND">VIP_24H_EXTEND</option>
+<option value="ADMIN_ADD_VIP">ADMIN_ADD_VIP</option>
+<option value="SHOP_PURCHASE">SHOP_PURCHASE</option>
+</select>
+
+<input id="userFilter" class="admin-input" placeholder="User ID">
+
+<select id="limitFilter" class="admin-input">
+<option value="50">50</option>
+<option value="100">100</option>
+<option value="200">200</option>
+</select>
+
+<button class="btn" onclick="loadLogs()">🔎 Filtrovat</button>
+<button class="btn" onclick="resetFilters()">Reset</button>
+
+</div>
+
 <table class="admin-table">
 
 <thead>

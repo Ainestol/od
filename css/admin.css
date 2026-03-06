@@ -377,3 +377,11 @@ body.admin-content {
   color: #888 !important;
   border: 1px solid #555;
 }
+.link{
+color:#d4af37;
+text-decoration:none;
+}
+
+.link:hover{
+text-decoration:underline;
+}
