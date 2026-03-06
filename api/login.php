@@ -1,13 +1,7 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
 
-session_set_cookie_params([
-    'path' => '/',
-    'httponly' => true,
-    'samesite' => 'Lax'
-]);
-
-session_start();
+require_once __DIR__ . '/../lib/session.php';
 $ip = $_SERVER['REMOTE_ADDR'] ?? null;
 $ua = substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 255);
 
