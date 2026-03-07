@@ -118,7 +118,7 @@ function updateFilters(api) {
 }
 async function loadSecurity(){
 
- const res = await fetch('/admin/api/security_brute.php',{
+ const res = await fetch('/admin/api/security_stats.php',{
   credentials:'same-origin'
  });
 
@@ -126,22 +126,72 @@ async function loadSecurity(){
 
  if(!data.ok) return;
 
- const tbody = document.getElementById('securityBrute');
+ const d = data.data;
 
- tbody.innerHTML="";
 
- data.rows.forEach(r=>{
+ /* BRUTE FORCE */
 
-  const tr=document.createElement("tr");
+ const brute = document.getElementById("securityBrute");
+ if(brute){
+  brute.innerHTML="";
+  d.brute_ips.forEach(r=>{
+   const tr=document.createElement("tr");
+   tr.innerHTML=`<td>${r.ip}</td><td>${r.fails}</td>`;
+   brute.appendChild(tr);
+  });
+ }
 
-  tr.innerHTML=`
-  <td>${r.ip}</td>
-  <td>${r.fails}</td>
-  `;
 
-  tbody.appendChild(tr);
+ /* RECENT FAILS */
 
- });
+ const recent = document.getElementById("securityRecent");
+ if(recent){
+  recent.innerHTML="";
+  d.recent_fails.forEach(r=>{
+   const tr=document.createElement("tr");
+   tr.innerHTML=`<td>${r.ip}</td><td>${r.fails}</td>`;
+   recent.appendChild(tr);
+  });
+ }
+
+
+ /* RATE LIMIT */
+
+ const rate = document.getElementById("securityRate");
+ if(rate){
+  rate.innerHTML="";
+  d.rate_limits.forEach(r=>{
+   const tr=document.createElement("tr");
+   tr.innerHTML=`<td>${r.ip}</td><td>${r.blocks}</td>`;
+   rate.appendChild(tr);
+  });
+ }
+
+
+ /* ATTACKED ACCOUNTS */
+
+ const acc = document.getElementById("securityAccounts");
+ if(acc){
+  acc.innerHTML="";
+  d.accounts.forEach(r=>{
+   const tr=document.createElement("tr");
+   tr.innerHTML=`<td>${r.email}</td><td>${r.fails}</td>`;
+   acc.appendChild(tr);
+  });
+ }
+
+
+ /* ECONOMY */
+
+ const eco = document.getElementById("securityEconomy");
+ if(eco){
+  eco.innerHTML="";
+  d.economy.forEach(r=>{
+   const tr=document.createElement("tr");
+   tr.innerHTML=`<td>${r.user_id}</td><td>${r.action}</td><td>${r.count}</td>`;
+   eco.appendChild(tr);
+  });
+ }
 
 }
 
