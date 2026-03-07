@@ -118,7 +118,7 @@ function updateFilters(api) {
 }
 async function loadSecurity(){
 
- const res = await fetch('/admin/api/security_stats.php',{
+ const res = await fetch('/admin/api/security_stats.php?days='+securityDays,{
   credentials:'same-origin'
  });
 
@@ -194,6 +194,18 @@ async function loadSecurity(){
  }
 
 }
+let securityDays = 7;
 
-document.addEventListener("DOMContentLoaded",loadSecurity);
-document.addEventListener("DOMContentLoaded", loadLogs);
+function setSecurityDays(days){
+
+ securityDays = days;
+
+ document.getElementById("securityDaysLabel").innerText = days;
+
+ loadSecurity();
+
+}
+document.addEventListener("DOMContentLoaded", () => {
+ loadLogs();
+ loadSecurity();
+});

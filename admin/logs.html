@@ -66,7 +66,21 @@ Security
 </div>
 <div id="securityTab" class="tab-content" style="display:none">
 
+<div class="admin-actions">
 
+<label>Časové okno:</label>
+
+<button class="btn" onclick="setSecurityDays(1)">1d</button>
+<button class="btn" onclick="setSecurityDays(7)">7d</button>
+<button class="btn" onclick="setSecurityDays(30)">30d</button>
+<button class="btn" onclick="setSecurityDays(90)">90d</button>
+<button class="btn" onclick="setSecurityDays(360)">360d</button>
+
+<span style="margin-left:15px;color:#888;">
+aktuálně: <span id="securityDaysLabel">7</span> dní
+</span>
+
+</div>
 <h3>Top brute-force IP</h3>
 <table class="admin-table">
 <thead>
