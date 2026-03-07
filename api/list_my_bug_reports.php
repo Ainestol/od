@@ -21,12 +21,16 @@ LEFT JOIN users u ON u.id = b.user_id
 ORDER BY b.created_at DESC
 ");
 
+$tickets = $st->fetchAll(PDO::FETCH_ASSOC);
+
 echo json_encode([
   'ok' => true,
-  'tickets' => $st->fetchAll(PDO::FETCH_ASSOC)
+  'tickets' => $tickets
 ]);
 
 } catch (Throwable $e) {
+
+error_log("BUG_LIST_ERROR: ".$e->getMessage());
 
 http_response_code(500);
 
