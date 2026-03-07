@@ -63,15 +63,15 @@ async function loadLogs() {
 
        const select = $('<select><option value="">All</option></select>')
          .appendTo($(column.header()))
-         .on('change', function () {
+      .on('change', function () {
 
-           const val = $.fn.dataTable.util.escapeRegex($(this).val());
+ const val = $(this).val();
 
-           column
-.search(val)
-.draw();
+ column
+  .search(val, true, false)
+  .draw();
 
-         });
+});
 
      });
 
