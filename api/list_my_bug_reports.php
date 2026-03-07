@@ -39,7 +39,12 @@ ORDER BY created_at DESC
     'ok' => true,
     'bugs' => $st->fetchAll(PDO::FETCH_ASSOC)
   ]);
-} catch (Throwable $e) {
+catch (Throwable $e) {
   http_response_code(500);
-  echo json_encode(['ok' => false, 'error' => 'SERVER_ERROR']);
+  echo json_encode([
+    'ok' => false,
+    'error' => $e->getMessage(),
+    'file' => $e->getFile(),
+    'line' => $e->getLine()
+  ]);
 }
