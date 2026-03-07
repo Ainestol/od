@@ -66,8 +66,8 @@ Security
 </div>
 <div id="securityTab" class="tab-content" style="display:none">
 
-<h3>Top brute-force IP</h3>
 
+<h3>Top brute-force IP</h3>
 <table class="admin-table">
 <thead>
 <tr>
@@ -75,14 +75,58 @@ Security
 <th>Login fails</th>
 </tr>
 </thead>
-
 <tbody id="securityBrute"></tbody>
-<tbody id="securityRecent"></tbody>
-<tbody id="securityRate"></tbody>
-<tbody id="securityAccounts"></tbody>
-<tbody id="securityEconomy"></tbody>
-
 </table>
+
+
+<h3>Login fails last 10 minutes</h3>
+<table class="admin-table">
+<thead>
+<tr>
+<th>IP</th>
+<th>Fails</th>
+</tr>
+</thead>
+<tbody id="securityRecent"></tbody>
+</table>
+
+
+<h3>Rate limit blocks</h3>
+<table class="admin-table">
+<thead>
+<tr>
+<th>IP</th>
+<th>Blocks</th>
+</tr>
+</thead>
+<tbody id="securityRate"></tbody>
+</table>
+
+
+<h3>Top attacked accounts</h3>
+<table class="admin-table">
+<thead>
+<tr>
+<th>Email</th>
+<th>Fails</th>
+</tr>
+</thead>
+<tbody id="securityAccounts"></tbody>
+</table>
+
+
+<h3>Economy abuse</h3>
+<table class="admin-table">
+<thead>
+<tr>
+<th>User</th>
+<th>Action</th>
+<th>Count</th>
+</tr>
+</thead>
+<tbody id="securityEconomy"></tbody>
+</table>
+
 
 </div>
 </section>
