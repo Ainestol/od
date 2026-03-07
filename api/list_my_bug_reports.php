@@ -1,39 +1,36 @@
 <?php
-
 require_once __DIR__.'/../../api/admin/_bootstrap.php';
-
 header('Content-Type: application/json; charset=utf-8');
+session_start();
+
+if (empty($_SESSION['web_user_id'])) {
+  http_response_code(401);
+  echo json_encode(['ok' => false, 'error' => 'NOT_LOGGED']);
+  exit;
+}
+
+require_once __DIR__ . '/../config/db.php';
+
+$userId = (int)$_SESSION['web_user_id'];
 
 try {
+  $st = $pdo->prepare("
+    SELECT
+      id,
+      title,
+      status,
+      created_at
+    FROM bug_reports
+    WHERE web_user_id = ?
+    ORDER BY created_at DESC
+  ");
+  $st->execute([$userId]);
 
-$st = $pdo->query("
-SELECT
-  b.id,
-  u.email,
-  b.game_account,
-  b.category,
-  b.title,
-  b.status,
-  b.created_at
-FROM bug_reports b
-LEFT JOIN users u ON u.id = b.user_id
-ORDER BY b.created_at DESC
-");
-
-echo json_encode([
-  'ok' => true,
-  'tickets' => $st->fetchAll(PDO::FETCH_ASSOC)
-]);
-
+  echo json_encode([
+    'ok' => true,
+    'bugs' => $st->fetchAll(PDO::FETCH_ASSOC)
+  ]);
 } catch (Throwable $e) {
-
-error_log("BUG_LIST_ERROR: ".$e->getMessage());
-
-http_response_code(500);
-
-echo json_encode([
-  'ok' => false,
-  'error' => 'SERVER_ERROR'
-]);
-
+  http_response_code(500);
+  echo json_encode(['ok' => false, 'error' => 'SERVER_ERROR']);
 }
