@@ -2,7 +2,10 @@
 
 require_once __DIR__.'/../../api/admin/_bootstrap.php';
 require_once __DIR__.'/../../config/db.php';
+$days = isset($_GET['days']) ? (int)$_GET['days'] : 7;
 
+if ($days < 1) $days = 1;
+if ($days > 360) $days = 360;
 $out = [];
 
 /* TOP brute force IP */
@@ -13,6 +16,7 @@ JSON_UNQUOTE(JSON_EXTRACT(meta,'$.ip')) AS ip,
 COUNT(*) AS fails
 FROM system_logs
 WHERE action='LOGIN_FAIL'
+AND created_at >= NOW() - INTERVAL $days DAY
 GROUP BY ip
 ORDER BY fails DESC
 LIMIT 10
@@ -45,6 +49,7 @@ JSON_UNQUOTE(JSON_EXTRACT(meta,'$.ip')) AS ip,
 COUNT(*) AS blocks
 FROM system_logs
 WHERE action='LOGIN_RATE_LIMIT'
+AND created_at >= NOW() - INTERVAL $days DAY
 GROUP BY ip
 ORDER BY blocks DESC
 ";
@@ -60,6 +65,7 @@ JSON_UNQUOTE(JSON_EXTRACT(meta,'$.email')) AS email,
 COUNT(*) AS fails
 FROM system_logs
 WHERE action='LOGIN_FAIL'
+AND created_at >= NOW() - INTERVAL $days DAY
 GROUP BY email
 ORDER BY fails DESC
 LIMIT 10
@@ -82,6 +88,7 @@ WHERE action IN (
 'VIP_24H_EXTEND',
 'VC_TO_DC_CONVERSION'
 )
+AND created_at >= NOW() - INTERVAL $days DAY
 GROUP BY user_id, action
 ORDER BY count DESC
 LIMIT 10
