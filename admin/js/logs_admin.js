@@ -111,7 +111,11 @@ function updateFilters(api) {
      select.append(`<option value="${val}">${val}</option>`);
    });
 
-   select.val(current);
+   if (select.find(`option[value="${current}"]`).length) {
+  select.val(current);
+} else {
+  select.val("");
+}
 
  });
 
