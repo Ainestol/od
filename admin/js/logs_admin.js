@@ -16,11 +16,9 @@ async function loadLogs() {
    let meta = "";
 
    try {
-     meta = JSON.stringify(
-       typeof log.meta === "string" ? JSON.parse(log.meta) : log.meta,
-       null,
-       2
-     );
+   meta = JSON.stringify(
+ typeof log.meta === "string" ? JSON.parse(log.meta) : log.meta
+);
    } catch(e) {
      meta = log.meta;
    }
