@@ -2,7 +2,7 @@
 ini_set('display_errors',1);
 error_reporting(E_ALL);
 
-require_once __DIR__.'/../../api/admin/_bootstrap.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/api/admin/_bootstrap.php';
 assert_admin();
 header('Content-Type: application/json; charset=utf-8');
 
@@ -17,13 +17,15 @@ $userId = (int)$_SESSION['web_user_id'];
 try {
   $st = $pdo->prepare("
     SELECT
-      id,
-      title,
-      status,
-      created_at
-    FROM bug_reports
-    WHERE web_user_id = ?
-    ORDER BY created_at DESC
+  id,
+  game_account,
+  category,
+  title,
+  status,
+  created_at
+FROM bug_reports
+WHERE web_user_id = ?
+ORDER BY created_at DESC
   ");
   $st->execute([$userId]);
 
