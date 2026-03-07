@@ -5,10 +5,7 @@ error_reporting(E_ALL);
 require_once __DIR__ . '/../../lib/session.php';
 
 require_once __DIR__ . '/../../lib/csrf.php';
-
-if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-    csrf_check();
-}
+csrf_check();
 
 require_once __DIR__ . '/../../lib/rate_limit.php';
 require_once __DIR__ . '/../../config/db.php'; // $pdo (web DB)
