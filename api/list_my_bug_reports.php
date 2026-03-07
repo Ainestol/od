@@ -14,25 +14,20 @@ try {
 
 header('Content-Type: application/json; charset=utf-8');
 
-if (empty($_SESSION['web_user_id'])) {
-    http_response_code(401);
-    echo json_encode(['ok' => false, 'error' => 'NOT_LOGGED']);
-    exit;
-}
-
 try {
 
     $st = $pdo->query("
         SELECT
-            id,
-            web_user_id,
-            game_account,
-            category,
-            title,
-            status,
-            created_at
-        FROM bug_reports
-        ORDER BY created_at DESC
+            br.id,
+            u.email,
+            br.game_account,
+            br.category,
+            br.title,
+            br.status,
+            br.created_at
+        FROM bug_reports br
+        LEFT JOIN users u ON br.web_user_id = u.id
+        ORDER BY br.created_at DESC
     ");
 
     echo json_encode([
@@ -45,9 +40,7 @@ try {
     http_response_code(500);
     echo json_encode([
         'ok' => false,
-        'error' => $e->getMessage(),
-        'file' => $e->getFile(),
-        'line' => $e->getLine()
+        'error' => $e->getMessage()
     ]);
 
 }
