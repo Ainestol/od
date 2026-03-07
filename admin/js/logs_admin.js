@@ -116,5 +116,34 @@ function updateFilters(api) {
  });
 
 }
+async function loadSecurity(){
 
+ const res = await fetch('/admin/api/security_brute.php',{
+  credentials:'same-origin'
+ });
+
+ const data = await res.json();
+
+ if(!data.ok) return;
+
+ const tbody = document.getElementById('securityBrute');
+
+ tbody.innerHTML="";
+
+ data.rows.forEach(r=>{
+
+  const tr=document.createElement("tr");
+
+  tr.innerHTML=`
+  <td>${r.ip}</td>
+  <td>${r.fails}</td>
+  `;
+
+  tbody.appendChild(tr);
+
+ });
+
+}
+
+document.addEventListener("DOMContentLoaded",loadSecurity);
 document.addEventListener("DOMContentLoaded", loadLogs);
