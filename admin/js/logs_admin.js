@@ -62,7 +62,7 @@ async function loadLogs() {
        const column = this;
 
        const select = $('<select><option value="">All</option></select>')
-         .appendTo($(column.header()).empty())
+         .appendTo($(column.header()))
          .on('change', function () {
 
            const val = $.fn.dataTable.util.escapeRegex($(this).val());
