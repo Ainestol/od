@@ -25,7 +25,31 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
   </section>
 
   <div class="admin-grid">
+  <div class="admin-card">
 
+    <h3>Server Overview</h3>
+
+    <div class="admin-stat">
+      Web účty: <b id="statWebUsers">...</b>
+    </div>
+
+    <div class="admin-stat">
+      Game účty: <b id="statGameAccounts">...</b>
+    </div>
+
+    <div class="admin-stat">
+      Postavy: <b id="statCharacters">...</b>
+    </div>
+
+    <div class="admin-stat">
+      VIP 24h aktivní: <b id="statVip24">...</b>
+    </div>
+
+    <div class="admin-stat">
+      Ostatní VIP aktivní: <b id="statVipOther">...</b>
+    </div>
+
+  </div>
     <div class="admin-card">
       <h3>Bug reports</h3>
       <p>Přehled hlášených chyb od hráčů.</p>
@@ -94,6 +118,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 </script>
-
+<script src="/admin/js/index_admin.js"></script>
 </body>
 </html>
