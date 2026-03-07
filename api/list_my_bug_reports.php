@@ -1,22 +1,15 @@
 <?php
+
 ini_set('display_errors',1);
 error_reporting(E_ALL);
 
-require_once $_SERVER['DOCUMENT_ROOT'].'/api/admin/_bootstrap.php';
+header('Content-Type: application/json');
 
-try {
-    assert_admin();
-} catch (Throwable $e) {
-    http_response_code(403);
-    echo json_encode(['ok'=>false,'error'=>'FORBIDDEN']);
-    exit;
-}
-
-header('Content-Type: application/json; charset=utf-8');
+require_once $_SERVER['DOCUMENT_ROOT'].'/config/db.php';
 
 try {
 
-    $st = $pdo->query("
+    $sql = "
         SELECT
             br.id,
             u.email,
@@ -28,19 +21,21 @@ try {
         FROM bug_reports br
         LEFT JOIN users u ON br.web_user_id = u.id
         ORDER BY br.created_at DESC
-    ");
+    ";
+
+    $stmt = $pdo->query($sql);
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     echo json_encode([
-        'ok' => true,
-        'tickets' => $st->fetchAll(PDO::FETCH_ASSOC)
+        "ok" => true,
+        "tickets" => $rows
     ]);
 
 } catch (Throwable $e) {
 
-    http_response_code(500);
     echo json_encode([
-        'ok' => false,
-        'error' => $e->getMessage()
+        "ok" => false,
+        "error" => $e->getMessage()
     ]);
 
 }
