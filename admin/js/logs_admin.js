@@ -67,9 +67,16 @@ async function loadLogs() {
 
  const val = $(this).val();
 
- column
-  .search(val, true, false)
-  .draw();
+if(column.index() === 5){
+
+ column.search(val, false, true).draw();
+
+}else{
+
+ const regex = val ? '^'+val+'$' : '';
+ column.search(regex, true, false).draw();
+
+}
 
 });
 
