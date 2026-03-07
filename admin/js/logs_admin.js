@@ -68,8 +68,8 @@ async function loadLogs() {
            const val = $.fn.dataTable.util.escapeRegex($(this).val());
 
            column
-             .search(val ? '^'+val+'$' : '', true, false)
-             .draw();
+.search(val)
+.draw();
 
          });
 
