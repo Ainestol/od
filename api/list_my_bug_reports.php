@@ -5,7 +5,6 @@ error_reporting(E_ALL);
 require_once __DIR__.'/../../api/admin/_bootstrap.php';
 assert_admin();
 header('Content-Type: application/json; charset=utf-8');
-session_start();
 
 if (empty($_SESSION['web_user_id'])) {
   http_response_code(401);
