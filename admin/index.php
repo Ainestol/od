@@ -19,10 +19,6 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
 <div id="adminHeader"></div>
 
 <main class="auth-container">
-
-  <section class="admin-card">
-    <h2>Admin Dashboard</h2>
-  </section>
 <div class="admin-stats-bar">
 
   <div class="stat-box">
@@ -49,6 +45,9 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     <span>Ostatní VIP</span>
     <b id="statVipOther">...</b>
   </div>
+  <section class="admin-card">
+    <h2>Admin Dashboard</h2>
+  </section>
 
 </div>
   <div class="admin-grid">
