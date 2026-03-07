@@ -3,7 +3,13 @@ ini_set('display_errors',1);
 error_reporting(E_ALL);
 
 require_once $_SERVER['DOCUMENT_ROOT'].'/api/admin/_bootstrap.php';
-assert_admin();
+try {
+    assert_admin();
+} catch (Throwable $e) {
+    http_response_code(403);
+    echo json_encode(['ok'=>false,'error'=>'FORBIDDEN']);
+    exit;
+}
 header('Content-Type: application/json; charset=utf-8');
 
 if (empty($_SESSION['web_user_id'])) {
@@ -16,15 +22,15 @@ $userId = (int)$_SESSION['web_user_id'];
 
 try {
   $st = $pdo->prepare("
-    SELECT
+  SELECT
   id,
+  web_user_id,
   game_account,
   category,
   title,
   status,
   created_at
 FROM bug_reports
-WHERE web_user_id = ?
 ORDER BY created_at DESC
   ");
   $st->execute([$userId]);
