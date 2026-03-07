@@ -2,45 +2,24 @@
 ini_set('display_errors',1);
 error_reporting(E_ALL);
 
-require_once $_SERVER['DOCUMENT_ROOT'].'/api/admin/_bootstrap.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/config/db.php';
 
-try {
-    assert_admin();
-} catch (Throwable $e) {
-    http_response_code(403);
-    echo json_encode(['ok'=>false,'error'=>'FORBIDDEN']);
-    exit;
-}
+header('Content-Type: application/json');
 
-header('Content-Type: application/json; charset=utf-8');
+$st = $pdo->query("
+SELECT
+id,
+web_user_id,
+game_account,
+category,
+title,
+status,
+created_at
+FROM bug_reports
+ORDER BY created_at DESC
+");
 
-try {
-
-    $st = $pdo->query("
-        SELECT
-            id,
-            web_user_id,
-            game_account,
-            category,
-            title,
-            status,
-            created_at
-        FROM bug_reports
-        ORDER BY created_at DESC
-    ");
-
-    echo json_encode([
-        'ok' => true,
-        'tickets' => $st->fetchAll(PDO::FETCH_ASSOC)
-    ]);
-
-} catch (Throwable $e) {
-
-    http_response_code(500);
-
-    echo json_encode([
-        'ok' => false,
-        'error' => $e->getMessage()
-    ]);
-
-}
+echo json_encode([
+    "ok" => true,
+    "tickets" => $st->fetchAll(PDO::FETCH_ASSOC)
+]);
