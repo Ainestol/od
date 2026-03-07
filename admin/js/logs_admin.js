@@ -110,7 +110,34 @@ function updateFilters(api) {
 
    const colIndex = column.index();
 
-   const unique = [...new Set(data.map(row => row[colIndex]))];
+   let unique;
+
+if(colIndex === 5){
+
+// META sloupec → rozdělit JSON na jednotlivé hodnoty
+
+const values = [];
+
+data.forEach(row => {
+
+ try{
+   const obj = JSON.parse(row[colIndex]);
+
+   Object.values(obj).forEach(v=>{
+     values.push(String(v));
+   });
+
+ }catch(e){}
+
+});
+
+unique = [...new Set(values)];
+
+}else{
+
+unique = [...new Set(data.map(row => row[colIndex]))];
+
+}
 
    unique.sort().forEach(val => {
      select.append(`<option value="${val}">${val}</option>`);
