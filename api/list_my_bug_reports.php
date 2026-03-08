@@ -35,5 +35,5 @@ $st->execute([$userId]);
 
 echo json_encode([
     "ok" => true,
-    "tickets" => $st->fetchAll(PDO::FETCH_ASSOC)
+    "bugs" => $st->fetchAll(PDO::FETCH_ASSOC)
 ]);
