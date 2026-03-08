@@ -2,8 +2,9 @@
 ini_set('display_errors',1);
 error_reporting(E_ALL);
 
+header('Content-Type: application/json');
+
 require_once $_SERVER['DOCUMENT_ROOT'].'/config/db.php';
-header('Content-Type: application/json; charset=utf-8');
 require_once __DIR__ . '/_bootstrap.php';
 
 
