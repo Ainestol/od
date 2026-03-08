@@ -5,7 +5,7 @@ error_reporting(E_ALL);
 header('Content-Type: application/json');
 
 require_once $_SERVER['DOCUMENT_ROOT'].'/config/db.php';
-require_once __DIR__ . '/_bootstrap.php';
+require_once __DIR__.'/../_bootstrap.php';
 
 
 if ($_SESSION['role'] !== 'admin') {
