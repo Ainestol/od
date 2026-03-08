@@ -1,36 +1,83 @@
 let currentUserId = null;
 
-/* ===== HLEDÁNÍ UŽIVATELE ===== */
+/* ============================= */
+/* FETCH WRAPPER (CSRF + SESSION) */
+/* ============================= */
+
+const _origFetch = window.fetch;
+
+window.fetch = function (url, options = {}) {
+
+  options.credentials = options.credentials || 'same-origin';
+  options.cache = 'no-store';
+
+  options.headers = options.headers || {};
+
+  if (options.method && options.method.toUpperCase() === 'POST') {
+    options.headers['X-CSRF-TOKEN'] = window.CSRF_TOKEN || '';
+  }
+
+  return _origFetch(url, options);
+};
+
+
+/* ============================= */
+/* SAFE JSON PARSE */
+/* ============================= */
+
+async function safeJson(res) {
+  try {
+    return await res.json();
+  } catch {
+    console.error("JSON parse error", res);
+    return { ok:false };
+  }
+}
+
+
+/* ============================= */
+/* HLEDÁNÍ UŽIVATELE */
+/* ============================= */
 
 document.getElementById('searchUser').addEventListener('click', async () => {
 
   const email = document.getElementById('searchEmail').value.trim();
   if (!email) return;
 
-  const res = await fetch('/admin/api/economy_search_user.php', {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({email})
-  });
+  try {
 
-  const data = await res.json();
+    const res = await fetch('/admin/api/economy_search_user.php', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({email})
+    });
 
-  if (!data.ok) {
-    alert('Uživatel nenalezen');
-    return;
+    const data = await safeJson(res);
+
+    if (!data.ok) {
+      alert('Uživatel nenalezen');
+      return;
+    }
+
+    currentUserId = data.user.id;
+
+    document.getElementById('userResult').classList.remove('hidden');
+    document.getElementById('userEmail').textContent = data.user.email;
+
+    updateWalletUI(data.wallet);
+    loadLedger(currentUserId);
+
+  } catch (e) {
+    console.error(e);
+    alert('Chyba komunikace se serverem');
   }
 
-  currentUserId = data.user.id;
-
-  document.getElementById('userResult').classList.remove('hidden');
-  document.getElementById('userEmail').textContent = data.user.email;
-
-  updateWalletUI(data.wallet);
-  loadLedger(currentUserId);
 });
 
 
-/* ===== ÚPRAVA BALANCE ===== */
+/* ============================= */
+/* ÚPRAVA BALANCE */
+/* ============================= */
 
 document.getElementById('adjustBalance').addEventListener('click', async () => {
 
@@ -47,79 +94,111 @@ document.getElementById('adjustBalance').addEventListener('click', async () => {
     return;
   }
 
-  const res = await fetch('/admin/api/economy_adjust_balance.php', {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({
-      user_id: currentUserId,
-      currency,
-      amount
-    })
-  });
+  try {
 
-  const data = await res.json();
+    const res = await fetch('/admin/api/economy_adjust_balance.php', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        user_id: currentUserId,
+        currency,
+        amount
+      })
+    });
 
-  if (!data.ok) {
-    alert('Chyba při úpravě');
-    return;
+    const data = await safeJson(res);
+
+    if (!data.ok) {
+      alert('Chyba při úpravě');
+      return;
+    }
+
+    document.getElementById('amountInput').value = '';
+
+    await refreshUser();
+
+  } catch (e) {
+    console.error(e);
+    alert('Server error');
   }
 
-  document.getElementById('amountInput').value = '';
-
-  await refreshUser();
 });
 
 
-/* ===== REFRESH USER ===== */
+/* ============================= */
+/* REFRESH USER */
+/* ============================= */
 
 async function refreshUser() {
 
   const email = document.getElementById('userEmail').textContent;
 
-  const res = await fetch('/admin/api/economy_search_user.php', {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({email})
-  });
+  try {
 
-  const data = await res.json();
-  if (!data.ok) return;
+    const res = await fetch('/admin/api/economy_search_user.php', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({email})
+    });
 
-  updateWalletUI(data.wallet);
-  loadLedger(currentUserId);
+    const data = await safeJson(res);
+
+    if (!data.ok) return;
+
+    updateWalletUI(data.wallet);
+    loadLedger(currentUserId);
+
+  } catch (e) {
+    console.error(e);
+  }
 }
 
 
-/* ===== WALLET UI ===== */
+/* ============================= */
+/* WALLET UI */
+/* ============================= */
 
 function updateWalletUI(wallet) {
+
   document.getElementById('adminVC').textContent =
     wallet.VOTE_COIN ?? 0;
 
   document.getElementById('adminDC').textContent =
     wallet.DC ?? 0;
+
 }
 
 
-/* ===== LEDGER ===== */
+/* ============================= */
+/* LEDGER */
+/* ============================= */
 
 async function loadLedger(userId) {
 
-  const res = await fetch('/admin/api/economy_get_ledger.php?user_id='+userId);
-  const data = await res.json();
+  try {
 
-  const box = document.getElementById('ledgerList');
-  box.innerHTML = '';
+    const res = await fetch('/admin/api/economy_get_ledger.php?user_id='+userId);
 
-  if (!data.ok) return;
+    const data = await safeJson(res);
 
-  data.ledger.forEach(row => {
+    const box = document.getElementById('ledgerList');
+    box.innerHTML = '';
 
-    const div = document.createElement('div');
+    if (!data.ok) return;
 
-    div.textContent =
-      `${row.created_at} | ${row.currency} | ${row.amount} | ${row.reason}`;
+    data.ledger.forEach(row => {
 
-    box.appendChild(div);
-  });
+      const div = document.createElement('div');
+
+      div.textContent =
+        `${row.created_at} | ${row.currency} | ${row.amount} | ${row.reason}`;
+
+      box.appendChild(div);
+
+    });
+
+  } catch (e) {
+    console.error(e);
+  }
+
 }
