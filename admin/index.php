@@ -63,7 +63,15 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
   <span>Dragon Coin celkem</span>
   <b id="statDcTotal">...</b>
 </div>
+<div class="stat-box">
+  <span>Vote Coin dnes</span>
+  <b id="statVoteToday">...</b>
+</div>
 
+<div class="stat-box">
+  <span>Dragon Coin dnes</span>
+  <b id="statDcToday">...</b>
+</div>
 </div>
   <div class="admin-grid">
   

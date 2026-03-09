@@ -19,7 +19,8 @@ document.getElementById("statVip2").innerText = d.vip_2;
 document.getElementById("statVip3").innerText = d.vip_3;
 document.getElementById("statVoteTotal").innerText = d.vote_total;
 document.getElementById("statDcTotal").innerText = d.dc_total;
-
+document.getElementById("statVoteToday").innerText = d.vote_today;
+document.getElementById("statDcToday").innerText = d.dc_today;
 }
 
 document.addEventListener("DOMContentLoaded", loadServerStats);

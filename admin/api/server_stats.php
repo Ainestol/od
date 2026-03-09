@@ -76,6 +76,27 @@ WHERE currency = 'DC'
 AND amount > 0
 ")->fetchColumn();
 
+/* ===== VOTE COIN DNES ===== */
+
+$out['vote_today'] = $pdo->query("
+SELECT COALESCE(SUM(amount),0)
+FROM wallet_ledger
+WHERE currency='VOTE_COIN'
+AND amount > 0
+AND created_at > NOW() - INTERVAL 1 DAY
+")->fetchColumn();
+
+
+/* ===== DRAGON COIN DNES ===== */
+
+$out['dc_today'] = $pdo->query("
+SELECT COALESCE(SUM(amount),0)
+FROM wallet_ledger
+WHERE currency='DC'
+AND amount > 0
+AND created_at > NOW() - INTERVAL 1 DAY
+")->fetchColumn();
+
 echo json_encode([
  'ok'=>true,
  'data'=>$out
