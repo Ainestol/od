@@ -58,7 +58,7 @@ async function loadOnlinePlayers() {
     console.error("Chyba při načítání online hráčů:", e);
   }
 }
-setInterval(loadOnlinePlayers, 7000);
+
 /* ===== RENDER TABLE ===== */
 function renderTable(players) {
   const tbody = document.querySelector('#onlineTable tbody');
@@ -136,7 +136,7 @@ document.querySelectorAll('#onlineTable th').forEach(th => {
 
 /* ===== INIT ===== */
 loadOnlinePlayers();
-setInterval(loadOnlinePlayers, 30000);
+setInterval(loadOnlinePlayers, 7000);
 </script>
 
 <script>
