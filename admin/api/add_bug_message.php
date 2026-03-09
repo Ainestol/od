@@ -1,5 +1,6 @@
 <?php
-require_once __DIR__ . '/_bootstrap.php';
+require_once __DIR__ . '/../../api/admin/_bootstrap.php';
+assert_admin();
 require_once __DIR__ . '/../../config/db.php';
 
 header('Content-Type: application/json; charset=utf-8');
