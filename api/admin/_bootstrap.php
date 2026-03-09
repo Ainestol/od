@@ -12,6 +12,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 
 require_once __DIR__ . '/../../lib/rate_limit.php';
 require_once __DIR__ . '/../../config/db.php'; // $pdo (web DB)
+var_dump($pdo->query("SELECT DATABASE()")->fetchColumn());
+exit;
 require_once __DIR__ . '/../../lib/admin_audit.php';
 // === ADMIN AUTH ===
 function assert_admin(): void
