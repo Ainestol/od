@@ -1560,3 +1560,62 @@ text-align:center;
 .rank-row .value{
 text-align:right;
 }
+/* CLAN LEADERBOARD GRID */
+
+#topClans{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:18px;
+margin-top:20px;
+}
+
+/* CLAN CARD */
+
+.clan-row{
+border:1px solid rgba(212,175,55,0.35);
+padding:16px 18px;
+background:rgba(0,0,0,0.35);
+transition:all 0.25s ease;
+}
+
+.clan-row:hover{
+border-color:#d4af37;
+background:rgba(0,0,0,0.55);
+}
+
+/* RANK */
+
+.clan-row .rank{
+font-size:14px;
+margin-bottom:4px;
+color:#ffd700;
+}
+
+/* CLAN NAME */
+
+.clan-row .clan-name{
+font-size:18px;
+font-family:'Cinzel',serif;
+font-weight:bold;
+color:#d4af37;
+margin-bottom:6px;
+}
+
+/* INFO */
+
+.clan-row .clan-info{
+font-size:13px;
+color:#c7b37a;
+line-height:1.4;
+}
+.clan-row:nth-child(1){
+border-color:#ffd700;
+}
+
+.clan-row:nth-child(2){
+border-color:#c0c0c0;
+}
+
+.clan-row:nth-child(3){
+border-color:#cd7f32;
+}

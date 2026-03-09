@@ -32,13 +32,16 @@ console.error("World stats error:", e);
    PLAYTIME FORMAT
 ========================= */
 
-function formatPlaytime(minutes){
+function formatPlaytime(seconds){
 
-const h = Math.floor(minutes / 60);
-const m = minutes % 60;
+const h = Math.floor(seconds / 3600);
+const m = Math.floor((seconds % 3600) / 60);
+const s = seconds % 60;
 
-return h + "h " + m + "m";
+if(h > 0) return `${h}h ${m}m`;
+if(m > 0) return `${m}m ${s}s`;
 
+return `${s}s`;
 }
 
 
@@ -88,20 +91,25 @@ function renderClans(list){
 const box = document.getElementById("topClans");
 if(!box) return;
 
-box.innerHTML = "";
+box.innerHTML="";
 
 list.forEach((c,i)=>{
 
 const div = document.createElement("div");
 
-div.className = "clan-row";
+div.className="clan-row";
 
-div.innerHTML = `
+div.innerHTML=`
 <div class="rank">#${i+1}</div>
-<div class="clan-name">${c.clan_name}</div>
+
+<div class="clan-name">
+${c.clan_name}
+</div>
+
 <div class="clan-info">
-Leader: ${c.leader_name}<br>
-Level ${c.clan_level} • ${c.members} members • Castle: ${c.castle}
+Leader: <strong>${c.leader_name}</strong><br>
+Level ${c.clan_level} • Members ${c.members}<br>
+Castle: ${c.castle !== "None" ? "🏰 " + c.castle : "None"}
 </div>
 `;
 
