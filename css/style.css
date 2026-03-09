@@ -1546,3 +1546,17 @@ color:#c0c0c0;
 .leaderboard-box div div:nth-child(3){
 color:#cd7f32;
 }
+.rank-row{
+display:grid;
+grid-template-columns:60px 1fr 80px;
+align-items:center;
+padding:3px 0;
+}
+
+.rank-row .name{
+text-align:center;
+}
+
+.rank-row .value{
+text-align:right;
+}
