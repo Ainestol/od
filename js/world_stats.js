@@ -1,4 +1,10 @@
+/* =========================
+   WORLD STATS LOADER
+========================= */
+
 async function loadWorldStats(){
+
+try{
 
 const res = await fetch('/api/world_stats.php');
 const data = await res.json();
@@ -15,9 +21,30 @@ renderList("topAdena", d.top_adena, "adena");
 
 renderClans(d.top_clans);
 
+}catch(e){
+console.error("World stats error:", e);
 }
 
-/* PLAYER LIST */
+}
+
+
+/* =========================
+   PLAYTIME FORMAT
+========================= */
+
+function formatPlaytime(minutes){
+
+const h = Math.floor(minutes / 60);
+const m = minutes % 60;
+
+return h + "h " + m + "m";
+
+}
+
+
+/* =========================
+   PLAYER LIST RENDER
+========================= */
 
 function renderList(id, list, field){
 
@@ -32,10 +59,17 @@ const div = document.createElement("div");
 
 div.className = "rank-row";
 
+let value = p[field];
+
+/* převod playtime */
+if(field === "onlinetime"){
+value = formatPlaytime(value);
+}
+
 div.innerHTML = `
 <span class="rank">#${i+1}</span>
 <span class="name">${p.char_name}</span>
-<span class="value">${p[field]}</span>
+<span class="value">${value}</span>
 `;
 
 box.appendChild(div);
@@ -45,23 +79,24 @@ box.appendChild(div);
 }
 
 
-/* CLAN LIST */
+/* =========================
+   CLAN LIST RENDER
+========================= */
 
 function renderClans(list){
 
 const box = document.getElementById("topClans");
-
 if(!box) return;
 
-box.innerHTML="";
+box.innerHTML = "";
 
 list.forEach((c,i)=>{
 
 const div = document.createElement("div");
 
-div.className="clan-row";
+div.className = "clan-row";
 
-div.innerHTML=`
+div.innerHTML = `
 <div class="rank">#${i+1}</div>
 <div class="clan-name">${c.clan_name}</div>
 <div class="clan-info">
@@ -76,12 +111,10 @@ box.appendChild(div);
 
 }
 
-loadWorldStats();
 
-/* refresh každou minutu */
-
-setInterval(loadWorldStats,5000);
-/* TAB SWITCHER */
+/* =========================
+   TAB SWITCHER
+========================= */
 
 document.querySelectorAll(".tab-btn").forEach(btn => {
 
@@ -99,3 +132,19 @@ document.getElementById("tab-" + tab).classList.add("active");
 });
 
 });
+
+
+/* =========================
+   INITIAL LOAD
+========================= */
+
+loadWorldStats();
+
+
+/* =========================
+   AUTO REFRESH
+========================= */
+
+/* každou minutu */
+
+setInterval(loadWorldStats,60000);

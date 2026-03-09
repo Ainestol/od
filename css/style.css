@@ -1516,8 +1516,9 @@ color:#d4af37;
 font-family:'Cinzel',serif;
 }
 .leaderboard-box div div{
-display:flex;
-justify-content:space-between;
+display:grid;
+grid-template-columns:60px 1fr 80px;
+align-items:center;
 padding:3px 0;
 font-size:14px;
 }
@@ -1525,4 +1526,23 @@ font-size:14px;
 .leaderboard-box div div span:first-child{
 color:#d4af37;
 margin-right:6px;
+}
+.leaderboard-box div div span:nth-child(2){
+text-align:center;
+}
+
+.leaderboard-box div div span:nth-child(3){
+text-align:right;
+}
+.leaderboard-box div div:nth-child(1){
+color:#ffd700;
+font-weight:bold;
+}
+
+.leaderboard-box div div:nth-child(2){
+color:#c0c0c0;
+}
+
+.leaderboard-box div div:nth-child(3){
+color:#cd7f32;
 }
