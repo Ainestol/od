@@ -32,3 +32,4 @@ async function initCsrf() {
     const data = await res.json();
     window.CSRF_TOKEN = data.token;
 }
+initCsrf();
