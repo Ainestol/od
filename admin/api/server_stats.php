@@ -24,7 +24,7 @@ SELECT COUNT(*) FROM game_accounts
 
 /* CHARACTERS */
 
-$out['characters'] = $pdo_game->query("
+$out['characters'] = $pdoGame->query("
 SELECT COUNT(*) FROM characters
 ")->fetchColumn();
 
@@ -46,6 +46,9 @@ WHERE vip_type!='VIP_24H'
 AND vip_expires_at > NOW()
 ")->fetchColumn();
 
+$out['online_players'] = $pdoGameStatus->query("
+SELECT COUNT(*) FROM characters WHERE online = 1
+")->fetchColumn();
 
 echo json_encode([
  'ok'=>true,
