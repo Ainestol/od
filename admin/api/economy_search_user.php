@@ -1,8 +1,6 @@
 <?php
 
 require_once __DIR__ . '/../../api/admin/_bootstrap.php';
-var_dump($_SESSION);
-exit;
 assert_admin();
 
 header('Content-Type: application/json; charset=utf-8');
