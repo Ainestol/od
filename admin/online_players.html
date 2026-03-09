@@ -58,7 +58,7 @@ async function loadOnlinePlayers() {
     console.error("Chyba při načítání online hráčů:", e);
   }
 }
-
+setInterval(loadOnlinePlayers, 7000);
 /* ===== RENDER TABLE ===== */
 function renderTable(players) {
   const tbody = document.querySelector('#onlineTable tbody');
