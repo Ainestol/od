@@ -139,11 +139,15 @@ async function refreshUser() {
 
   try {
 
-    const res = await fetch('/admin/api/economy_search_user.php', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({email})
-    });
+   const res = await fetch('/admin/api/economy_search_user.php', {
+  method:'POST',
+  credentials:'same-origin',
+  headers:{
+    'Content-Type':'application/json',
+    'X-CSRF-TOKEN': window.CSRF_TOKEN
+  },
+  body: JSON.stringify({email})
+});
 
     const data = await safeJson(res);
 
