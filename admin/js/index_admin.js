@@ -13,8 +13,10 @@ async function loadServerStats(){
  document.getElementById("statWebUsers").innerText = d.web_users;
  document.getElementById("statGameAccounts").innerText = d.game_accounts;
  document.getElementById("statCharacters").innerText = d.characters;
- document.getElementById("statVip24").innerText = d.vip_24h;
- document.getElementById("statVipOther").innerText = d.vip_other;
+ document.getElementById("statOnline").innerText = d.online;
+ document.getElementById("statVip1").innerText = d.vip_1;
+document.getElementById("statVip2").innerText = d.vip_2;
+document.getElementById("statVip3").innerText = d.vip_3;
 
 }
 

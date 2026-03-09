@@ -3,8 +3,6 @@
 require_once __DIR__.'/../../api/admin/_bootstrap.php';
 assert_admin();
 
-header('Content-Type: application/json; charset=utf-8');
-
 require_once __DIR__.'/../../config/db.php';
 require_once __DIR__.'/../../config/db_game.php';
 
@@ -28,22 +26,35 @@ $out['characters'] = $pdoGame->query("
 SELECT COUNT(*) FROM characters
 ")->fetchColumn();
 
-/* VIP 24H */
+/* VIP I */
 
-$out['vip_24h'] = $pdo->query("
+$out['vip_1'] = $pdo->query("
 SELECT COUNT(*)
 FROM vip_grants
-WHERE vip_level_id = 1
-AND expires_at > NOW()
+WHERE level_id = 1
+AND end_at > NOW()
 ")->fetchColumn();
 
-/* OTHER VIP */
+/* VIP II */
 
-$out['vip_other'] = $pdo->query("
+$out['vip_2'] = $pdo->query("
 SELECT COUNT(*)
 FROM vip_grants
-WHERE vip_level_id != 1
-AND expires_at > NOW()
+WHERE level_id = 2
+AND end_at > NOW()
+")->fetchColumn();
+
+/* VIP III */
+
+$out['vip_3'] = $pdo->query("
+SELECT COUNT(*)
+FROM vip_grants
+WHERE level_id = 3
+AND end_at > NOW()
+")->fetchColumn();
+
+$out['online'] = $pdoGame->query("
+SELECT COUNT(*) FROM characters WHERE online = 1
 ")->fetchColumn();
 
 echo json_encode([

@@ -36,15 +36,24 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     <b id="statCharacters">...</b>
   </div>
 
-  <div class="stat-box">
-    <span>VIP 24h</span>
-    <b id="statVip24">...</b>
-  </div>
+ <div class="stat-box">
+  <span>VIP I</span>
+  <b id="statVip1">...</b>
+</div>
 
-  <div class="stat-box">
-    <span>Ostatní VIP</span>
-    <b id="statVipOther">...</b>
-  </div>
+<div class="stat-box">
+  <span>VIP II</span>
+  <b id="statVip2">...</b>
+</div>
+
+<div class="stat-box">
+  <span>VIP III</span>
+  <b id="statVip3">...</b>
+</div>
+<div class="stat-box">
+  <span>Online hráči</span>
+  <b id="statOnline">...</b>
+</div>
   <section class="admin-card">
     <h2>Admin Dashboard</h2>
   </section>
