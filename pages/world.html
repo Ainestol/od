@@ -48,10 +48,33 @@
     </nav>
 
     <div class="content-box">
-     <h3>Clan statistiky</h3>
+    <h3>Statistiky světa</h3>
+
+<div class="world-tabs">
+
+<button class="tab-btn active" data-tab="clans">
+Clan statistiky
+</button>
+
+<button class="tab-btn" data-tab="players">
+Statistika hráčů
+</button>
+
+</div>
+
+
+<!-- CLAN TAB -->
+
+<div id="tab-clans" class="tab-content active">
+
 <div id="topClans"></div>
 
-<h3>Top hráči</h3>
+</div>
+
+
+<!-- PLAYER TAB -->
+
+<div id="tab-players" class="tab-content">
 
 <h4>Top Level</h4>
 <div id="topLevel"></div>
@@ -67,6 +90,8 @@
 
 <h4>Top Playtime</h4>
 <div id="topTime"></div>
+
+</div>
 
     <!-- ✅ FOOTER STEJNÝ JAKO NA OSTATNÍCH STRÁNKÁCH -->
      <div class="page-footer">

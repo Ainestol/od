@@ -1469,3 +1469,30 @@ body.auth-page .auth-container {
   height: 42px;
   padding: 10px 14px;
 }
+.world-tabs{
+display:flex;
+gap:10px;
+margin-bottom:20px;
+}
+
+.tab-btn{
+padding:8px 16px;
+background:#1a1a1a;
+border:1px solid #444;
+color:#ccc;
+cursor:pointer;
+font-family: Cinzel;
+}
+
+.tab-btn.active{
+background:#c6a25a;
+color:#000;
+}
+
+.tab-content{
+display:none;
+}
+
+.tab-content.active{
+display:block;
+}
