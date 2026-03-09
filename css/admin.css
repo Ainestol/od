@@ -391,28 +391,35 @@ text-decoration:underline;
 
 .admin-stats-bar{
   display:flex;
-  gap:20px;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:18px;
   margin-bottom:30px;
-  width:100%;
 }
 .stat-box{
-  flex:1;
   min-width:140px;
-  background:#141414;
-  border:1px solid #2a2a2a;
+  height:70px;
+
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+
+  padding:12px 16px;
+
   border-radius:10px;
-  padding:16px;
-  text-align:center;
+  background:#111;
+
+  border:1px solid rgba(255,255,255,0.05);
 }
 
 .stat-box span{
-  display:block;
-  font-size:12px;
+  font-size:13px;
   color:#999;
-  margin-bottom:4px;
 }
 
 .stat-box b{
-  font-size:22px;
-  color:#e5c46a;
+  font-size:20px;
+  color:#d4af37;
+  margin-top:4px;
 }
