@@ -54,9 +54,15 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
   <span>Online hráči</span>
   <b id="statOnline">...</b>
 </div>
-  <section class="admin-card">
-    <h2>Admin Dashboard</h2>
-  </section>
+<div class="stat-box">
+  <span>Vote Coin celkem</span>
+  <b id="statVoteTotal">...</b>
+</div>
+
+<div class="stat-box">
+  <span>Dragon Coin celkem</span>
+  <b id="statDcTotal">...</b>
+</div>
 
 </div>
   <div class="admin-grid">

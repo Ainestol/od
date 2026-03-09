@@ -57,6 +57,25 @@ $out['online'] = $pdoGame->query("
 SELECT COUNT(*) FROM characters WHERE online = 1
 ")->fetchColumn();
 
+/* ===== TOTAL VOTE COINS ===== */
+
+$out['vote_total'] = $pdo->query("
+SELECT COALESCE(SUM(amount),0)
+FROM wallet_ledger
+WHERE currency = 'VOTE_COIN'
+AND amount > 0
+")->fetchColumn();
+
+
+/* ===== TOTAL DRAGON COINS ===== */
+
+$out['dc_total'] = $pdo->query("
+SELECT COALESCE(SUM(amount),0)
+FROM wallet_ledger
+WHERE currency = 'DC'
+AND amount > 0
+")->fetchColumn();
+
 echo json_encode([
  'ok'=>true,
  'data'=>$out

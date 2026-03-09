@@ -17,6 +17,8 @@ async function loadServerStats(){
  document.getElementById("statVip1").innerText = d.vip_1;
 document.getElementById("statVip2").innerText = d.vip_2;
 document.getElementById("statVip3").innerText = d.vip_3;
+document.getElementById("statVoteTotal").innerText = d.vote_total;
+document.getElementById("statDcTotal").innerText = d.dc_total;
 
 }
 
