@@ -1496,3 +1496,33 @@ display:none;
 .tab-content.active{
 display:block;
 }
+.leaderboards{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:25px;
+margin-top:20px;
+}
+
+.leaderboard-box{
+border:1px solid rgba(255,215,0,0.25);
+padding:15px 18px;
+background:rgba(0,0,0,0.35);
+}
+
+.leaderboard-box h4{
+margin-bottom:10px;
+font-size:16px;
+color:#d4af37;
+font-family:'Cinzel',serif;
+}
+.leaderboard-box div div{
+display:flex;
+justify-content:space-between;
+padding:3px 0;
+font-size:14px;
+}
+
+.leaderboard-box div div span:first-child{
+color:#d4af37;
+margin-right:6px;
+}
