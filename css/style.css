@@ -1611,3 +1611,8 @@ border-color:#c0c0c0;
 .clan-row:nth-child(3){
 border-color:#cd7f32;
 }
+.clan-crest{
+width:24px;
+height:24px;
+image-rendering:pixelated;
+}

@@ -103,7 +103,11 @@ div.innerHTML=`
 <div class="rank">#${i+1}</div>
 
 <div class="clan-name">
+
+${c.crest_id > 0 ? `<img class="clan-crest" src="/api/crest.php?id=${c.crest_id}">` : ""}
+
 ${c.clan_name}
+
 </div>
 
 <div class="clan-info">
