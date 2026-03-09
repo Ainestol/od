@@ -48,13 +48,25 @@
     </nav>
 
     <div class="content-box">
-      <h3>Svět</h3>
-      <p>Svět Adenu, města, zóny, bossové.</p>
-      <p>
-        Tato část webu se teprve připravuje, čekáme na zpětnou vazbu co by vlastně hráci zde chtěli mít,
-        např filtr lvl hráčů, pvp/pk bodů, počet adena atd.
-      </p>
-    </div>
+     <h3>Clan statistiky</h3>
+<div id="topClans"></div>
+
+<h3>Top hráči</h3>
+
+<h4>Top Level</h4>
+<div id="topLevel"></div>
+
+<h4>Top PvP</h4>
+<div id="topPvP"></div>
+
+<h4>Top PK</h4>
+<div id="topPK"></div>
+
+<h4>Top Adena</h4>
+<div id="topAdena"></div>
+
+<h4>Top Playtime</h4>
+<div id="topTime"></div>
 
     <!-- ✅ FOOTER STEJNÝ JAKO NA OSTATNÍCH STRÁNKÁCH -->
      <div class="page-footer">
@@ -143,6 +155,6 @@ async function updateServerStatus() {
 updateServerStatus();
 setInterval(updateServerStatus, 10000);
 </script>
-
+<script src="/js/world_stats.js"></script>
 </body>
 </html>
