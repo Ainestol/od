@@ -32,22 +32,18 @@ SELECT COUNT(*) FROM characters
 
 $out['vip_24h'] = $pdo->query("
 SELECT COUNT(*)
-FROM user_vip
-WHERE vip_type='VIP_24H'
-AND vip_expires_at > NOW()
+FROM vip_grants
+WHERE vip_level_id = 1
+AND expires_at > NOW()
 ")->fetchColumn();
 
 /* OTHER VIP */
 
 $out['vip_other'] = $pdo->query("
 SELECT COUNT(*)
-FROM user_vip
-WHERE vip_type!='VIP_24H'
-AND vip_expires_at > NOW()
-")->fetchColumn();
-
-$out['online_players'] = $pdoGameStatus->query("
-SELECT COUNT(*) FROM characters WHERE online = 1
+FROM vip_grants
+WHERE vip_level_id != 1
+AND expires_at > NOW()
 ")->fetchColumn();
 
 echo json_encode([
