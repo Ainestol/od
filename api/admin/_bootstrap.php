@@ -16,18 +16,16 @@ require_once __DIR__ . '/../../lib/admin_audit.php';
 // === ADMIN AUTH ===
 function assert_admin(): void
 {
-    global $pdo;
-
     if (empty($_SESSION['web_user_id'])) {
-        throw new Exception('NOT_LOGGED_IN');
+        http_response_code(401);
+        echo json_encode(["ok"=>false,"error"=>"NOT_LOGGED_IN"]);
+        exit;
     }
 
-    $stmt = $pdo->prepare("SELECT role FROM users WHERE id = ?");
-    $stmt->execute([$_SESSION['web_user_id']]);
-    $role = $stmt->fetchColumn();
-
-    if ($role !== 'admin') {
-        throw new Exception('FORBIDDEN');
+    if (($_SESSION['role'] ?? '') !== 'admin') {
+        http_response_code(403);
+        echo json_encode(["ok"=>false,"error"=>"FORBIDDEN"]);
+        exit;
     }
 }
 
