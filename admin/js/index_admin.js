@@ -21,3 +21,4 @@ document.getElementById("statVip3").innerText = d.vip_3;
 }
 
 document.addEventListener("DOMContentLoaded", loadServerStats);
+setInterval(loadServerStats, 5000);

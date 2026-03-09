@@ -44,3 +44,4 @@ try {
         'error' => $e->getMessage()
     ]);
 }
+setInterval(loadServerStats, 5000);
