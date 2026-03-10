@@ -98,6 +98,7 @@ cd.clan_name,
 cd.clan_level,
 cd.reputation_score,
 cd.hasCastle,
+cd.crest_id,
 leader.char_name AS leader_name,
 COUNT(c.charId) AS members
 
@@ -109,7 +110,7 @@ ON c.clanid = cd.clan_id
 LEFT JOIN characters leader
 ON leader.charId = cd.leader_id
 
-GROUP BY cd.clan_id
+GROUP BY cd.clan_id, leader.char_name
 ORDER BY members DESC
 LIMIT 10
 ")->fetchAll(PDO::FETCH_ASSOC);
