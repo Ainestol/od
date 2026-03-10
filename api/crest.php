@@ -25,29 +25,38 @@ if(!$row){
 
 $data = $row['data'];
 
-/* crest rozměry */
 $width = 16;
 $height = 12;
 
-$image = imagecreatetruecolor($width,$height);
+$image = imagecreate($width,$height);
 
-/* jednoduchá grayscale paleta */
+/* vytvoření 256 barevné palety */
+$palette = [];
+
+for($i=0;$i<256;$i++){
+    $palette[$i] = imagecolorallocate($image,$i,$i,$i);
+}
+
+/* kreslení pixelů */
+
+$pos = 0;
+
 for($y=0;$y<$height;$y++){
+
     for($x=0;$x<$width;$x++){
 
-        $i = ($y*$width)+$x;
+        if(!isset($data[$pos])) continue;
 
-        if(!isset($data[$i])) continue;
+        $colorIndex = ord($data[$pos]);
 
-        $val = ord($data[$i]);
+        imagesetpixel($image,$x,$y,$palette[$colorIndex]);
 
-        $color = imagecolorallocate($image,$val,$val,$val);
-
-        imagesetpixel($image,$x,$y,$color);
+        $pos++;
     }
 }
 
 header("Content-Type: image/png");
 
 imagepng($image);
+
 imagedestroy($image);
