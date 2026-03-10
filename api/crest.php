@@ -9,14 +9,6 @@ if(!$id){
     exit;
 }
 
-$cacheFile = __DIR__."/../cache/crests/$id.png";
-
-if(file_exists($cacheFile)){
-    header("Content-Type: image/png");
-    readfile($cacheFile);
-    exit;
-}
-
 $stmt = $pdoGame->prepare("
 SELECT data
 FROM crests
@@ -33,13 +25,14 @@ if(!$row){
 }
 
 $tmp = "/tmp/crest_$id.dds";
+$tmp2 = "/tmp/crest_$id.png";
 
 file_put_contents($tmp,$row['data']);
 
-$cmd = "convert $tmp -define dds:compression=none -filter point -resize 48x36 $cacheFile";
-shell_exec($cmd);
-
-unlink($tmp);
+shell_exec("nvdecompress $tmp $tmp2");
 
 header("Content-Type: image/png");
-readfile($cacheFile);
+readfile($tmp2);
+
+unlink($tmp);
+unlink($tmp2);
