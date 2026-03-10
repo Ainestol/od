@@ -16,6 +16,7 @@ WHERE crest_id = ?
 ");
 
 $stmt->execute([$id]);
+
 $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if(!$row){
@@ -23,30 +24,11 @@ if(!$row){
     exit;
 }
 
-$data = $row['data'];
-
-$width = 16;
-$height = 12;
-
-$image = imagecreatetruecolor($width,$height);
-
-$pos = 0;
-
-for($y=$height-1;$y>=0;$y--){
-
-    for($x=0;$x<$width;$x++){
-
-        $b = ord($data[$pos++]);
-        $g = ord($data[$pos++]);
-        $r = ord($data[$pos++]);
-
-        $color = imagecolorallocate($image,$r,$g,$b);
-
-        imagesetpixel($image,$x,$y,$color);
-    }
-}
+$tmp = "/tmp/crest_".$id.".dds";
+file_put_contents($tmp,$row['data']);
 
 header("Content-Type: image/png");
 
-imagepng($image);
-imagedestroy($image);
+passthru("convert $tmp png:-");
+
+unlink($tmp);
