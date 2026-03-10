@@ -1630,3 +1630,9 @@ border:1px solid rgba(255,215,0,0.5);
 padding:2px;
 background:#111;
 }
+.crest canvas{
+width:32px;
+height:24px;
+margin-right:6px;
+image-rendering:pixelated;
+}

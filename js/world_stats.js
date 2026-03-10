@@ -103,17 +103,21 @@ div.innerHTML=`
 <div class="rank">#${i+1}</div>
 
 <div class="clan-name">
-<img class="clan-crest" src="/api/crest.php?id=${c.crest_id}">
+<span class="crest" id="crest-${c.crest_id}"></span>
 ${c.clan_name}
 </div>
 
 <div class="clan-info">
-Leader: <strong>${c.leader_name}</strong><br>
+Leader: ${c.leader_name}<br>
 Level ${c.clan_level} • Members ${c.members}<br>
-Castle: ${c.castle !== "None" ? "🏰 " + c.castle : "None"}
+Castle: ${c.castle}
 </div>
 `;
+const crestContainer = div.querySelector(`#crest-${c.crest_id}`);
 
+if(c.crest_id){
+    loadCrest(c.crest_id, crestContainer);
+}
 box.appendChild(div);
 
 });
