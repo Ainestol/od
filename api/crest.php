@@ -9,6 +9,14 @@ if(!$id){
     exit;
 }
 
+$cacheFile = __DIR__."/../cache/crests/$id.png";
+
+if(file_exists($cacheFile)){
+    header("Content-Type: image/png");
+    readfile($cacheFile);
+    exit;
+}
+
 $stmt = $pdoGame->prepare("
 SELECT data
 FROM crests
@@ -24,12 +32,14 @@ if(!$row){
     exit;
 }
 
-$tmp = "/tmp/crest_".$id.".dds";
+$tmp = "/tmp/crest_$id.dds";
+
 file_put_contents($tmp,$row['data']);
 
-header("Content-Type: image/png");
-
-/* důležité nastavení pro malé DDS */
-passthru("convert $tmp -define dds:compression=none -filter point -resize 48x36 png:-");
+$cmd = "convert $tmp -define dds:compression=none -filter point -resize 48x36 $cacheFile";
+shell_exec($cmd);
 
 unlink($tmp);
+
+header("Content-Type: image/png");
+readfile($cacheFile);

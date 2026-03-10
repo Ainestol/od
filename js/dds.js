@@ -1,5 +1,10 @@
 async function loadCrest(id, element){
 
+if(!element){
+console.log("crest container missing", id);
+return;
+}
+
 const res = await fetch(`/api/crest.php?id=${id}`);
 const buffer = await res.arrayBuffer();
 
@@ -16,8 +21,6 @@ dds.decode(imageData.data);
 
 ctx.putImageData(imageData,0,0);
 
-/* velikost na webu */
-
 canvas.style.width = "32px";
 canvas.style.height = "24px";
 canvas.style.imageRendering = "pixelated";
@@ -25,5 +28,3 @@ canvas.style.imageRendering = "pixelated";
 element.appendChild(canvas);
 
 }
-canvas.style.width = "32px";
-canvas.style.height = "24px";

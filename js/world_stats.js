@@ -104,7 +104,7 @@ div.innerHTML=`
 <div class="rank">#${i+1}</div>
 
 <div class="clan-name">
-<span class="crest" id="crest-${c.crest_id}"></span>
+<img class="clan-crest" src="/api/crest.php?id=${c.crest_id}">
 ${c.clan_name}
 </div>
 
@@ -117,15 +117,16 @@ Castle: ${c.castle}
 
 box.appendChild(div);
 
-/* načtení crest */
-
-if(c.crest_id){
+/* důležité */
+setTimeout(()=>{
 
 const container = document.getElementById(`crest-${c.crest_id}`);
 
+if(c.crest_id){
 loadCrest(c.crest_id, container);
-
 }
+
+},0);
 
 });
 
