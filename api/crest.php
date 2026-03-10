@@ -12,15 +12,11 @@ if(!$id){
 $cacheDir = __DIR__.'/../cache/crests/';
 $cacheFile = $cacheDir.$id.'.png';
 
-/* pokud cache existuje → rovnou ji pošli */
-
 if(file_exists($cacheFile)){
     header("Content-Type: image/png");
     readfile($cacheFile);
     exit;
 }
-
-/* načíst DDS z databáze */
 
 $stmt = $pdoGame->prepare("
 SELECT data
@@ -36,28 +32,12 @@ if(!$row){
     exit;
 }
 
-/* uložit DDS do temp */
-
 $tmp = sys_get_temp_dir()."/crest_".$id.".dds";
 file_put_contents($tmp,$row['data']);
 
-/* převést DDS → PNG */
-
-$cmd = "convert -define dds:compression=none $tmp -filter point -resize 16x12! $cacheFile";
-exec($cmd);
-
-/* pokud PNG nevzniklo → fallback */
-
-if(!file_exists($cacheFile)){
-    header("Content-Type: image/png");
-    passthru("convert -define dds:compression=none $tmp -filter point -resize 16x12! png:-");
-    unlink($tmp);
-    exit;
-}
+exec("convert $tmp -filter point -resize 16x12! $cacheFile");
 
 unlink($tmp);
-
-/* vrátit PNG */
 
 header("Content-Type: image/png");
 readfile($cacheFile);
