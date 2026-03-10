@@ -156,4 +156,4 @@ loadWorldStats();
 
 /* každou minutu */
 
-setInterval(loadWorldStats,60000);
+setInterval(loadWorldStats,5000);
