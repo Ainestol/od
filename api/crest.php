@@ -16,6 +16,7 @@ WHERE crest_id = ?
 ");
 
 $stmt->execute([$id]);
+
 $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if(!$row){
@@ -23,40 +24,6 @@ if(!$row){
     exit;
 }
 
-$data = $row['data'];
+header("Content-Type: image/bmp");
 
-$width = 16;
-$height = 12;
-
-$image = imagecreate($width,$height);
-
-/* vytvoření 256 barevné palety */
-$palette = [];
-
-for($i=0;$i<256;$i++){
-    $palette[$i] = imagecolorallocate($image,$i,$i,$i);
-}
-
-/* kreslení pixelů */
-
-$pos = 0;
-
-for($y=0;$y<$height;$y++){
-
-    for($x=0;$x<$width;$x++){
-
-        if(!isset($data[$pos])) continue;
-
-        $colorIndex = ord($data[$pos]);
-
-        imagesetpixel($image,$x,$y,$palette[$colorIndex]);
-
-        $pos++;
-    }
-}
-
-header("Content-Type: image/png");
-
-imagepng($image);
-
-imagedestroy($image);
+echo $row['data'];
