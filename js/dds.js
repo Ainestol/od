@@ -16,6 +16,14 @@ dds.decode(imageData.data);
 
 ctx.putImageData(imageData,0,0);
 
+/* velikost na webu */
+
+canvas.style.width = "32px";
+canvas.style.height = "24px";
+canvas.style.imageRendering = "pixelated";
+
 element.appendChild(canvas);
 
 }
+canvas.style.width = "32px";
+canvas.style.height = "24px";

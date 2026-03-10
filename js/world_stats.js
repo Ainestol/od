@@ -89,6 +89,7 @@ box.appendChild(div);
 function renderClans(list){
 
 const box = document.getElementById("topClans");
+
 if(!box) return;
 
 box.innerHTML="";
@@ -113,12 +114,18 @@ Level ${c.clan_level} • Members ${c.members}<br>
 Castle: ${c.castle}
 </div>
 `;
-const crestContainer = div.querySelector(`#crest-${c.crest_id}`);
+
+box.appendChild(div);
+
+/* načtení crest */
 
 if(c.crest_id){
-    loadCrest(c.crest_id, crestContainer);
+
+const container = document.getElementById(`crest-${c.crest_id}`);
+
+loadCrest(c.crest_id, container);
+
 }
-box.appendChild(div);
 
 });
 
