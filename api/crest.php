@@ -16,7 +16,6 @@ WHERE crest_id = ?
 ");
 
 $stmt->execute([$id]);
-
 $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if(!$row){
@@ -26,38 +25,28 @@ if(!$row){
 
 $data = $row['data'];
 
-/* crest velikost v L2 */
 $width = 16;
 $height = 12;
 
-/* vytvoření BMP hlavičky */
+$image = imagecreatetruecolor($width,$height);
 
-$filesize = 54 + strlen($data);
+$pos = 0;
 
-$bmp  = "BM";
-$bmp .= pack("V", $filesize);
-$bmp .= pack("V", 0);
-$bmp .= pack("V", 54);
-$bmp .= pack("V", 40);
-$bmp .= pack("V", $width);
-$bmp .= pack("V", $height);
-$bmp .= pack("v", 1);
-$bmp .= pack("v", 8);
-$bmp .= pack("V", 0);
-$bmp .= pack("V", strlen($data));
-$bmp .= pack("V", 0);
-$bmp .= pack("V", 0);
-$bmp .= pack("V", 256);
-$bmp .= pack("V", 0);
+for($y=$height-1;$y>=0;$y--){
 
-/* grayscale paleta */
+    for($x=0;$x<$width;$x++){
 
-for ($i = 0; $i < 256; $i++) {
-    $bmp .= chr($i) . chr($i) . chr($i) . chr(0);
+        $b = ord($data[$pos++]);
+        $g = ord($data[$pos++]);
+        $r = ord($data[$pos++]);
+
+        $color = imagecolorallocate($image,$r,$g,$b);
+
+        imagesetpixel($image,$x,$y,$color);
+    }
 }
 
-$bmp .= $data;
+header("Content-Type: image/png");
 
-header("Content-Type: image/bmp");
-
-echo $bmp;
+imagepng($image);
+imagedestroy($image);
