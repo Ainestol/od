@@ -9,10 +9,10 @@ if(!$id){
     exit;
 }
 
-$cacheDir = __DIR__ . '/../cache/crests/';
-$cacheFile = $cacheDir . $id . '.png';
+$cacheDir = __DIR__.'/../cache/crests/';
+$cacheFile = $cacheDir.$id.'.png';
 
-/* pokud PNG existuje → rovnou ho pošli */
+/* pokud cache existuje → rovnou ji pošli */
 
 if(file_exists($cacheFile)){
     header("Content-Type: image/png");
@@ -20,7 +20,7 @@ if(file_exists($cacheFile)){
     exit;
 }
 
-/* jinak načti DDS z databáze */
+/* načíst DDS z databáze */
 
 $stmt = $pdoGame->prepare("
 SELECT data
@@ -38,17 +38,24 @@ if(!$row){
 
 /* uložit DDS do temp */
 
-$tmpDDS = sys_get_temp_dir() . "/crest_" . $id . ".dds";
-file_put_contents($tmpDDS,$row['data']);
+$tmp = sys_get_temp_dir()."/crest_".$id.".dds";
+file_put_contents($tmp,$row['data']);
 
-/* převést na PNG */
+/* převést DDS → PNG */
 
-$cmd = "convert -define dds:compression=none $tmpDDS -filter point -resize 16x12! $cacheFile";
+$cmd = "convert -define dds:compression=none $tmp -filter point -resize 16x12! $cacheFile";
 exec($cmd);
 
-/* uklid temp */
+/* pokud PNG nevzniklo → fallback */
 
-unlink($tmpDDS);
+if(!file_exists($cacheFile)){
+    header("Content-Type: image/png");
+    passthru("convert -define dds:compression=none $tmp -filter point -resize 16x12! png:-");
+    unlink($tmp);
+    exit;
+}
+
+unlink($tmp);
 
 /* vrátit PNG */
 
