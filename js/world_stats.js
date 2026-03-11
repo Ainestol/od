@@ -1,88 +1,3 @@
-function decodeDXT1(data, width, height){
-
-const out = new Uint8ClampedArray(width*height*4);
-
-let offset = 0;
-
-for(let by=0; by<height/4; by++){
-for(let bx=0; bx<width/4; bx++){
-
-const c0 = data[offset] | (data[offset+1]<<8);
-const c1 = data[offset+2] | (data[offset+3]<<8);
-const bits = data[offset+4] | (data[offset+5]<<8) | (data[offset+6]<<16) | (data[offset+7]<<24);
-
-offset += 8;
-
-const r0=((c0>>11)&31)*255/31;
-const g0=((c0>>5)&63)*255/63;
-const b0=(c0&31)*255/31;
-
-const r1=((c1>>11)&31)*255/31;
-const g1=((c1>>5)&63)*255/63;
-const b1=(c1&31)*255/31;
-
-const colors=[
-[r0,g0,b0,255],
-[r1,g1,b1,255],
-[(2*r0+r1)/3,(2*g0+g1)/3,(2*b0+b1)/3,255],
-[(r0+2*r1)/3,(g0+2*g1)/3,(b0+2*b1)/3,255]
-];
-
-for(let py=0; py<4; py++){
-for(let px=0; px<4; px++){
-
-const idx=(bits>>(2*((3-py)*4+px)))&3;
-const color=colors[idx];
-
-const x=bx*4+px;
-const y=by*4+py;
-
-const i=(y*width+x)*4;
-
-out[i]=color[0];
-out[i+1]=color[1];
-out[i+2]=color[2];
-out[i+3]=255;
-
-}
-}
-
-}
-}
-
-return out;
-}
-
-async function loadCrest(id, element){
-if(!element) return;
-
-const res = await fetch(`/api/crest.php?id=${id}`);
-const buffer = await res.arrayBuffer();
-
-const data = new Uint8Array(buffer);
-
-const width=16;
-const height=12;
-
-const pixels = decodeDXT1(data,width,height);
-
-const canvas=document.createElement("canvas");
-canvas.width=width;
-canvas.height=height;
-
-const ctx=canvas.getContext("2d");
-const img=ctx.createImageData(width,height);
-
-img.data.set(pixels);
-
-ctx.putImageData(img,0,0);
-
-canvas.style.width="40px";
-canvas.style.height="30px";
-canvas.style.imageRendering="pixelated";
-
-element.appendChild(canvas);
-}
 /* =========================
    WORLD STATS LOADER
 ========================= */
@@ -189,7 +104,7 @@ div.innerHTML = `
 <div class="rank">#${i+1}</div>
 
 <div class="clan-name">
-<span class="crest" id="crest-${c.crest_id}"></span>
+<img class="clan-crest" src="/api/crest.php?id=${c.crest_id}">
 ${c.clan_name}
 </div>
 
@@ -206,7 +121,6 @@ if(c.crest_id){
 
 const container = document.getElementById(`crest-${c.crest_id}`);
 
-loadCrest(c.crest_id, container);
 
 }
 
