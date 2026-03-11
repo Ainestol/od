@@ -33,7 +33,7 @@ file_put_contents($tmpDDS,$row['data']);
 
 /* převod DDS -> PNG */
 
-shell_exec("convert $tmpDDS $tmpPNG");
+shell_exec("convert $tmpDDS -flip $tmpPNG");
 
 /* cache */
 
