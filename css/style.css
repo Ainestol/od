@@ -1638,3 +1638,48 @@ height:24px;
 margin-right:6px;
 vertical-align:middle;
 }
+/* GOLD */
+.clan-rank-1 {
+  filter: drop-shadow(0 0 6px gold);
+  animation: pulseGold 2s infinite;
+}
+
+/* SILVER */
+.clan-rank-2 {
+  filter: drop-shadow(0 0 6px silver);
+  animation: pulseSilver 2s infinite;
+}
+
+/* BRONZE */
+.clan-rank-3 {
+  filter: drop-shadow(0 0 6px #cd7f32);
+  animation: pulseBronze 2s infinite;
+}
+
+
+/* GOLD animation */
+@keyframes pulseGold {
+  0% { filter: drop-shadow(0 0 3px gold); }
+  50% { filter: drop-shadow(0 0 10px gold); }
+  100% { filter: drop-shadow(0 0 3px gold); }
+}
+
+/* SILVER animation */
+@keyframes pulseSilver {
+  0% { filter: drop-shadow(0 0 3px silver); }
+  50% { filter: drop-shadow(0 0 10px silver); }
+  100% { filter: drop-shadow(0 0 3px silver); }
+}
+
+/* BRONZE animation */
+@keyframes pulseBronze {
+  0% { filter: drop-shadow(0 0 3px #cd7f32); }
+  50% { filter: drop-shadow(0 0 10px #cd7f32); }
+  100% { filter: drop-shadow(0 0 3px #cd7f32); }
+  }
+  .clan-rank-1,
+.clan-rank-2,
+.clan-rank-3{
+  width:48px;
+  height:36px;
+}

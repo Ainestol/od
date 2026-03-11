@@ -97,14 +97,34 @@ box.innerHTML="";
 list.forEach((c,i)=>{
 
 const div = document.createElement("div");
-
 div.className="clan-row";
 
+/* crest výběr */
+
+let crest;
+
+if(i === 0){
+crest = "/img/clan1.png";
+}
+else if(i === 1){
+crest = "/img/clan2.png";
+}
+else if(i === 2){
+crest = "/img/clan3.png";
+}
+else{
+crest = "/img/clan_default.png";
+}
+let rankClass = "";
+
+if(i === 0) rankClass = "clan-rank-1";
+else if(i === 1) rankClass = "clan-rank-2";
+else if(i === 2) rankClass = "clan-rank-3";
 div.innerHTML = `
 <div class="rank">#${i+1}</div>
 
 <div class="clan-name">
-<img class="clan-crest" src="/api/crest.php?id=${c.crest_id}">
+<img class="clan-crest ${rankClass}" src="${crest}">
 ${c.clan_name}
 </div>
 
@@ -116,13 +136,6 @@ Castle: ${c.castle}
 `;
 
 box.appendChild(div);
-
-if(c.crest_id){
-
-const container = document.getElementById(`crest-${c.crest_id}`);
-
-
-}
 
 });
 
