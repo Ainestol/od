@@ -111,7 +111,7 @@ LEFT JOIN characters leader
 ON leader.charId = cd.leader_id
 
 GROUP BY cd.clan_id, leader.char_name
-ORDER BY members DESC
+ORDER BY cd.clan_level DESC, cd.reputation_score DESC
 LIMIT 10
 ")->fetchAll(PDO::FETCH_ASSOC);
 
