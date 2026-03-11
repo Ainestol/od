@@ -45,8 +45,11 @@ file_put_contents($tmpDDS,$row['data']);
 
 /* převod DDS → PNG */
 
-$cmd = "nvdecompress $tmpDDS $cacheFile";
-shell_exec($cmd);
+$cmd = "/usr/bin/nvdecompress $tmpDDS $cacheFile";
+
+$output = shell_exec($cmd . " 2>&1");
+
+file_put_contents("/tmp/crest_debug.txt",$output);
 
 unlink($tmpDDS);
 
