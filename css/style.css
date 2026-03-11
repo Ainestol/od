@@ -1615,12 +1615,12 @@ border-color:#cd7f32;
 .clan-name{
 display:flex;
 align-items:center;
-gap:12px;
+gap:20px;
 }
 
 .clan-crest{
-width:48px;
-height:36px;
+width:160px;
+height:120px;
 image-rendering:pixelated;
 margin-right:6px;
 vertical-align:middle;
@@ -1677,9 +1677,3 @@ vertical-align:middle;
   50% { filter: drop-shadow(0 0 10px #cd7f32); }
   100% { filter: drop-shadow(0 0 3px #cd7f32); }
   }
-  .clan-rank-1,
-.clan-rank-2,
-.clan-rank-3{
-  width:48px;
-  height:36px;
-}
