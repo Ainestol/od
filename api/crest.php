@@ -58,7 +58,7 @@ for ($y = 0; $y < $height; $y++) {
      $blockX = intdiv($x,4);
 $blockY = intdiv($y,4);
 
-$blockIndex = ($blockY * 4 + $blockX) * 8;
+$blockIndex = ($blockY * ($width/4) + $blockX) * 8;
 
 $c0 = unpack("v", substr($data,$blockIndex,2))[1];
 $c1 = unpack("v", substr($data,$blockIndex+2,2))[1];
@@ -83,7 +83,7 @@ $lookup = unpack("V", substr($data,$blockIndex+4,4))[1];
 $px = $x % 4;
 $py = $y % 4;
 
-$shift = ($py*4 + $px) * 2;
+$shift = ($px*4 + $py) * 2;
 
 $index = ($lookup >> $shift) & 3;
 
