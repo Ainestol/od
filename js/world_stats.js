@@ -130,7 +130,8 @@ ${c.clan_name}
 
 <div class="clan-info">
 Leader: ${c.leader_name}<br>
-Level ${c.clan_level} • Members ${c.members}<br>
+Level ${c.clan_level} • Rep ${c.reputation_score}<br>
+Members ${c.members}<br>
 Castle: ${c.castle}
 </div>
 `;
