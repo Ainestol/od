@@ -1563,8 +1563,8 @@ text-align:right;
 /* CLAN LEADERBOARD GRID */
 
 #topClans{
-display:grid;
-grid-template-columns:repeat(auto-fit, minmax(320px,1fr));
+display:flex;
+flex-direction:column;
 gap:18px;
 margin-top:20px;
 max-width:900px;
@@ -1619,8 +1619,8 @@ gap:20px;
 }
 
 .clan-crest{
-width:120px;
-height:100px;
+width:95px;
+height:130px;
 image-rendering:pixelated;
 margin-right:6px;
 vertical-align:middle;
