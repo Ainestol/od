@@ -24,4 +24,5 @@ if(!$row){
 }
 
 header("Content-Type: application/octet-stream");
+header("Content-Disposition: inline");
 echo $row['data'];

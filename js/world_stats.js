@@ -31,7 +31,7 @@ const colors=[
 for(let py=0; py<4; py++){
 for(let px=0; px<4; px++){
 
-const idx=(bits>>(2*(py*4+px)))&3;
+const idx=(bits>>(2*((3-py)*4+px)))&3;
 const color=colors[idx];
 
 const x=bx*4+px;
