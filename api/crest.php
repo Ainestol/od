@@ -45,7 +45,7 @@ file_put_contents($tmpDDS,$row['data']);
 
 /* převod DDS → PNG */
 
-$cmd = "/usr/bin/nvdecompress $tmpDDS $cacheFile";
+$cmd = "/usr/bin/nvdecompress $tmpDDS > $cacheFile";
 
 $output = shell_exec($cmd . " 2>&1");
 
