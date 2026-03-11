@@ -12,7 +12,7 @@ if(!$id){
 $cacheDir = __DIR__."/../cache/crests/";
 $cacheFile = $cacheDir.$id.".png";
 
-/* pokud už crest existuje v cache */
+/* pokud crest už existuje v cache */
 
 if(file_exists($cacheFile)){
     header("Content-Type: image/png");
@@ -20,7 +20,7 @@ if(file_exists($cacheFile)){
     exit;
 }
 
-/* načti z databáze */
+/* načíst crest z databáze */
 
 $stmt = $pdoGame->prepare("
 SELECT data
@@ -37,29 +37,46 @@ if(!$row){
     exit;
 }
 
-/* uložit DDS */
+/* vytvořit dočasný DDS */
 
 $tmpDDS = "/tmp/crest_$id.dds";
 
-$ddsHeader = hex2bin(
-"444453207C00000007100A00000000000C00000010000000000000000000000000000000000000000000000020000000040000004458543100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+/* správný DDS header pro L2 crest (DXT1 16x12) */
+
+$header = pack(
+    "a4V7a4V5",
+    "DDS ",
+    124,
+    0x00021007,
+    12,
+    16,
+    0,
+    0,
+    0,
+    "DXT1",
+    0,
+    0,
+    0,
+    0,
+    0
 );
 
-file_put_contents($tmpDDS, $ddsHeader . $row['data']);
+/* zapsat DDS */
+
+file_put_contents($tmpDDS, $header . $row['data']);
 
 /* převod DDS → PNG */
 
 $cmd = "/usr/bin/nvdecompress $tmpDDS > $cacheFile";
+shell_exec($cmd);
 
-$output = shell_exec($cmd . " 2>&1");
-
-file_put_contents("/tmp/crest_debug.txt",$output);
+/* smazat tmp */
 
 unlink($tmpDDS);
 
 /* zobraz PNG */
 
-if(file_exists($cacheFile)){
+if(file_exists($cacheFile) && filesize($cacheFile) > 0){
     header("Content-Type: image/png");
     readfile($cacheFile);
 }else{
