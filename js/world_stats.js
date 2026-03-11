@@ -100,7 +100,7 @@ const div = document.createElement("div");
 
 div.className="clan-row";
 
-div.innerHTML=`
+div.innerHTML = `
 <div class="rank">#${i+1}</div>
 
 <div class="clan-name">

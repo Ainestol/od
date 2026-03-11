@@ -1619,12 +1619,11 @@ gap:12px;
 }
 
 .clan-crest{
-width:40px;
-height:30px;
-image-rendering: pixelated;
-border:1px solid rgba(255,215,0,0.5);
-padding:2px;
-background:#111;
+width:32px;
+height:24px;
+image-rendering:pixelated;
+margin-right:6px;
+vertical-align:middle;
 }
 .crest canvas{
 width:32px;

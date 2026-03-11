@@ -9,6 +9,19 @@ if(!$id){
     exit;
 }
 
+$cacheDir = __DIR__."/../cache/crests/";
+$cacheFile = $cacheDir.$id.".png";
+
+/* pokud už crest existuje v cache */
+
+if(file_exists($cacheFile)){
+    header("Content-Type: image/png");
+    readfile($cacheFile);
+    exit;
+}
+
+/* načti z databáze */
+
 $stmt = $pdoGame->prepare("
 SELECT data
 FROM crests
@@ -24,15 +37,24 @@ if(!$row){
     exit;
 }
 
-$tmp = "/tmp/crest_$id.dds";
-$tmp2 = "/tmp/crest_$id.png";
+/* uložit DDS */
 
-file_put_contents($tmp,$row['data']);
+$tmpDDS = "/tmp/crest_$id.dds";
 
-shell_exec("nvdecompress $tmp $tmp2");
+file_put_contents($tmpDDS,$row['data']);
 
-header("Content-Type: image/png");
-readfile($tmp2);
+/* převod DDS → PNG */
 
-unlink($tmp);
-unlink($tmp2);
+$cmd = "nvdecompress $tmpDDS $cacheFile";
+shell_exec($cmd);
+
+unlink($tmpDDS);
+
+/* zobraz PNG */
+
+if(file_exists($cacheFile)){
+    header("Content-Type: image/png");
+    readfile($cacheFile);
+}else{
+    http_response_code(500);
+}
