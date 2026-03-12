@@ -153,14 +153,17 @@ Level ${c.clan_level} • Rep ${c.reputation_score}<br>
 Members ${c.members}<br>
 Castle: ${c.castle}<br><br>
 
+<span class="raid">
 RB: ${c.raid_kills ?? 0}<br>
 Last: ${c.last_raid_name ?? "-"}<br>
-Time: ${formatDateTime(c.last_raid_kill)}<br><br>
+Time: ${formatDateTime(c.last_raid_kill)}
+</span><br><br>
 
+<span class="epic">
 Epic: ${c.epic_kills ?? 0}<br>
 Last: ${c.last_epic_name ?? "-"}<br>
 Time: ${formatDateTime(c.last_epic_kill)}
-
+</span>
 </div>
 </div>
 `;

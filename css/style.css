@@ -1710,10 +1710,27 @@ color:#d4af37;
 
 .clan-body{
 display:flex;
-gap:20px;
 align-items:flex-start;
+gap:40px;
 }
 
 .clan-info{
-line-height:1.5;
+line-height:1.4;
+margin-top:0px;
+}
+.clan-info br{
+line-height:1.1;
+}
+/* RAID BOSS */
+
+.clan-info .raid{
+color:#4aa3ff;
+font-size:14px;
+}
+
+/* EPIC BOSS */
+
+.clan-info .epic{
+color:#c77dff;
+font-size:14px;
 }
