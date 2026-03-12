@@ -8,31 +8,25 @@ try {
 
 $sql = "
 SELECT
-r.boss_id,
-n.name,
-n.level,
-r.respawn_time
-
-FROM raidboss_spawnlist r
-
-LEFT JOIN npc n
-ON n.id = r.boss_id
-
-ORDER BY n.level ASC, n.name ASC
+boss_id,
+respawn_time,
+respawn_random
+FROM raidboss_spawnlist
+ORDER BY boss_id ASC
 ";
 
 $stmt = $pdoGame->query($sql);
 
 echo json_encode([
-"ok" => true,
-"data" => $stmt->fetchAll(PDO::FETCH_ASSOC)
+    "ok" => true,
+    "data" => $stmt->fetchAll(PDO::FETCH_ASSOC)
 ]);
 
 } catch(Exception $e){
 
 echo json_encode([
-"ok" => false,
-"error" => $e->getMessage()
+    "ok" => false,
+    "error" => $e->getMessage()
 ]);
 
 }
