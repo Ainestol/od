@@ -294,7 +294,7 @@ const div = document.createElement("div");
 div.className = "raid-row";
 
 div.innerHTML = `
-<span class="raid-name">${b.name}</span>
+<span class="raid-name">Boss ${b.boss_id}</span>
 <span class="raid-level">${b.level}</span>
 <span class="raid-status">${status}</span>
 <span class="raid-time">${time}</span>
