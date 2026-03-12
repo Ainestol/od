@@ -214,6 +214,7 @@ document.getElementById("subtab-" + tab).classList.add("active");
 });
 
 /* =========================
+   /* =========================
    RAID BOSS LOADER
 ========================= */
 
@@ -222,18 +223,20 @@ async function loadRaidBoss(){
 const res = await fetch('/api/raidboss_status.php');
 const json = await res.json();
 
-if(!json.ok) return;
+if(!json.ok || !json.data) return;
 
 const box = document.getElementById("raidBossList");
 
 box.innerHTML = "";
+
+const now = Math.floor(Date.now()/1000);
 
 json.data.forEach(b=>{
 
 let status = "Alive";
 let time = "-";
 
-if(b.respawn_time > Math.floor(Date.now()/1000)){
+if(b.respawn_time > now){
 
 status = "Dead";
 
@@ -248,8 +251,8 @@ const div = document.createElement("div");
 div.className = "raid-row";
 
 div.innerHTML = `
-<span class="raid-name">Boss ${b.boss_id}</span>
-<span class="raid-level">${b.level}</span>
+<span class="raid-name">${b.name ?? "Unknown Boss"}</span>
+<span class="raid-level">Lv ${b.level ?? "?"}</span>
 <span class="raid-status">${status}</span>
 <span class="raid-time">${time}</span>
 `;
@@ -259,7 +262,6 @@ box.appendChild(div);
 });
 
 }
-
 /* =========================
    GRAND BOSS LOADER
 ========================= */
@@ -268,7 +270,7 @@ async function loadGrandBoss(){
 const res = await fetch('/api/grandboss_status.php');
 const json = await res.json();
 
-if(!json.ok) return;
+if(!json.ok || !json.data) return;
 
 const box = document.getElementById("grandBossList");
 
@@ -294,8 +296,8 @@ const div = document.createElement("div");
 div.className = "raid-row";
 
 div.innerHTML = `
-<span class="raid-name">Boss ${b.boss_id}</span>
-<span class="raid-level">${b.level}</span>
+<span class="raid-name">${b.name ?? "Unknown Boss"}</span>
+<span class="raid-level">Lv ${b.level ?? "?"}</span>
 <span class="raid-status">${status}</span>
 <span class="raid-time">${time}</span>
 `;

@@ -1761,3 +1761,14 @@ display:none;
 .subtab-content.active{
 display:block;
 }
+.raid-status{
+font-weight:bold;
+}
+
+.raid-status:contains("Alive"){
+color:#2ecc71;
+}
+
+.raid-status:contains("Dead"){
+color:#e74c3c;
+}
