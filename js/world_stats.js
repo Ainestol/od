@@ -136,42 +136,32 @@ if(i === 0) rankClass = "clan-rank-1";
 else if(i === 1) rankClass = "clan-rank-2";
 else if(i === 2) rankClass = "clan-rank-3";
 div.innerHTML = `
-<div class="rank">#${i+1}</div>
 
-<div class="clan-name">
-<img class="clan-crest ${rankClass}" src="${crest}">
-${c.clan_name}
+<div class="clan-header">
+<span class="rank">#${i+1}</span>
+<span class="clan-title">${c.clan_name}</span>
 </div>
 
+<div class="clan-body">
+
+<img class="clan-crest ${rankClass}" src="${crest}">
+
 <div class="clan-info">
+
 Leader: ${c.leader_name}<br>
 Level ${c.clan_level} • Rep ${c.reputation_score}<br>
 Members ${c.members}<br>
-Castle: ${c.castle}<br>
+Castle: ${c.castle}<br><br>
 
-<span class="raid-stat">
-RB: ${c.raid_kills ?? 0}
-</span><br>
+RB: ${c.raid_kills ?? 0}<br>
+Last: ${c.last_raid_name ?? "-"}<br>
+Time: ${formatDateTime(c.last_raid_kill)}<br><br>
 
-<span class="raid-last">
-Last: ${c.last_boss_name ?? "-"}
-</span><br>
-
-<span class="raid-time">
-Time: ${formatDateTime(c.last_raid_kill)}
-</span><br><br>
-
-<span class="epic-stat">
-Epic: ${c.epic_kills ?? 0}
-</span><br>
-
-<span class="epic-last">
-Last: ${c.last_epic_kill ? c.last_boss_name : "-"}
-</span><br>
-
-<span class="epic-time">
+Epic: ${c.epic_kills ?? 0}<br>
+Last: ${c.last_epic_name ?? "-"}<br>
 Time: ${formatDateTime(c.last_epic_kill)}
-</span>
+
+</div>
 </div>
 `;
 
