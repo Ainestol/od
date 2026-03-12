@@ -253,7 +253,7 @@ div.className = "raid-row";
 div.innerHTML = `
 <span class="raid-name">${b.name ?? "Unknown Boss"}</span>
 <span class="raid-level">Lv ${b.level ?? "?"}</span>
-<span class="raid-status">${status}</span>
+<span class="raid-status ${status.toLowerCase()}">${status}</span>
 <span class="raid-time">${time}</span>
 `;
 
@@ -298,7 +298,7 @@ div.className = "raid-row";
 div.innerHTML = `
 <span class="raid-name">${b.name ?? "Unknown Boss"}</span>
 <span class="raid-level">Lv ${b.level ?? "?"}</span>
-<span class="raid-status">${status}</span>
+<span class="raid-status ${status.toLowerCase()}">${status}</span>
 <span class="raid-time">${time}</span>
 `;
 

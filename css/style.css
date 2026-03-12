@@ -1772,3 +1772,47 @@ color:#2ecc71;
 .raid-status:contains("Dead"){
 color:#e74c3c;
 }
+/* RAIDBOSS PANEL */
+
+.raid-row{
+display:grid;
+grid-template-columns: 1fr 80px 90px 80px;
+align-items:center;
+padding:6px 10px;
+border-bottom:1px solid rgba(255,215,0,0.15);
+font-family: "Cinzel", serif;
+font-size:15px;
+}
+
+.raid-name{
+color:#d4af37;
+}
+
+.raid-level{
+color:#aaa;
+text-align:center;
+}
+
+.raid-time{
+color:#888;
+text-align:right;
+}
+
+/* STATUS */
+
+.raid-status{
+font-weight:bold;
+text-align:center;
+}
+
+.raid-status.alive{
+color:#2ecc71;
+}
+
+.raid-status.dead{
+color:#e74c3c;
+}
+#grandBossList .raid-name{
+color:#ffcc66;
+font-weight:bold;
+}
