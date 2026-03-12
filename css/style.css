@@ -1690,3 +1690,8 @@ color:#d6a3ff;
 font-size:13px;
 opacity:0.9;
 }
+.raid-time,
+.epic-time{
+font-size:12px;
+opacity:0.75;
+}

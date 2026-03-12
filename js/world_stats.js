@@ -80,7 +80,22 @@ box.appendChild(div);
 });
 
 }
+function formatDateTime(sqlTime){
 
+if(!sqlTime) return "-";
+
+const d = new Date(sqlTime);
+
+const hours = String(d.getHours()).padStart(2,"0");
+const minutes = String(d.getMinutes()).padStart(2,"0");
+
+const day = d.getDate();
+const month = d.getMonth()+1;
+const year = d.getFullYear();
+
+return `${hours}:${minutes} ${day}.${month}.${year}`;
+
+}
 
 /* =========================
    CLAN LIST RENDER
@@ -136,12 +151,26 @@ Castle: ${c.castle}<br>
 
 <span class="raid-stat">
 RB: ${c.raid_kills ?? 0}
-${c.last_boss_name ? "• last: " + c.last_boss_name : ""}
 </span><br>
+
+<span class="raid-last">
+Last: ${c.last_boss_name ?? "-"}
+</span><br>
+
+<span class="raid-time">
+Time: ${formatDateTime(c.last_raid_kill)}
+</span><br><br>
 
 <span class="epic-stat">
 Epic: ${c.epic_kills ?? 0}
-${c.last_epic_kill ? "• last: " + new Date(c.last_epic_kill).toLocaleDateString() : ""}
+</span><br>
+
+<span class="epic-last">
+Last: ${c.last_epic_kill ? c.last_boss_name : "-"}
+</span><br>
+
+<span class="epic-time">
+Time: ${formatDateTime(c.last_epic_kill)}
 </span>
 </div>
 `;
