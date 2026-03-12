@@ -276,18 +276,47 @@ const box = document.getElementById("grandBossList");
 
 box.innerHTML = "";
 
+const now = Math.floor(Date.now()/1000);
+
 json.data.forEach(b=>{
 
-let status = "Alive";
-let time = "-";
+let status = "ALIVE";
+let statusClass = "alive";
+let info = "";
+
+let windowStart = b.respawn_time + b.respawn;
+let windowEnd = windowStart + b.respawn_random;
 
 if(b.respawn_time > 0){
 
-status = "Dead";
+    if(now < windowStart){
 
-const d = new Date(b.respawn_time * 1000);
+        status = "DEAD";
+        statusClass = "dead";
 
-time = d.toLocaleTimeString("cs-CZ",{hour:"2-digit",minute:"2-digit"});
+        let diff = windowStart - now;
+
+        let h = Math.floor(diff/3600);
+        let m = Math.floor((diff%3600)/60);
+        let s = diff%60;
+
+        info = `Spawn window in ${h}h ${m}m ${s}s`;
+
+    }
+    else if(now >= windowStart && now <= windowEnd){
+
+        status = "RESPAWN WINDOW";
+        statusClass = "window";
+
+        let start = new Date(windowStart*1000)
+        .toLocaleTimeString("cs-CZ",{hour:'2-digit',minute:'2-digit'});
+
+        let end = new Date(windowEnd*1000)
+        .toLocaleTimeString("cs-CZ",{hour:'2-digit',minute:'2-digit'});
+
+        info = `Spawn window: ${start} – ${end}`;
+
+    }
 
 }
 
@@ -298,8 +327,8 @@ div.className = "raid-row";
 div.innerHTML = `
 <span class="raid-name">${b.name ?? "Unknown Boss"}</span>
 <span class="raid-level">Lv ${b.level ?? "?"}</span>
-<span class="raid-status ${status.toLowerCase()}">${status}</span>
-<span class="raid-time">${time}</span>
+<span class="raid-status ${statusClass}">${status}</span>
+<div class="raid-extra">${info}</div>
 `;
 
 box.appendChild(div);
