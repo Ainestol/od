@@ -1619,8 +1619,8 @@ gap:20px;
 }
 
 .clan-crest{
-width:115px;
-height:130px;
+width:180px;
+height:220px;
 image-rendering:pixelated;
 margin-right:6px;
 vertical-align:middle;
@@ -1715,8 +1715,8 @@ gap:40px;
 }
 
 .clan-info{
-line-height:1.4;
-margin-top:0px;
+line-height:1.1;
+margin-top:-6px;
 }
 .clan-info br{
 line-height:1.1;
