@@ -106,7 +106,8 @@ COALESCE(crs.raid_kills,0) AS raid_kills,
 COALESCE(crs.epic_kills,0) AS epic_kills,
 crs.last_raid_kill,
 crs.last_epic_kill,
-crs.last_boss_name
+crs.last_raid_name,
+crs.last_epic_name
 
 FROM clan_data cd
 
