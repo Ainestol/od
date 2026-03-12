@@ -1,9 +1,15 @@
 <?php
 
+$env = parse_ini_file('/var/www/.env');
+
 $pdo = new PDO(
-    "mysql:host=localhost;dbname=l2game;charset=utf8mb4",
-    "l2_reader",
-    trim(file_get_contents('/var/www/.env')) // pokud máš jinak, dej heslo
+    'mysql:host=localhost;dbname=l2game;charset=utf8mb4',
+    'l2_reader',
+    $env['L2_READER_PASS'],
+    [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    ]
 );
 
 $dir = "/opt/l2/ClassicLude/game/data/stats/npcs/";
