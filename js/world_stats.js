@@ -259,12 +259,59 @@ box.appendChild(div);
 });
 
 }
+
+/* =========================
+   GRAND BOSS LOADER
+========================= */
+async function loadGrandBoss(){
+
+const res = await fetch('/api/grandboss_status.php');
+const json = await res.json();
+
+if(!json.ok) return;
+
+const box = document.getElementById("grandBossList");
+
+box.innerHTML = "";
+
+json.data.forEach(b=>{
+
+let status = "Alive";
+let time = "-";
+
+if(b.respawn_time > Math.floor(Date.now()/1000)){
+
+status = "Dead";
+
+const d = new Date(b.respawn_time * 1000);
+
+time = d.toLocaleTimeString("cs-CZ",{hour:"2-digit",minute:"2-digit"});
+
+}
+
+const div = document.createElement("div");
+
+div.className = "raid-row";
+
+div.innerHTML = `
+<span class="raid-name">${b.name}</span>
+<span class="raid-level">${b.level}</span>
+<span class="raid-status">${status}</span>
+<span class="raid-time">${time}</span>
+`;
+
+box.appendChild(div);
+
+});
+
+}
 /* =========================
    INITIAL LOAD
 ========================= */
 
 loadWorldStats();
 loadRaidBoss();
+loadGrandBoss();
 
 /* =========================
    AUTO REFRESH
@@ -272,3 +319,4 @@ loadRaidBoss();
 
 setInterval(loadWorldStats,60000);
 setInterval(loadRaidBoss,60000);
+setInterval(loadGrandBoss,60000);
