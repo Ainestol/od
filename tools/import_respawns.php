@@ -2,7 +2,14 @@
 
 require_once __DIR__.'/../config/db_game.php';
 
-$xml = simplexml_load_file('/opt/l2/ClassicLude/game/data/spawns/Rbspawn.xml');
+$path = '/opt/l2/ClassicLude/game/data/spawns/RBspawn.xml';
+
+if(!file_exists($path)){
+    die("XML NOT FOUND: ".$path."\n");
+}
+
+$xml = simplexml_load_file($path);
+
 foreach ($xml->spawn as $spawn)
 {
     $npc = $spawn->npc;
