@@ -1,35 +1,32 @@
 <?php
 
-require_once __DIR__ . '/../config/db_game.php';
+require_once __DIR__.'/db_game.php';
 
-header('Content-Type: application/json; charset=utf-8');
-
-try {
+try{
 
 $sql = "
 SELECT
 g.boss_id,
-n.name,
-n.level,
-g.respawn_time,
-g.status
+b.name,
+b.level,
+g.respawn_time
 FROM grandboss_data g
-LEFT JOIN npc n ON n.id = g.boss_id
-ORDER BY n.level ASC
+LEFT JOIN boss_list b ON b.boss_id = g.boss_id
+ORDER BY b.level ASC
 ";
 
 $stmt = $pdoGame->query($sql);
 
 echo json_encode([
-    "ok" => true,
-    "data" => $stmt->fetchAll(PDO::FETCH_ASSOC)
+    "ok"=>true,
+    "data"=>$stmt->fetchAll()
 ]);
 
-} catch(Exception $e){
+}catch(Exception $e){
 
 echo json_encode([
-    "ok" => false,
-    "error" => $e->getMessage()
+    "ok"=>false,
+    "error"=>$e->getMessage()
 ]);
 
 }
