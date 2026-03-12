@@ -9,11 +9,11 @@ SELECT
 g.boss_id,
 b.name,
 b.level,
-g.respawn_time
+MAX(g.respawn_time) as respawn_time
 FROM grandboss_data g
 LEFT JOIN boss_list b ON b.boss_id = g.boss_id
+GROUP BY b.name
 ORDER BY b.level ASC
-";
 
 $stmt = $pdoGame->query($sql);
 

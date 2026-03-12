@@ -281,7 +281,7 @@ json.data.forEach(b=>{
 let status = "Alive";
 let time = "-";
 
-if(b.respawn_time > Math.floor(Date.now()/1000)){
+if(b.respawn_time > 0){
 
 status = "Dead";
 
