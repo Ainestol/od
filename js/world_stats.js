@@ -284,10 +284,12 @@ let status = "ALIVE";
 let statusClass = "alive";
 let info = "";
 
-let windowStart = b.respawn_time + b.respawn;
+let respawnTime = Math.floor(b.respawn_time / 1000);
+
+let windowStart = respawnTime + b.respawn;
 let windowEnd = windowStart + b.respawn_random;
 
-if(b.respawn_time > 0){
+if(respawnTime > 0){
 
     if(now < windowStart){
 
