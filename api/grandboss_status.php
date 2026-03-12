@@ -14,27 +14,17 @@ b.level,
 MAX(g.respawn_time) AS respawn_time
 FROM grandboss_data g
 LEFT JOIN boss_list b ON b.boss_id = g.boss_id
-WHERE g.boss_id IN (
-29001, -- Queen Ant
-29006, -- Core
-29014, -- Orfen
-29022, -- Zaken
-29020, -- Baium
-29019, -- Antharas
-29028, -- Valakas
-29045  -- Frintezza
-)
+WHERE b.type='grand'
+AND g.boss_id != 25512
 GROUP BY g.boss_id
 ORDER BY b.level ASC
 ";
 
 $stmt = $pdoGame->query($sql);
 
-$data = $stmt->fetchAll();
-
 echo json_encode([
     "ok" => true,
-    "data" => $data
+    "data" => $stmt->fetchAll()
 ]);
 
 }catch(Exception $e){
