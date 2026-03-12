@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__.'/../db_game.php';
+require_once __DIR__.'/../config/db_game.php';
 
 try{
 
