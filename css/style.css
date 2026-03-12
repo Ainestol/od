@@ -1677,3 +1677,16 @@ vertical-align:middle;
   50% { filter: drop-shadow(0 0 10px #cd7f32); }
   100% { filter: drop-shadow(0 0 3px #cd7f32); }
   }
+/* RAID STATS */
+
+.raid-stat{
+color:#9be2ff;
+font-size:13px;
+opacity:0.9;
+}
+
+.epic-stat{
+color:#d6a3ff;
+font-size:13px;
+opacity:0.9;
+}

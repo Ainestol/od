@@ -132,7 +132,17 @@ ${c.clan_name}
 Leader: ${c.leader_name}<br>
 Level ${c.clan_level} • Rep ${c.reputation_score}<br>
 Members ${c.members}<br>
-Castle: ${c.castle}
+Castle: ${c.castle}<br>
+
+<span class="raid-stat">
+RB: ${c.raid_kills ?? 0}
+${c.last_boss_name ? "• last: " + c.last_boss_name : ""}
+</span><br>
+
+<span class="epic-stat">
+Epic: ${c.epic_kills ?? 0}
+${c.last_epic_kill ? "• last: " + new Date(c.last_epic_kill).toLocaleDateString() : ""}
+</span>
 </div>
 `;
 
