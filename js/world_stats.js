@@ -196,7 +196,22 @@ document.getElementById("tab-" + tab).classList.add("active");
 
 });
 
+document.querySelectorAll(".subtab-btn").forEach(btn => {
 
+btn.addEventListener("click", () => {
+
+document.querySelectorAll(".subtab-btn").forEach(b => b.classList.remove("active"));
+document.querySelectorAll(".subtab-content").forEach(c => c.classList.remove("active"));
+
+btn.classList.add("active");
+
+const tab = btn.dataset.subtab;
+
+document.getElementById("subtab-" + tab).classList.add("active");
+
+});
+
+});
 /* =========================
    INITIAL LOAD
 ========================= */
@@ -210,4 +225,4 @@ loadWorldStats();
 
 /* každou minutu */
 
-setInterval(loadWorldStats,15000);
+setInterval(loadWorldStats,60000);

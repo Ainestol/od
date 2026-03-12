@@ -1735,3 +1735,29 @@ font-size:14px;
 color:#c77dff;
 font-size:14px;
 }
+.sub-tabs{
+display:flex;
+gap:10px;
+margin-bottom:20px;
+}
+
+.subtab-btn{
+background:#111;
+border:1px solid #444;
+color:#ccc;
+padding:8px 16px;
+cursor:pointer;
+}
+
+.subtab-btn.active{
+background:#c9a54d;
+color:black;
+}
+
+.subtab-content{
+display:none;
+}
+
+.subtab-content.active{
+display:block;
+}
