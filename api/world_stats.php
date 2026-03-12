@@ -100,7 +100,13 @@ cd.reputation_score,
 cd.hasCastle,
 cd.crest_id,
 leader.char_name AS leader_name,
-COUNT(c.charId) AS members
+COUNT(c.charId) AS members,
+
+COALESCE(crs.raid_kills,0) AS raid_kills,
+COALESCE(crs.epic_kills,0) AS epic_kills,
+crs.last_raid_kill,
+crs.last_epic_kill,
+crs.last_boss_name
 
 FROM clan_data cd
 
@@ -109,6 +115,9 @@ ON c.clanid = cd.clan_id
 
 LEFT JOIN characters leader
 ON leader.charId = cd.leader_id
+
+LEFT JOIN clan_raid_stats crs
+ON crs.clan_id = cd.clan_id
 
 GROUP BY cd.clan_id, leader.char_name
 ORDER BY cd.clan_level DESC, cd.reputation_score DESC, members DESC
