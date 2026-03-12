@@ -30,7 +30,25 @@ foreach ($files as $file){
         if(!$stmt->fetch()) continue;
 
         $name = (string)$npc['name'];
-        $level = (int)$npc->level;
+
+        /* ------------------------
+           ZÍSKÁNÍ LEVELU
+        ------------------------ */
+
+        $level = 0;
+
+        if(isset($npc->set)){
+            foreach ($npc->set as $set){
+                if((string)$set['name'] === 'level'){
+                    $level = (int)$set['val'];
+                    break;
+                }
+            }
+        }
+
+        /* ------------------------
+           UPDATE TABULKY
+        ------------------------ */
 
         $update = $pdo->prepare("
             UPDATE boss_list
