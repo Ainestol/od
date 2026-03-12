@@ -1587,8 +1587,9 @@ background:rgba(0,0,0,0.55);
 
 .clan-row .rank{
 color:#ffd700;
-font-size:14px;
-margin-bottom:6px;
+font-size:22px;
+font-family:'Cinzel',serif;
+font-weight:bold;
 }
 
 .clan-row .clan-name{
@@ -1698,7 +1699,7 @@ opacity:0.75;
 .clan-header{
 display:flex;
 align-items:center;
-gap:10px;
+gap:14px;
 margin-bottom:10px;
 }
 
