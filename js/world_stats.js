@@ -264,16 +264,23 @@ if(windowEnd > 0){
         status = "RESPAWN WINDOW";
         statusClass = "window";
 
-       let startDate = new Date(windowStart*1000);
-       let endDate = new Date(windowEnd*1000);
+        let startDate = new Date(windowStart*1000);
+        let endDate = new Date(windowEnd*1000);
 
-       let start =
-       `${startDate.getDate()}.${startDate.getMonth()+1} ${startDate.getHours().toString().padStart(2,"0")}:${startDate.getMinutes().toString().padStart(2,"0")}`;
+        let start =
+        `${startDate.getDate()}.${(startDate.getMonth()+1).toString().padStart(2,"0")} ${startDate.getHours().toString().padStart(2,"0")}:${startDate.getMinutes().toString().padStart(2,"0")}`;
 
-       let end =
-       `${endDate.getDate()}.${endDate.getMonth()+1} ${endDate.getHours().toString().padStart(2,"0")}:${endDate.getMinutes().toString().padStart(2,"0")}`;
+        let end =
+        `${endDate.getDate()}.${(endDate.getMonth()+1).toString().padStart(2,"0")} ${endDate.getHours().toString().padStart(2,"0")}:${endDate.getMinutes().toString().padStart(2,"0")}`;
 
-       info = `Spawn window: ${start} – ${end}`;
+        info = `Spawn window: ${start} – ${end}`;
+
+    }
+    else if(now > windowEnd){
+
+        status = "ALIVE";
+        statusClass = "alive";
+        info = "Boss is alive";
 
     }
 
