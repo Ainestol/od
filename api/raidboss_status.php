@@ -72,6 +72,7 @@ LEFT JOIN boss_list b ON b.boss_id = r.id
 LEFT JOIN raidboss_spawnlist s ON s.boss_id = r.id
 WHERE b.type='raid'
 ORDER BY b.level ASC;
+";
 
 $stmt = $pdoGame->query($sql);
 
