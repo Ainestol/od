@@ -29,6 +29,8 @@ foreach($data as &$b){
     $kill = intval($b['kill_time']);
     $delay = intval($b['respawn_delay']);
     $random = intval($b['respawn_random']);
+    
+    $b['respawn_delay'] = $delay;
 
     if($kill > 0){
 

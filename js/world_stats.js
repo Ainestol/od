@@ -238,15 +238,17 @@ let status = "ALIVE";
 let statusClass = "alive";
 let info = "";
 
-let respawnTime = parseInt(b.respawn_time) || 0;
+let killTime = parseInt(b.respawn_time) || 0;
+let delay = parseInt(b.respawn_delay) || 0;
 let random = parseInt(b.respawn_random) || 0;
 
-let windowStart = respawnTime;
-let windowEnd = respawnTime + random;
+let spawnTime = killTime + delay;
+let windowStart = spawnTime;
+let windowEnd = spawnTime + random;
 
-if(respawnTime > 0){
+if(killTime > 0){
 
-    if(now < windowStart){
+    if(now < spawnTime){
 
         status = "DEAD";
         statusClass = "dead";
@@ -262,8 +264,8 @@ if(respawnTime > 0){
     }
     else if(now >= windowStart && now <= windowEnd){
 
-        status = "RESPAWN WINDOW";
-        statusClass = "window";
+    status = "RESPAWN WINDOW";
+    statusClass = "window";
 
         let start = new Date(windowStart*1000)
         .toLocaleTimeString("cs-CZ",{hour:'2-digit',minute:'2-digit'});
@@ -284,7 +286,7 @@ div.className = "raid-row";
 div.innerHTML = `
 <span class="raid-name">${b.name ?? "Unknown Boss"}</span>
 <span class="raid-level">Lv ${b.level ?? "?"}</span>
-<span class="raid-status ${status.toLowerCase()}">${status}</span>
+<span class="raid-status ${statusClass}">${status}</span>
 <div class="raid-extra" data-window="${windowStart}">${info}</div>
 `;
 
