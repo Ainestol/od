@@ -239,24 +239,18 @@ let info = "";
 
 let windowEnd = parseInt(b.respawn_time) || 0;
 let random = parseInt(b.respawn_random) || 0;
+let killTime = parseInt(b.kill_time) || 0;
 
-let windowStart = windowEnd - random;
-let spawnTime = windowStart;
+/* status boss */
 
 if(windowEnd > 0){
 
-    if(now < spawnTime){
+    let windowStart = windowEnd - random;
+
+    if(now < windowStart){
 
         status = "DEAD";
         statusClass = "dead";
-
-        let diff = spawnTime - now;
-
-        let h = Math.floor(diff/3600);
-        let m = Math.floor((diff%3600)/60);
-        let s = diff%60;
-
-        info = `Spawn window in ${h}h ${m}m ${s}s`;
 
     }
     else if(now >= windowStart && now <= windowEnd){
@@ -264,25 +258,31 @@ if(windowEnd > 0){
         status = "RESPAWN WINDOW";
         statusClass = "window";
 
-        let startDate = new Date(windowStart*1000);
-        let endDate = new Date(windowEnd*1000);
-
-        let start =
-        `${startDate.getDate()}.${(startDate.getMonth()+1).toString().padStart(2,"0")} ${startDate.getHours().toString().padStart(2,"0")}:${startDate.getMinutes().toString().padStart(2,"0")}`;
-
-        let end =
-        `${endDate.getDate()}.${(endDate.getMonth()+1).toString().padStart(2,"0")} ${endDate.getHours().toString().padStart(2,"0")}:${endDate.getMinutes().toString().padStart(2,"0")}`;
-
-        info = `Spawn window: ${start} – ${end}`;
-
     }
-    else if(now > windowEnd){
+    else{
 
         status = "ALIVE";
         statusClass = "alive";
-        info = "Boss is alive";
 
     }
+
+}
+
+/* kill time info */
+
+if(killTime > 0){
+
+let killDate = new Date(killTime*1000);
+
+let kill =
+`${killDate.getDate()}.${(killDate.getMonth()+1).toString().padStart(2,"0")} ${killDate.getHours().toString().padStart(2,"0")}:${killDate.getMinutes().toString().padStart(2,"0")}`;
+
+info = `Last kill: ${kill}`;
+
+}
+else{
+
+info = "No kill data";
 
 }
 
@@ -293,7 +293,7 @@ div.innerHTML = `
 <span class="raid-name">${b.name ?? "Unknown Boss"}</span>
 <span class="raid-level">Lv ${b.level ?? "?"}</span>
 <span class="raid-status ${statusClass}">${status}</span>
-<div class="raid-extra" data-window="${spawnTime}">${info}</div>
+<div class="raid-extra">${info}</div>
 `;
 
 box.appendChild(div);

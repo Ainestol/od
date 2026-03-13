@@ -11,7 +11,7 @@ SELECT
 r.id AS boss_id,
 b.name,
 b.level,
-FLOOR(r.respawnTime/1000) AS kill_time,
+FLOOR(r.respawnTime/1000) AS respawn_time,
 s.respawn_delay,
 s.respawn_random
 FROM npc_respawns r
@@ -26,22 +26,22 @@ $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 foreach($data as &$b){
 
-    $respawnTime = intval($b['kill_time']);
-    $random = intval($b['respawn_random']);
+    $respawn = intval($b['respawn_time']);
+    $delay   = intval($b['respawn_delay']);
+    $random  = intval($b['respawn_random']);
 
-    if($respawnTime > 0){
+    if($respawn > 0){
 
-        $b['respawn_time'] = $respawnTime;
-        $b['respawn_random'] = $random;
+        // odhad kill time
+        $kill = $respawn - $delay - $random;
+
+        $b['kill_time'] = $kill;
 
     }else{
 
-        $b['respawn_time'] = 0;
-        $b['respawn_random'] = 0;
+        $b['kill_time'] = 0;
 
     }
-
-    unset($b['kill_time']);
 
 }
 
