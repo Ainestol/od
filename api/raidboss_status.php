@@ -18,7 +18,7 @@ END AS respawn_time,
 s.respawn_random
 FROM npc_respawns r
 LEFT JOIN boss_list b ON b.boss_id = r.id
-LEFT JOIN boss_respawn s ON s.boss_id = r.id
+LEFT JOIN raidboss_spawnlist s ON s.boss_id = r.id
 WHERE b.type = 'raid'
 ORDER BY b.level ASC
 ";
