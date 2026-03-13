@@ -22,23 +22,20 @@ ORDER BY b.level ASC
 ";
 
 $stmt = $pdoGame->query($sql);
-
 $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 foreach($data as &$b){
 
     $kill = intval($b['kill_time']);
-
-    if($kill > time()){
-        $kill = 0;
-    }
+    $delay = intval($b['respawn_delay']);
+    $random = intval($b['respawn_random']);
 
     if($kill > 0){
 
-        $windowStart = $kill + intval($b['respawn_delay']);
+        $windowStart = $kill + $delay;
 
         $b['respawn_time']   = $windowStart;
-        $b['respawn_random'] = intval($b['respawn_random']);
+        $b['respawn_random'] = $random;
 
     }else{
 
