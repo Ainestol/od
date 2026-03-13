@@ -234,24 +234,46 @@ json.data.forEach(b=>{
 
 let respawn = parseInt(b.respawn_time) || 0;
 
-let status = "Alive";
-let time = "Respawn";
+let status = "ALIVE";
+let statusClass = "alive";
+let info = "";
 
-if(respawn > 0){
+let respawnTime = parseInt(b.respawn_time) || 0;
+let random = parseInt(b.respawn_random) || 0;
 
-status = "Dead";
+let windowStart = respawnTime;
+let windowEnd = respawnTime + random;
 
-let diff = respawn - now;
+if(respawnTime > 0){
 
-if(diff > 0){
+    if(now < windowStart){
 
-let h = Math.floor(diff / 3600);
-let m = Math.floor((diff % 3600) / 60);
-let s = diff % 60;
+        status = "DEAD";
+        statusClass = "dead";
 
-time = `${h}h ${m}m ${s}s`;
+        let diff = windowStart - now;
 
-}
+        let h = Math.floor(diff/3600);
+        let m = Math.floor((diff%3600)/60);
+        let s = diff%60;
+
+        info = `Spawn window in ${h}h ${m}m ${s}s`;
+
+    }
+    else if(now >= windowStart && now <= windowEnd){
+
+        status = "RESPAWN WINDOW";
+        statusClass = "window";
+
+        let start = new Date(windowStart*1000)
+        .toLocaleTimeString("cs-CZ",{hour:'2-digit',minute:'2-digit'});
+
+        let end = new Date(windowEnd*1000)
+        .toLocaleTimeString("cs-CZ",{hour:'2-digit',minute:'2-digit'});
+
+        info = `Spawn window: ${start} – ${end}`;
+
+    }
 
 }
 
@@ -263,7 +285,7 @@ div.innerHTML = `
 <span class="raid-name">${b.name ?? "Unknown Boss"}</span>
 <span class="raid-level">Lv ${b.level ?? "?"}</span>
 <span class="raid-status ${status.toLowerCase()}">${status}</span>
-<span class="raid-time" data-respawn="${b.respawn_time}">${time}</span>
+<div class="raid-extra" data-window="${windowStart}">${info}</div>
 `;
 
 box.appendChild(div);
