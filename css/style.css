@@ -1771,7 +1771,7 @@ display:block;
 
 .raid-row{
 display:grid;
-grid-template-columns:360px 80px 100px 120px;
+grid-template-columns:360px 80px 100px 1fr;
 align-items:center;
 padding:6px 10px;
 border-bottom:1px solid rgba(212,175,55,0.25);
@@ -1820,12 +1820,19 @@ font-weight:bold;
 text-align:right;
 font-size:13px;
 color:#bbb;
+white-space:nowrap;
 }
-
 #grandBossList .raid-name{
 color:#ffcc66;
 font-weight:bold;
 }
-#grandBossList .raid-extra{
-white-space:nowrap;
+.raid-status.window{
+color:#f39c12;
+animation: raidpulse 1.5s infinite;
+}
+
+@keyframes raidpulse{
+0%{opacity:1;}
+50%{opacity:0.4;}
+100%{opacity:1;}
 }

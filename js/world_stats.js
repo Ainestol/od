@@ -393,23 +393,19 @@ setInterval(()=>{
 
 const now = Math.floor(Date.now()/1000);
 
-document.querySelectorAll(".raid-time[data-respawn]").forEach(el=>{
+document.querySelectorAll("#raidBossList .raid-extra[data-window]").forEach(el=>{
 
-let respawn = parseInt(el.dataset.respawn) || 0;
+let start = parseInt(el.dataset.window) || 0;
 
-if(respawn > now){
+if(start > now){
 
-let diff = respawn - now;
+let diff = start - now;
 
 let h = Math.floor(diff/3600);
 let m = Math.floor((diff%3600)/60);
 let s = diff%60;
 
-el.textContent = `${h}h ${m}m ${s}s`;
-
-}else{
-
-el.textContent = "Respawn";
+el.textContent = `Spawn window in ${h}h ${m}m ${s}s`;
 
 }
 
