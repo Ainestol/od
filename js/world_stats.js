@@ -214,7 +214,6 @@ document.getElementById("subtab-" + tab).classList.add("active");
 });
 
 /* =========================
-   /* =========================
    RAID BOSS LOADER
 ========================= */
 
@@ -235,14 +234,19 @@ json.data.forEach(b=>{
 
 let status = "Alive";
 let time = "-";
+let respawn = parseInt(b.respawn_time) || 0;
 
-if(b.respawn_time > now){
+if(respawn > now){
 
 status = "Dead";
 
-const d = new Date(b.respawn_time * 1000);
+let diff = respawn - now;
 
-time = d.toLocaleTimeString("cs-CZ",{hour:"2-digit",minute:"2-digit"});
+let h = Math.floor(diff / 3600);
+let m = Math.floor((diff % 3600) / 60);
+let s = diff % 60;
+
+time = `${h}h ${m}m ${s}s`;
 
 }
 
@@ -254,7 +258,7 @@ div.innerHTML = `
 <span class="raid-name">${b.name ?? "Unknown Boss"}</span>
 <span class="raid-level">Lv ${b.level ?? "?"}</span>
 <span class="raid-status ${status.toLowerCase()}">${status}</span>
-<span class="raid-time">${time}</span>
+<span class="raid-time" data-respawn="${b.respawn_time}">${time}</span>
 `;
 
 box.appendChild(div);
@@ -330,7 +334,7 @@ div.innerHTML = `
 <span class="raid-name">${b.name ?? "Unknown Boss"}</span>
 <span class="raid-level">Lv ${b.level ?? "?"}</span>
 <span class="raid-status ${statusClass}">${status}</span>
-<div class="raid-extra">${info}</div>
+<div class="raid-extra" data-window="${windowStart}">${info}</div>
 `;
 
 box.appendChild(div);
@@ -353,3 +357,62 @@ loadGrandBoss();
 setInterval(loadWorldStats,60000);
 setInterval(loadRaidBoss,60000);
 setInterval(loadGrandBoss,60000);
+
+/* =========================
+   LIVE RAID COUNTDOWN
+========================= */
+
+setInterval(()=>{
+
+const now = Math.floor(Date.now()/1000);
+
+document.querySelectorAll(".raid-time[data-respawn]").forEach(el=>{
+
+let respawn = parseInt(el.dataset.respawn) || 0;
+
+if(respawn > now){
+
+let diff = respawn - now;
+
+let h = Math.floor(diff/3600);
+let m = Math.floor((diff%3600)/60);
+let s = diff%60;
+
+el.textContent = `${h}h ${m}m ${s}s`;
+
+}else{
+
+el.textContent = "Respawn";
+
+}
+
+});
+
+},1000);
+/* =========================
+   GRAND BOSS LIVE COUNTDOWN
+========================= */
+
+setInterval(()=>{
+
+const now = Math.floor(Date.now()/1000);
+
+document.querySelectorAll("#grandBossList .raid-extra[data-window]").forEach(el=>{
+
+let start = parseInt(el.dataset.window);
+
+if(start > now){
+
+let diff = start - now;
+
+let h = Math.floor(diff/3600);
+let m = Math.floor((diff%3600)/60);
+let s = diff%60;
+
+el.textContent = `Spawn window in ${h}h ${m}m ${s}s`;
+
+}
+
+});
+
+},1000);
