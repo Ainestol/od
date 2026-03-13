@@ -232,23 +232,18 @@ const now = Math.floor(Date.now()/1000);
 
 json.data.forEach(b=>{
 
-let respawn = parseInt(b.respawn_time) || 0;
-
 let status = "ALIVE";
 let statusClass = "alive";
 let info = "";
 
-let killTime = parseInt(b.respawn_time) || 0;
-let delay = parseInt(b.respawn_delay) || 0;
+/* respawn data z API */
+let windowStart = parseInt(b.respawn_time) || 0;
 let random = parseInt(b.respawn_random) || 0;
+let windowEnd = windowStart + random;
 
-let spawnTime = killTime + delay;
-let windowStart = spawnTime;
-let windowEnd = spawnTime + random;
+if(windowStart > 0){
 
-if(killTime > 0){
-
-    if(now < spawnTime){
+    if(now < windowStart){
 
         status = "DEAD";
         statusClass = "dead";
@@ -264,8 +259,8 @@ if(killTime > 0){
     }
     else if(now >= windowStart && now <= windowEnd){
 
-    status = "RESPAWN WINDOW";
-    statusClass = "window";
+        status = "RESPAWN WINDOW";
+        statusClass = "window";
 
         let start = new Date(windowStart*1000)
         .toLocaleTimeString("cs-CZ",{hour:'2-digit',minute:'2-digit'});
