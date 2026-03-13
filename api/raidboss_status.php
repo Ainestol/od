@@ -26,15 +26,14 @@ $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 foreach($data as &$b){
 
-    $kill = intval($b['kill_time']);
-    $delay = intval($b['respawn_delay']);
-    $random = intval($b['respawn_random']);
-    
-    $b['respawn_delay'] = $delay;
+    $respawn = intval($b['kill_time']); // ve skutečnosti respawnTime z DB
+    $delay   = intval($b['respawn_delay']);
+    $random  = intval($b['respawn_random']);
 
-    if($kill > 0){
+    if($respawn > 0){
 
-        $windowStart = $kill + $delay;
+        // DB obsahuje window END
+        $windowStart = $respawn - $random;
 
         $b['respawn_time']   = $windowStart;
         $b['respawn_random'] = $random;
