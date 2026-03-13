@@ -9,7 +9,7 @@ SELECT
 g.boss_id,
 b.name,
 b.level,
-g.respawn_time,
+FLOOR(g.respawn_time/1000) AS respawn_time,
 r.respawn,
 r.respawn_random
 FROM grandboss_data g
