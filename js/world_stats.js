@@ -225,7 +225,6 @@ const json = await res.json();
 if(!json.ok || !json.data) return;
 
 const box = document.getElementById("raidBossList");
-
 box.innerHTML = "";
 
 const now = Math.floor(Date.now()/1000);
@@ -236,19 +235,26 @@ let status = "ALIVE";
 let statusClass = "alive";
 let info = "";
 
-/* respawn data z API */
-let windowStart = parseInt(b.respawn_time) || 0;
+/* hodnoty z API */
+
+let killTime = parseInt(b.respawn_time) || 0;
+let delay = parseInt(b.respawn_delay) || 0;
 let random = parseInt(b.respawn_random) || 0;
-let windowEnd = windowStart + random;
 
-if(windowStart > 0){
+/* výpočet spawn okna */
 
-    if(now < windowStart){
+let spawnTime = killTime + delay;
+let windowStart = spawnTime;
+let windowEnd = spawnTime + random;
+
+if(killTime > 0){
+
+    if(now < spawnTime){
 
         status = "DEAD";
         statusClass = "dead";
 
-        let diff = windowStart - now;
+        let diff = spawnTime - now;
 
         let h = Math.floor(diff/3600);
         let m = Math.floor((diff%3600)/60);
@@ -275,7 +281,6 @@ if(windowStart > 0){
 }
 
 const div = document.createElement("div");
-
 div.className = "raid-row";
 
 div.innerHTML = `
