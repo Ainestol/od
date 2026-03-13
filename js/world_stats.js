@@ -237,17 +237,13 @@ let info = "";
 
 /* hodnoty z API */
 
-let killTime = parseInt(b.respawn_time) || 0;
-let delay = parseInt(b.respawn_delay) || 0;
+let windowEnd = parseInt(b.respawn_time) || 0;
 let random = parseInt(b.respawn_random) || 0;
 
-/* výpočet spawn okna */
+let windowStart = windowEnd - random;
+let spawnTime = windowStart;
 
-let spawnTime = killTime + delay;
-let windowStart = spawnTime;
-let windowEnd = spawnTime + random;
-
-if(killTime > 0){
+if(windowEnd > 0){
 
     if(now < spawnTime){
 
@@ -287,7 +283,7 @@ div.innerHTML = `
 <span class="raid-name">${b.name ?? "Unknown Boss"}</span>
 <span class="raid-level">Lv ${b.level ?? "?"}</span>
 <span class="raid-status ${statusClass}">${status}</span>
-<div class="raid-extra" data-window="${windowStart}">${info}</div>
+<div class="raid-extra" data-window="${spawnTime}">${info}</div>
 `;
 
 box.appendChild(div);
