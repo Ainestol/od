@@ -316,7 +316,7 @@ let status = "ALIVE";
 let statusClass = "alive";
 let info = "";
 
-let respawnTime = Math.floor(b.respawn_time / 1000);
+let respawnTime = parseInt(b.respawn_time);
 
 let windowStart = respawnTime + b.respawn;
 let windowEnd = windowStart + b.respawn_random;
@@ -342,11 +342,14 @@ if(respawnTime > 0){
         status = "RESPAWN WINDOW";
         statusClass = "window";
 
-        let start = new Date(windowStart*1000)
-        .toLocaleTimeString("cs-CZ",{hour:'2-digit',minute:'2-digit'});
+        let startDate = new Date(windowStart*1000);
+let endDate = new Date(windowEnd*1000);
 
-        let end = new Date(windowEnd*1000)
-        .toLocaleTimeString("cs-CZ",{hour:'2-digit',minute:'2-digit'});
+let start =
+`${startDate.getDate()}.${startDate.getMonth()+1} ${startDate.getHours().toString().padStart(2,"0")}:${startDate.getMinutes().toString().padStart(2,"0")}`;
+
+let end =
+`${endDate.getDate()}.${endDate.getMonth()+1} ${endDate.getHours().toString().padStart(2,"0")}:${endDate.getMinutes().toString().padStart(2,"0")}`;
 
         info = `Spawn window: ${start} – ${end}`;
 
