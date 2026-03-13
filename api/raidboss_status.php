@@ -26,28 +26,27 @@ $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 foreach($data as &$b){
 
-    $respawn = intval($b['kill_time']); // ve skutečnosti respawnTime z DB
-    $delay   = intval($b['respawn_delay']);
-    $random  = intval($b['respawn_random']);
+    $respawnTime = intval($b['kill_time']); // ve skutečnosti next respawn
+    $delay = intval($b['respawn_delay']);
+    $random = intval($b['respawn_random']);
 
-    if($respawn > 0){
+    if($respawnTime > 0){
 
-        // DB obsahuje window END
-        $windowStart = $respawn - $random;
+        // spawn window start
+        $windowStart = $respawnTime - $random;
 
-        $b['respawn_time']   = $windowStart;
+        $b['respawn_time'] = $windowStart;
         $b['respawn_random'] = $random;
 
     }else{
 
-        $b['respawn_time']   = 0;
+        $b['respawn_time'] = 0;
         $b['respawn_random'] = 0;
 
     }
 
     unset($b['kill_time']);
     unset($b['respawn_delay']);
-
 }
 
 echo json_encode([
