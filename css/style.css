@@ -1826,3 +1826,9 @@ color:#bbb;
 color:#ffcc66;
 font-weight:bold;
 }
+#grandBossList .raid-row{
+grid-template-columns:360px 80px 100px 1fr;
+}
+#grandBossList .raid-extra{
+white-space:nowrap;
+}
