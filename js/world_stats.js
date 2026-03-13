@@ -232,21 +232,26 @@ const now = Math.floor(Date.now()/1000);
 
 json.data.forEach(b=>{
 
-let status = "Alive";
-let time = "-";
 let respawn = parseInt(b.respawn_time) || 0;
 
-if(respawn > now){
+let status = "Alive";
+let time = "Respawn";
+
+if(respawn > 0){
 
 status = "Dead";
 
 let diff = respawn - now;
+
+if(diff > 0){
 
 let h = Math.floor(diff / 3600);
 let m = Math.floor((diff % 3600) / 60);
 let s = diff % 60;
 
 time = `${h}h ${m}m ${s}s`;
+
+}
 
 }
 
