@@ -241,7 +241,7 @@ let windowEnd = parseInt(b.respawn_time) || 0;
 let random = parseInt(b.respawn_random) || 0;
 let killTime = parseInt(b.kill_time) || 0;
 
-/* status boss */
+/* DEAD / ALIVE */
 
 if(windowEnd > 0){
 
@@ -252,14 +252,7 @@ if(windowEnd > 0){
         status = "DEAD";
         statusClass = "dead";
 
-    }
-    else if(now >= windowStart && now <= windowEnd){
-
-        status = "RESPAWN WINDOW";
-        statusClass = "window";
-
-    }
-    else{
+    }else{
 
         status = "ALIVE";
         statusClass = "alive";
@@ -268,7 +261,7 @@ if(windowEnd > 0){
 
 }
 
-/* kill time info */
+/* kill time */
 
 if(killTime > 0){
 
