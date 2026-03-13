@@ -42,7 +42,6 @@ foreach($data as &$b){
     }
 
     unset($b['kill_time']);
-    unset($b['respawn_delay']);
 
 }
 
