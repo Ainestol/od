@@ -254,12 +254,17 @@ statusClass = "dead";
 
 let diff = windowStart - now;
 
-let h = Math.floor(diff/3600);
-let m = Math.floor((diff%3600)/60);
-let s = diff%60;
+let d = Math.floor(diff / 86400);
+let h = Math.floor((diff % 86400) / 3600);
+let m = Math.floor((diff % 3600) / 60);
+let s = diff % 60;
 
+if(d > 0){
+info = `Spawn window in ${d}d ${h}h ${m}m`;
+}else{
 info = `Spawn window in ${h}h ${m}m ${s}s`;
-
+}
+el.textContent = info;
 }
 else if(now >= windowStart && now <= windowEnd){
 
@@ -332,12 +337,17 @@ if(start > now){
 
 let diff = start - now;
 
-let h = Math.floor(diff/3600);
-let m = Math.floor((diff%3600)/60);
-let s = diff%60;
+let d = Math.floor(diff / 86400);
+let h = Math.floor((diff % 86400) / 3600);
+let m = Math.floor((diff % 3600) / 60);
+let s = diff % 60;
 
-el.textContent = `Spawn window in ${h}h ${m}m ${s}s`;
-
+if(d > 0){
+info = `Spawn window in ${d}d ${h}h ${m}m`;
+}else{
+info = `Spawn window in ${h}h ${m}m ${s}s`;
+}
+el.textContent = info;
 }
 
 });
@@ -359,11 +369,17 @@ if(start > now){
 
 let diff = start - now;
 
-let h = Math.floor(diff/3600);
-let m = Math.floor((diff%3600)/60);
-let s = diff%60;
+let d = Math.floor(diff / 86400);
+let h = Math.floor((diff % 86400) / 3600);
+let m = Math.floor((diff % 3600) / 60);
+let s = diff % 60;
 
-el.textContent = `Spawn window in ${h}h ${m}m ${s}s`;
+if(d > 0){
+info = `Spawn window in ${d}d ${h}h ${m}m`;
+}else{
+info = `Spawn window in ${h}h ${m}m ${s}s`;
+}
+el.textContent = info;
 
 }
 
