@@ -14,8 +14,9 @@ l.kill_time,
 l.respawn_delay,
 l.respawn_random,
 b.level
-FROM boss_kill_log l
-LEFT JOIN boss_list b ON b.boss_id = l.boss_id
+FROM boss_list b
+LEFT JOIN boss_kill_log l ON l.boss_id = b.boss_id
+WHERE b.type IN ('raid','grand')
 ORDER BY b.level ASC
 ";
 
