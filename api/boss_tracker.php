@@ -12,14 +12,19 @@ b.name AS boss_name,
 b.type AS boss_type,
 b.level,
 
-FLOOR(r.respawnTime/1000) - s.respawn_delay - s.respawn_random AS kill_time,
+k.kill_time,
 
 s.respawn_delay,
 s.respawn_random
 
 FROM boss_list b
 
-LEFT JOIN npc_respawns r ON r.id = b.boss_id
+LEFT JOIN (
+    SELECT boss_id, MAX(kill_time) AS kill_time
+    FROM boss_kill_log
+    GROUP BY boss_id
+) k ON k.boss_id = b.boss_id
+
 LEFT JOIN raidboss_spawnlist s ON s.boss_id = b.boss_id
 
 WHERE b.type IN ('raid','grand')
