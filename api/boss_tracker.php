@@ -7,15 +7,20 @@ try{
 
 $sql = "
 SELECT
-l.boss_id,
-l.boss_name,
-l.boss_type,
+b.boss_id,
+b.name AS boss_name,
+b.type AS boss_type,
+b.level,
 l.kill_time,
 l.respawn_delay,
-l.respawn_random,
-b.level
+l.respawn_random
 FROM boss_list b
-LEFT JOIN boss_kill_log l ON l.boss_id = b.boss_id
+LEFT JOIN (
+    SELECT boss_id, MAX(kill_time) AS kill_time,
+           respawn_delay, respawn_random
+    FROM boss_kill_log
+    GROUP BY boss_id
+) l ON l.boss_id = b.boss_id
 WHERE b.type IN ('raid','grand')
 ORDER BY b.level ASC
 ";
