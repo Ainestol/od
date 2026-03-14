@@ -214,6 +214,21 @@ document.getElementById("subtab-" + tab).classList.add("active");
 });
 
 /*=========================
+    časy
+==========================*/
+
+function formatCountdown(diff){
+
+let d = Math.floor(diff / 86400);
+let h = Math.floor((diff % 86400) / 3600);
+let m = Math.floor((diff % 3600) / 60);
+let s = diff % 60;
+
+return `D ${String(d).padStart(2,"0")} H ${String(h).padStart(2,"0")} M ${String(m).padStart(2,"0")} S ${String(s).padStart(2,"0")}`;
+
+}
+
+/*=========================
     SJEDNOCENÉ FUNKCE
 ==========================*/
 
@@ -254,16 +269,7 @@ statusClass = "dead";
 
 let diff = windowStart - now;
 
-let d = Math.floor(diff / 86400);
-let h = Math.floor((diff % 86400) / 3600);
-let m = Math.floor((diff % 3600) / 60);
-let s = diff % 60;
-
-if(d > 0){
-info = `Spawn window in ${d}d ${h}h ${m}m`;
-}else{
-info = `Spawn window in ${h}h ${m}m ${s}s`;
-}
+info = `Spawn window in ${formatCountdown(diff)}`;
 
 }
 else if(now >= windowStart && now <= windowEnd){
@@ -337,16 +343,7 @@ let diff = start - now;
 
 if(diff > 0){
 
-let d = Math.floor(diff / 86400);
-let h = Math.floor((diff % 86400) / 3600);
-let m = Math.floor((diff % 3600) / 60);
-let s = diff % 60;
-
-if(d > 0){
-info = `Spawn window in ${d}d ${h}h ${m}m`;
-}else{
-info = `Spawn window in ${h}h ${m}m ${s}s`;
-}
+el.textContent = `Spawn window in ${formatCountdown(diff)}`;
 
 el.textContent = info;
 
@@ -371,17 +368,7 @@ let diff = start - now;
 
 if(diff > 0){
 
-let d = Math.floor(diff / 86400);
-let h = Math.floor((diff % 86400) / 3600);
-let m = Math.floor((diff % 3600) / 60);
-let s = diff % 60;
-
-if(d > 0){
-info = `Spawn window in ${d}d ${h}h ${m}m`;
-}else{
-info = `Spawn window in ${h}h ${m}m ${s}s`;
-}
-
+el.textContent = `Spawn window in ${formatCountdown(diff)}`;
 el.textContent = info;
 
 }
