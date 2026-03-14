@@ -247,7 +247,7 @@ let windowEnd = windowStart + random;
 
 if(killTime > 0){
 
-if(now < windowStart){
+if(windowStart > now){
 
 status = "DEAD";
 statusClass = "dead";
@@ -333,9 +333,9 @@ document.querySelectorAll("#raidBossList .raid-extra[data-window]").forEach(el=>
 
 let start = parseInt(el.dataset.window) || 0;
 
-if(start > now){
-
 let diff = start - now;
+
+if(diff > 0){
 
 let d = Math.floor(diff / 86400);
 let h = Math.floor((diff % 86400) / 3600);
@@ -347,7 +347,9 @@ info = `Spawn window in ${d}d ${h}h ${m}m`;
 }else{
 info = `Spawn window in ${h}h ${m}m ${s}s`;
 }
+
 el.textContent = info;
+
 }
 
 });
@@ -365,9 +367,9 @@ document.querySelectorAll("#grandBossList .raid-extra[data-window]").forEach(el=
 
 let start = parseInt(el.dataset.window);
 
-if(start > now){
-
 let diff = start - now;
+
+if(diff > 0){
 
 let d = Math.floor(diff / 86400);
 let h = Math.floor((diff % 86400) / 3600);
@@ -379,6 +381,7 @@ info = `Spawn window in ${d}d ${h}h ${m}m`;
 }else{
 info = `Spawn window in ${h}h ${m}m ${s}s`;
 }
+
 el.textContent = info;
 
 }
