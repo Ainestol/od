@@ -232,7 +232,7 @@ const now = Math.floor(Date.now()/1000);
 
 json.data.forEach(b=>{
 
-if(b.boss_type !== type) return;
+if(b.boss_type.toLowerCase() !== type.toLowerCase()) return;
 
 let status = "ALIVE";
 let statusClass = "alive";
