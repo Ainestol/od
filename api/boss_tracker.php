@@ -28,6 +28,10 @@ LEFT JOIN (
 LEFT JOIN raidboss_spawnlist s ON s.boss_id = b.boss_id
 
 WHERE b.type IN ('raid','grand')
+AND (
+    b.type='raid'
+    OR b.boss_id IN (29001,29006,29014,29020,29022,29028,29045)
+)
 
 ORDER BY b.level ASC
 ";
