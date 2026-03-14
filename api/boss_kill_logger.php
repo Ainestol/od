@@ -105,8 +105,8 @@ $boss_id,
 $b['name'],
 'GRAND',
 $kill_time,
-$b['respawn'],
-$b['respawn_random']
+$b['respawn'] ?? 0,
+$b['respawn_random'] ?? 0
 ]);
 
 }
