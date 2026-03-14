@@ -213,13 +213,101 @@ document.getElementById("subtab-" + tab).classList.add("active");
 
 });
 
+/*=========================
+    SJEDNOCENÉ FUNKCE
+==========================*/
+
+async function loadBoss(type){
+
+const res = await fetch('/api/boss_tracker.php');
+const json = await res.json();
+
+if(!json.ok || !json.data) return;
+
+const box = document.getElementById(type === "RAID" ? "raidBossList" : "grandBossList");
+
+box.innerHTML = "";
+
+const now = Math.floor(Date.now()/1000);
+
+json.data.forEach(b=>{
+
+if(b.boss_type !== type) return;
+
+let status = "ALIVE";
+let statusClass = "alive";
+let info = "";
+
+let killTime = parseInt(b.kill_time) || 0;
+let delay = parseInt(b.respawn_delay) || 0;
+let random = parseInt(b.respawn_random) || 0;
+
+let windowStart = killTime + delay;
+let windowEnd = windowStart + random;
+
+if(killTime > 0){
+
+if(now < windowStart){
+
+status = "DEAD";
+statusClass = "dead";
+
+let diff = windowStart - now;
+
+let h = Math.floor(diff/3600);
+let m = Math.floor((diff%3600)/60);
+let s = diff%60;
+
+info = `Spawn window in ${h}h ${m}m ${s}s`;
+
+}
+else if(now >= windowStart && now <= windowEnd){
+
+status = "RESPAWN WINDOW";
+statusClass = "window";
+
+let start = new Date(windowStart*1000).toLocaleString("cs-CZ");
+let end = new Date(windowEnd*1000).toLocaleString("cs-CZ");
+
+info = `Spawn window: ${start} – ${end}`;
+
+}
+else{
+
+status = "ALIVE";
+statusClass = "alive";
+info = "Boss is alive";
+
+}
+
+}
+
+const div = document.createElement("div");
+
+div.className = "raid-row";
+
+div.innerHTML = `
+<span class="raid-name">${b.boss_name}</span>
+<span class="raid-level">Lv ${b.level ?? "?"}</span>
+<span class="raid-status ${statusClass}">${status}</span>
+<div class="raid-extra" data-window="${windowStart}">${info}</div>
+`;
+
+box.appendChild(div);
+
+});
+
+}
+
+
+
 /* =========================
    RAID BOSS LOADER
 ========================= */
 
 async function loadRaidBoss(){
 
-const res = await fetch('/api/raidboss_status.php');
+const res = await fetch('/api/boss_tracker.php');
 const json = await res.json();
 
 if(!json.ok || !json.data) return;
@@ -237,25 +325,55 @@ let info = "";
 
 /* hodnoty z API */
 
-let windowEnd = parseInt(b.respawn_time) || 0;
-let random = parseInt(b.respawn_random) || 0;
 let killTime = parseInt(b.kill_time) || 0;
+let delay = parseInt(b.respawn_delay) || 0;
+let random = parseInt(b.respawn_random) || 0;
+
+let windowStart = killTime + delay;
+let windowEnd = windowStart + random;
 
 /* DEAD / ALIVE */
 
-if(windowEnd > 0){
+/* DEAD / ALIVE */
 
-    let windowStart = windowEnd - random;
+if(killTime > 0){
 
     if(now < windowStart){
 
         status = "DEAD";
         statusClass = "dead";
 
-    }else{
+        let diff = windowStart - now;
+
+        let h = Math.floor(diff/3600);
+        let m = Math.floor((diff%3600)/60);
+        let s = diff%60;
+
+        info = `Spawn window in ${h}h ${m}m ${s}s`;
+
+    }
+    else if(now >= windowStart && now <= windowEnd){
+
+        status = "RESPAWN WINDOW";
+        statusClass = "window";
+
+        let startDate = new Date(windowStart*1000);
+        let endDate = new Date(windowEnd*1000);
+
+        let start =
+        `${startDate.getDate()}.${startDate.getMonth()+1} ${startDate.getHours().toString().padStart(2,"0")}:${startDate.getMinutes().toString().padStart(2,"0")}`;
+
+        let end =
+        `${endDate.getDate()}.${endDate.getMonth()+1} ${endDate.getHours().toString().padStart(2,"0")}:${endDate.getMinutes().toString().padStart(2,"0")}`;
+
+        info = `Spawn window: ${start} – ${end}`;
+
+    }
+    else{
 
         status = "ALIVE";
         statusClass = "alive";
+        info = "Boss is alive";
 
     }
 
@@ -286,7 +404,7 @@ div.innerHTML = `
 <span class="raid-name">${b.name ?? "Unknown Boss"}</span>
 <span class="raid-level">Lv ${b.level ?? "?"}</span>
 <span class="raid-status ${statusClass}">${status}</span>
-<div class="raid-extra">${info}</div>
+<div class="raid-extra" data-window="${windowStart}">${info}</div>
 `;
 
 box.appendChild(div);
@@ -299,7 +417,7 @@ box.appendChild(div);
 ========================= */
 async function loadGrandBoss(){
 
-const res = await fetch('/api/grandboss_status.php');
+const res = await fetch('/api/boss_tracker.php');
 const json = await res.json();
 
 if(!json.ok || !json.data) return;
@@ -311,7 +429,7 @@ box.innerHTML = "";
 const now = Math.floor(Date.now()/1000);
 
 json.data.forEach(b=>{
-
+if(b.boss_type !== "GRAND") return;
 let status = "ALIVE";
 let statusClass = "alive";
 let info = "";
@@ -378,16 +496,16 @@ box.appendChild(div);
 ========================= */
 
 loadWorldStats();
-loadRaidBoss();
-loadGrandBoss();
+loadBoss("RAID");
+loadBoss("GRAND");
 
 /* =========================
    AUTO REFRESH
 ========================= */
 
 setInterval(loadWorldStats,60000);
-setInterval(loadRaidBoss,60000);
-setInterval(loadGrandBoss,60000);
+setInterval(()=>loadBoss("RAID"),60000);
+setInterval(()=>loadBoss("GRAND"),60000);
 
 /* =========================
    LIVE RAID COUNTDOWN
