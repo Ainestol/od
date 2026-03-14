@@ -264,7 +264,7 @@ info = `Spawn window in ${d}d ${h}h ${m}m`;
 }else{
 info = `Spawn window in ${h}h ${m}m ${s}s`;
 }
-el.textContent = info;
+
 }
 else if(now >= windowStart && now <= windowEnd){
 
