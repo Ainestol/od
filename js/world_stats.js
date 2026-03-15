@@ -240,6 +240,7 @@ const json = await res.json();
 if(!json.ok || !json.data) return;
 
 const box = document.getElementById(type === "RAID" ? "raidBossList" : "grandBossList");
+if(!box) return;
 
 box.innerHTML = "";
 
@@ -256,22 +257,39 @@ let info = "";
 let killTime = parseInt(b.kill_time) || 0;
 let delay = parseInt(b.respawn_delay) || 0;
 let random = parseInt(b.respawn_random) || 0;
+let spawnTime = parseInt(b.spawn_time) || 0;
 
 let windowStart = killTime + delay;
 let windowEnd = windowStart + random;
 
+
+/* =========================
+   STATUS LOGIKA
+========================= */
+
 if(killTime > 0){
 
-if(windowStart > now){
+/* boss už spawnul */
+if(spawnTime > windowStart){
+
+status = "ALIVE";
+statusClass = "alive";
+info = "Boss is alive";
+
+}
+
+/* ještě před spawn window */
+else if(now < windowStart){
 
 status = "DEAD";
 statusClass = "dead";
 
 let diff = windowStart - now;
-
 info = `Spawn window in ${formatCountdown(diff)}`;
 
 }
+
+/* spawn window */
 else if(now >= windowStart && now <= windowEnd){
 
 status = "RESPAWN WINDOW";
@@ -283,6 +301,8 @@ let end = new Date(windowEnd*1000).toLocaleString("cs-CZ");
 info = `Spawn window: ${start} – ${end}`;
 
 }
+
+/* fallback */
 else{
 
 status = "ALIVE";
@@ -292,6 +312,11 @@ info = "Boss is alive";
 }
 
 }
+
+
+/* =========================
+   RENDER
+========================= */
 
 const div = document.createElement("div");
 
@@ -323,9 +348,9 @@ loadBoss("GRAND");
    AUTO REFRESH
 ========================= */
 
-setInterval(loadWorldStats,60000);
-setInterval(()=>loadBoss("RAID"),60000);
-setInterval(()=>loadBoss("GRAND"),60000);
+setInterval(loadWorldStats,10000);
+setInterval(()=>loadBoss("RAID"),10000);
+setInterval(()=>loadBoss("GRAND"),10000);
 
 /* =========================
    LIVE RAID COUNTDOWN
