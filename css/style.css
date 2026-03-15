@@ -1868,3 +1868,109 @@ margin-left:16px;
 .timer span{
 margin-right:8px;
 }
+/* ===============================
+   RAID STATUS BADGE
+================================ */
+
+.raid-status{
+padding:3px 12px;
+border-radius:4px;
+font-weight:bold;
+letter-spacing:1px;
+text-align:center;
+}
+
+/* ALIVE */
+
+.raid-status.alive{
+color:#2ecc71;
+background:rgba(46,204,113,0.08);
+border:1px solid rgba(46,204,113,0.35);
+}
+
+/* DEAD */
+
+.raid-status.dead{
+color:#e74c3c;
+background:rgba(231,76,60,0.08);
+border:1px solid rgba(231,76,60,0.35);
+}
+
+/* RESPAWN WINDOW */
+
+.raid-status.window{
+color:#f1c40f;
+background:rgba(241,196,15,0.08);
+border:1px solid rgba(241,196,15,0.35);
+animation: raidpulse 1.5s infinite;
+}
+
+/* jemné zvýraznění řádku */
+
+.raid-row.window-row{
+background:rgba(241,196,15,0.03);
+}
+
+/* ===============================
+   TIMER
+================================ */
+
+.timer{
+font-family:"Cinzel",serif;
+font-size:14px;
+letter-spacing:1px;
+margin-left:18px;
+}
+
+/* spacing */
+
+.timer span{
+margin-right:10px;
+font-weight:bold;
+}
+
+/* colors */
+
+.timer-days{
+color:#ff4040;
+}
+
+.timer-hours{
+color:#ffd700;
+}
+
+.timer-minutes{
+color:#4da6ff;
+}
+
+.timer-seconds{
+color:#3cff3c;
+}
+
+/* ===============================
+   LAST 10 MIN WARNING
+================================ */
+
+.timer.warning{
+animation: timerBlink 1s infinite;
+}
+
+@keyframes timerBlink{
+0%{opacity:1;}
+50%{opacity:0.5;}
+100%{opacity:1;}
+}
+
+/* ===============================
+   LAST 60 SEC PULSE
+================================ */
+
+.timer.danger{
+animation: timerPulse 0.6s infinite;
+}
+
+@keyframes timerPulse{
+0%{transform:scale(1);}
+50%{transform:scale(1.15);}
+100%{transform:scale(1);}
+}

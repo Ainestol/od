@@ -224,8 +224,22 @@ let h = Math.floor((diff % 86400) / 3600);
 let m = Math.floor((diff % 3600) / 60);
 let s = diff % 60;
 
+let timerClass = "";
+
+/* posledních 10 minut */
+
+if(diff <= 600){
+timerClass = "warning";
+}
+
+/* posledních 60 sekund */
+
+if(diff <= 60){
+timerClass = "danger";
+}
+
 return `
-<span class="timer">
+<span class="timer ${timerClass}">
 <span class="timer-days">D ${String(d).padStart(2,"0")}</span>
 <span class="timer-hours">H ${String(h).padStart(2,"0")}</span>
 <span class="timer-minutes">M ${String(m).padStart(2,"0")}</span>
@@ -234,7 +248,6 @@ return `
 `;
 
 }
-
 /*=========================
     SJEDNOCENÉ FUNKCE
 ==========================*/

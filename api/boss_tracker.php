@@ -15,15 +15,16 @@ b.level,
 k.kill_time,
 s.spawn_time,
 
-COALESCE(k.respawn_delay, rb.respawn_delay, gb.respawn) AS respawn_delay,
-COALESCE(k.respawn_random, rb.respawn_random, gb.respawn_random) AS respawn_random
+b.respawn_delay,
+b.respawn_random
+
 FROM boss_list b
 
 /* poslední kill */
 LEFT JOIN (
-    SELECT *
+    SELECT boss_id, MAX(kill_time) AS kill_time
     FROM boss_kill_log
-    ORDER BY kill_time DESC
+    GROUP BY boss_id
 ) k
 ON k.boss_id = b.boss_id
 
@@ -32,13 +33,8 @@ LEFT JOIN (
     SELECT boss_id, MAX(spawn_time) AS spawn_time
     FROM boss_spawn_log
     GROUP BY boss_id
-) s ON s.boss_id = b.boss_id
-
-LEFT JOIN raidboss_spawnlist rb
-ON rb.boss_id = b.boss_id
-
-LEFT JOIN boss_respawn gb
-ON gb.boss_id = b.boss_id
+) s
+ON s.boss_id = b.boss_id
 
 WHERE
 b.type='raid'
