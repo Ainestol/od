@@ -240,8 +240,6 @@ const json = await res.json();
 if(!json.ok || !json.data) return;
 
 const box = document.getElementById(type === "RAID" ? "raidBossList" : "grandBossList");
-if(!box) return;
-
 box.innerHTML = "";
 
 const now = Math.floor(Date.now()/1000);
@@ -250,8 +248,8 @@ json.data.forEach(b=>{
 
 if(b.boss_type.toLowerCase() !== type.toLowerCase()) return;
 
-let status = "ALIVE";
-let statusClass = "alive";
+let status = "UNKNOWN";
+let statusClass = "window";
 let info = "";
 
 let killTime = parseInt(b.kill_time) || 0;
@@ -262,15 +260,9 @@ let spawnTime = parseInt(b.spawn_time) || 0;
 let windowStart = killTime + delay;
 let windowEnd = windowStart + random;
 
+/* boss spawnul */
 
-/* =========================
-   STATUS LOGIKA
-========================= */
-
-if(killTime > 0){
-
-/* boss už spawnul */
-if(spawnTime >= windowStart){
+if(spawnTime > killTime && spawnTime > 0){
 
 status = "ALIVE";
 statusClass = "alive";
@@ -278,18 +270,20 @@ info = "Boss is alive";
 
 }
 
-/* ještě před spawn window */
-else if(now < windowStart){
+/* boss zabit */
+
+else if(killTime > 0){
+
+if(now < windowStart){
 
 status = "DEAD";
 statusClass = "dead";
 
 let diff = windowStart - now;
-info = `Spawn window in ${formatCountdown(diff)}`;
+info = `Respawn in ${formatCountdown(diff)}`;
 
 }
 
-/* spawn window */
 else if(now >= windowStart && now <= windowEnd){
 
 status = "RESPAWN WINDOW";
@@ -302,21 +296,23 @@ info = `Spawn window: ${start} – ${end}`;
 
 }
 
-/* fallback */
 else{
 
 status = "ALIVE";
 statusClass = "alive";
-info = "Boss is alive";
+info = "Boss should be alive";
 
 }
 
 }
 
+else{
 
-/* =========================
-   RENDER
-========================= */
+status = "ALIVE";
+statusClass = "alive";
+info = "No kill recorded";
+
+}
 
 const div = document.createElement("div");
 
@@ -326,7 +322,7 @@ div.innerHTML = `
 <span class="raid-name">${b.boss_name}</span>
 <span class="raid-level">Lv ${b.level ?? "?"}</span>
 <span class="raid-status ${statusClass}">${status}</span>
-<div class="raid-extra" data-window="${killTime ? windowStart : 0}">${info}</div>
+<div class="raid-extra">${info}</div>
 `;
 
 box.appendChild(div);
@@ -334,8 +330,6 @@ box.appendChild(div);
 });
 
 }
-
-
 /* =========================
    INITIAL LOAD
 ========================= */
@@ -348,53 +342,7 @@ loadBoss("GRAND");
    AUTO REFRESH
 ========================= */
 
-setInterval(loadWorldStats,10000);
-setInterval(()=>loadBoss("RAID"),10000);
-setInterval(()=>loadBoss("GRAND"),10000);
+setInterval(loadWorldStats,60000);
+setInterval(()=>loadBoss("RAID"),60000);
+setInterval(()=>loadBoss("GRAND"),60000);
 
-/* =========================
-   LIVE RAID COUNTDOWN
-========================= */
-
-setInterval(()=>{
-
-const now = Math.floor(Date.now()/1000);
-
-document.querySelectorAll("#raidBossList .raid-extra[data-window]").forEach(el=>{
-
-let start = parseInt(el.dataset.window) || 0;
-
-let diff = start - now;
-
-if(diff > 0){
-
-el.textContent = `Spawn window in ${formatCountdown(diff)}`;
-
-}
-
-});
-
-},1000);
-/* =========================
-   GRAND BOSS LIVE COUNTDOWN
-========================= */
-
-setInterval(()=>{
-
-const now = Math.floor(Date.now()/1000);
-
-document.querySelectorAll("#grandBossList .raid-extra[data-window]").forEach(el=>{
-
-let start = parseInt(el.dataset.window);
-
-let diff = start - now;
-
-if(diff > 0){
-
-el.textContent = `Spawn window in ${formatCountdown(diff)}`;
-
-}
-
-});
-
-},1000);

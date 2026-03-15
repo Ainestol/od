@@ -12,6 +12,7 @@ b.name AS boss_name,
 b.type AS boss_type,
 b.level,
 
+k.kill_time,
 s.spawn_time,
 
 COALESCE(rb.respawn_delay, gb.respawn) AS respawn_delay,
@@ -19,6 +20,15 @@ COALESCE(rb.respawn_random, gb.respawn_random) AS respawn_random
 
 FROM boss_list b
 
+/* poslední kill */
+LEFT JOIN (
+    SELECT boss_id, MAX(kill_time) AS kill_time
+    FROM boss_kill_log
+    GROUP BY boss_id
+) k
+ON k.boss_id = b.boss_id
+
+/* poslední spawn */
 LEFT JOIN boss_spawn_log s
 ON s.boss_id = b.boss_id
 
@@ -40,22 +50,10 @@ $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 foreach($data as &$b){
 
-$spawn = intval($b['spawn_time'] ?? 0);
-$delay = intval($b['respawn_delay'] ?? 0);
-$random = intval($b['respawn_random'] ?? 0);
-
-if($spawn > 0){
-
-$kill_time = $spawn - $delay;
-$b['kill_time'] = $kill_time;
-
-}else{
-
-$b['kill_time'] = 0;
-
-}
-
-$b['spawn_time'] = $spawn;
+$b['kill_time'] = intval($b['kill_time'] ?? 0);
+$b['spawn_time'] = intval($b['spawn_time'] ?? 0);
+$b['respawn_delay'] = intval($b['respawn_delay'] ?? 0);
+$b['respawn_random'] = intval($b['respawn_random'] ?? 0);
 
 }
 
