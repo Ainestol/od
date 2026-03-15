@@ -224,7 +224,14 @@ let h = Math.floor((diff % 86400) / 3600);
 let m = Math.floor((diff % 3600) / 60);
 let s = diff % 60;
 
-return `D ${String(d).padStart(2,"0")} H ${String(h).padStart(2,"0")} M ${String(m).padStart(2,"0")} S ${String(s).padStart(2,"0")}`;
+return `
+<span class="timer">
+<span class="timer-days">D ${String(d).padStart(2,"0")}</span>
+<span class="timer-hours">H ${String(h).padStart(2,"0")}</span>
+<span class="timer-minutes">M ${String(m).padStart(2,"0")}</span>
+<span class="timer-seconds">S ${String(s).padStart(2,"0")}</span>
+</span>
+`;
 
 }
 
@@ -342,6 +349,8 @@ loadBoss("GRAND");
 ========================= */
 
 setInterval(loadWorldStats,60000);
-setInterval(()=>loadBoss("RAID"),60000);
-setInterval(()=>loadBoss("GRAND"),60000);
+setInterval(()=>{
+loadBoss("RAID");
+loadBoss("GRAND");
+},1000);
 

@@ -1836,3 +1836,31 @@ animation: raidpulse 1.5s infinite;
 50%{opacity:0.4;}
 100%{opacity:1;}
 }
+.timer-days{
+color:#ff4040;
+font-weight:bold;
+}
+
+.timer-hours{
+color:#ffd700;
+font-weight:bold;
+}
+
+.timer-minutes{
+color:#4da6ff;
+font-weight:bold;
+}
+
+.timer-seconds{
+color:#3cff3c;
+font-weight:bold;
+}
+
+.timer{
+font-family: "Georgia", serif;
+font-size:14px;
+letter-spacing:1px;
+}
+.timer span{
+margin-right:6px;
+}
