@@ -21,9 +21,9 @@ FROM boss_list b
 
 /* poslední kill */
 LEFT JOIN (
-    SELECT boss_id, MAX(kill_time) AS kill_time
+    SELECT boss_id, kill_time, respawn_delay, respawn_random
     FROM boss_kill_log
-    GROUP BY boss_id
+    ORDER BY kill_time DESC
 ) k
 ON k.boss_id = b.boss_id
 
