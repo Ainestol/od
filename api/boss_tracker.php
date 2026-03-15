@@ -21,7 +21,7 @@ FROM boss_list b
 
 /* poslední kill */
 LEFT JOIN (
-    SELECT boss_id, kill_time, respawn_delay, respawn_random
+    SELECT *
     FROM boss_kill_log
     ORDER BY kill_time DESC
 ) k
