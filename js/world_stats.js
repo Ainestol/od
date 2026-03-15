@@ -264,72 +264,75 @@ box.innerHTML = "";
 
 const now = Math.floor(Date.now()/1000);
 
-json.data.forEach(b=>{
+json.data.forEach(b => {
 
-if(b.boss_type.toLowerCase() !== type.toLowerCase()) return;
+if((b.boss_type || "").toLowerCase() !== type.toLowerCase()) return;
 
-let status = "UNKNOWN";
-let statusClass = "window";
+const killTime = Number(b.kill_time) || 0;
+const delay = Number(b.respawn_delay) || 0;
+const random = Number(b.respawn_random) || 0;
+const spawnTime = Number(b.spawn_time) || 0;
+
+const windowStart = killTime + delay;
+const windowEnd = windowStart + random;
+
+let status = "";
+let statusClass = "";
 let info = "";
 
-let killTime = parseInt(b.kill_time) || 0;
-let delay = parseInt(b.respawn_delay) || 0;
-let random = parseInt(b.respawn_random) || 0;
-let spawnTime = parseInt(b.spawn_time) || 0;
+/* boss je živý (spawnul po posledním killu) */
 
-let windowStart = killTime + delay;
-let windowEnd = windowStart + random;
-
-/* boss spawnul */
-
-if(spawnTime > killTime && spawnTime <= now){
+if(spawnTime > killTime){
 
     status = "ALIVE";
     statusClass = "alive";
     info = "Boss is alive";
 
 }
-/* boss zabit */
+
+/* boss byl zabit */
 
 else if(killTime > 0){
 
-if(now < windowStart){
+    if(now < windowStart){
 
-status = "DEAD";
-statusClass = "dead";
+        status = "DEAD";
+        statusClass = "dead";
 
-let diff = windowStart - now;
-info = `Spawn window in ${formatCountdown(diff)}`;
+        const diff = windowStart - now;
+        info = `Spawn window in ${formatCountdown(diff)}`;
+
+    }
+
+    else if(now >= windowStart && now <= windowEnd){
+
+        status = "RESPAWN WINDOW";
+        statusClass = "window";
+
+        const start = new Date(windowStart*1000).toLocaleString("cs-CZ");
+        const end = new Date(windowEnd*1000).toLocaleString("cs-CZ");
+
+        info = `Spawn window: ${start} – ${end}`;
+
+    }
+
+    else{
+
+        status = "ALIVE";
+        statusClass = "alive";
+        info = "Boss should be alive";
+
+    }
 
 }
 
-else if(now >= windowStart && now <= windowEnd){
-
-status = "RESPAWN WINDOW";
-statusClass = "window";
-
-let start = new Date(windowStart*1000).toLocaleString("cs-CZ");
-let end = new Date(windowEnd*1000).toLocaleString("cs-CZ");
-
-info = `Spawn window: ${start} – ${end}`;
-
-}
-
-else if(now > windowEnd){
-
-status = "ALIVE";
-statusClass = "alive";
-info = "Boss should be alive";
-
-}
-
-}
+/* boss nikdy nebyl zabit */
 
 else{
 
-status = "ALIVE";
-statusClass = "alive";
-info = "No kill recorded";
+    status = "ALIVE";
+    statusClass = "alive";
+    info = "No kill recorded";
 
 }
 
