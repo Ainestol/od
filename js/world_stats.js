@@ -262,14 +262,13 @@ let windowEnd = windowStart + random;
 
 /* boss spawnul */
 
-if(spawnTime > killTime && spawnTime > 0){
+if(spawnTime > 0 && spawnTime > killTime && spawnTime <= now){
 
-status = "ALIVE";
-statusClass = "alive";
-info = "Boss is alive";
+    status = "ALIVE";
+    statusClass = "alive";
+    info = "Boss is alive";
 
 }
-
 /* boss zabit */
 
 else if(killTime > 0){
