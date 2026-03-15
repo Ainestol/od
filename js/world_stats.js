@@ -280,7 +280,7 @@ status = "DEAD";
 statusClass = "dead";
 
 let diff = windowStart - now;
-info = `Respawn in ${formatCountdown(diff)}`;
+info = `Spawn window in ${formatCountdown(diff)}`;
 
 }
 
