@@ -315,7 +315,7 @@ info = `Spawn window: ${start} – ${end}`;
 
 }
 
-else{
+else if(now > windowEnd){
 
 status = "ALIVE";
 statusClass = "alive";
