@@ -12,26 +12,25 @@ b.name AS boss_name,
 b.type AS boss_type,
 b.level,
 
-k.kill_time,
+s.spawn_time,
 
-s.respawn_delay,
-s.respawn_random
+COALESCE(rb.respawn_delay, gb.respawn) AS respawn_delay,
+COALESCE(rb.respawn_random, gb.respawn_random) AS respawn_random
 
 FROM boss_list b
 
-LEFT JOIN (
-    SELECT boss_id, MAX(kill_time) AS kill_time
-    FROM boss_kill_log
-    GROUP BY boss_id
-) k ON k.boss_id = b.boss_id
+LEFT JOIN boss_spawn_log s
+ON s.boss_id = b.boss_id
 
-LEFT JOIN raidboss_spawnlist s ON s.boss_id = b.boss_id
+LEFT JOIN raidboss_spawnlist rb
+ON rb.boss_id = b.boss_id
 
-WHERE b.type IN ('raid','grand')
-AND (
-    b.type='raid'
-    OR b.boss_id IN (29001,29006,29014,29020,29019,29045)
-)
+LEFT JOIN boss_respawn gb
+ON gb.boss_id = b.boss_id
+
+WHERE
+b.type='raid'
+OR b.boss_id IN (29001,29006,29014,29020,29019,29045)
 
 ORDER BY b.level ASC
 ";
@@ -39,16 +38,37 @@ ORDER BY b.level ASC
 $stmt = $pdoGame->query($sql);
 $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+foreach($data as &$b){
+
+$spawn = intval($b['spawn_time'] ?? 0);
+$delay = intval($b['respawn_delay'] ?? 0);
+$random = intval($b['respawn_random'] ?? 0);
+
+if($spawn > 0){
+
+$kill_time = $spawn - $delay;
+$b['kill_time'] = $kill_time;
+
+}else{
+
+$b['kill_time'] = 0;
+
+}
+
+$b['spawn_time'] = $spawn;
+
+}
+
 echo json_encode([
-    "ok" => true,
-    "data" => $data
+"ok"=>true,
+"data"=>$data
 ]);
 
 }catch(Exception $e){
 
 echo json_encode([
-    "ok" => false,
-    "error" => $e->getMessage()
+"ok"=>false,
+"error"=>$e->getMessage()
 ]);
 
 }

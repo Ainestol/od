@@ -345,8 +345,6 @@ if(diff > 0){
 
 el.textContent = `Spawn window in ${formatCountdown(diff)}`;
 
-el.textContent = info;
-
 }
 
 });
@@ -369,7 +367,6 @@ let diff = start - now;
 if(diff > 0){
 
 el.textContent = `Spawn window in ${formatCountdown(diff)}`;
-el.textContent = info;
 
 }
 
