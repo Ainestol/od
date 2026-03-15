@@ -265,7 +265,13 @@ box.innerHTML = "";
 const now = Math.floor(Date.now()/1000);
 
 json.data.forEach(b => {
-
+console.log(
+b.boss_name,
+"kill:", Number(b.kill_time),
+"delay:", Number(b.respawn_delay),
+"random:", Number(b.respawn_random),
+"spawn:", Number(b.spawn_time)
+);
 if((b.boss_type || "").toLowerCase() !== type.toLowerCase()) return;
 
 const killTime = Number(b.kill_time) || 0;
