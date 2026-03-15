@@ -1771,7 +1771,7 @@ display:block;
 
 .raid-row{
 display:grid;
-grid-template-columns:380px 70px 180px 240px;
+grid-template-columns:380px 70px 240px 260px;
 align-items:center;
 padding:6px 10px;
 border-bottom:1px solid rgba(212,175,55,0.25);
@@ -1973,4 +1973,7 @@ animation: timerPulse 0.6s infinite;
 0%{transform:scale(1);}
 50%{transform:scale(1.15);}
 100%{transform:scale(1);}
+}
+.raid-extra{
+padding-left:20px;
 }
