@@ -28,8 +28,11 @@ LEFT JOIN (
 ON k.boss_id = b.boss_id
 
 /* poslední spawn */
-LEFT JOIN boss_spawn_log s
-ON s.boss_id = b.boss_id
+LEFT JOIN (
+    SELECT boss_id, MAX(spawn_time) AS spawn_time
+    FROM boss_spawn_log
+    GROUP BY boss_id
+) s ON s.boss_id = b.boss_id
 
 LEFT JOIN raidboss_spawnlist rb
 ON rb.boss_id = b.boss_id

@@ -63,6 +63,16 @@ intval($b['respawn_delay']),
 intval($b['respawn_random'])
 ]);
 
+/* RESET SPAWN LOG */
+
+$reset = $pdoGame->prepare("
+UPDATE boss_spawn_log
+SET spawn_time = 0
+WHERE boss_id = ?
+");
+
+$reset->execute([$boss_id]);
+
 }
 
 }
@@ -123,6 +133,16 @@ $kill_time,
 intval($b['respawn'] ?? 0),
 intval($b['respawn_random'] ?? 0)
 ]);
+
+/* RESET SPAWN LOG */
+
+$reset = $pdoGame->prepare("
+UPDATE boss_spawn_log
+SET spawn_time = 0
+WHERE boss_id = ?
+");
+
+$reset->execute([$boss_id]);
 
 }
 
