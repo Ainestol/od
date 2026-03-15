@@ -1861,6 +1861,10 @@ font-family: "Georgia", serif;
 font-size:14px;
 letter-spacing:1px;
 }
+.timer{
+margin-left:16px;
+}
+
 .timer span{
-margin-right:6px;
+margin-right:8px;
 }
