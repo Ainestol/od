@@ -270,7 +270,7 @@ let windowEnd = windowStart + random;
 if(killTime > 0){
 
 /* boss už spawnul */
-if(spawnTime > windowStart){
+if(spawnTime >= windowStart){
 
 status = "ALIVE";
 statusClass = "alive";
