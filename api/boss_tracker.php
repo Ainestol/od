@@ -15,9 +15,8 @@ b.level,
 k.kill_time,
 s.spawn_time,
 
-COALESCE(rb.respawn_delay, gb.respawn) AS respawn_delay,
-COALESCE(rb.respawn_random, gb.respawn_random) AS respawn_random
-
+COALESCE(k.respawn_delay, rb.respawn_delay, gb.respawn) AS respawn_delay,
+COALESCE(k.respawn_random, rb.respawn_random, gb.respawn_random) AS respawn_random
 FROM boss_list b
 
 /* poslední kill */
