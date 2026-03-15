@@ -282,7 +282,7 @@ let windowEnd = windowStart + random;
 
 /* boss spawnul */
 
-if(spawnTime > 0 && spawnTime > killTime && spawnTime <= now){
+if(spawnTime > killTime && spawnTime <= now){
 
     status = "ALIVE";
     statusClass = "alive";

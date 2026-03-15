@@ -12,8 +12,8 @@ b.name AS boss_name,
 b.type AS boss_type,
 b.level,
 
-k.kill_time,
-s.spawn_time,
+COALESCE(k.kill_time,0) AS kill_time,
+COALESCE(s.spawn_time,0) AS spawn_time,
 
 b.respawn_delay,
 b.respawn_random
