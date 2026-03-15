@@ -48,11 +48,92 @@
     </nav>
 
     <div class="content-box">
-      <h3>World</h3>
-      <p>World of Aden – cities, zones, bosses.</p>
-      <p>This section of the website is still under development. We are currently waiting for player feedback on what features they would like to see here, such as player level filters, PvP/PK points, amount of Adena, and more.</p>
-    </div>
+<h3>World Statistics</h3>
 
+<div class="world-tabs">
+
+<button class="tab-btn active" data-tab="clans">
+Clan statistics
+</button>
+
+<button class="tab-btn" data-tab="players">
+Player statistics
+</button>
+
+<button class="tab-btn" data-tab="raidboss">
+Raid Boss statistics
+</button>
+
+</div>
+
+<!-- CLAN TAB -->
+
+<div id="tab-clans" class="tab-content active">
+<div id="topClans"></div>
+</div>
+
+<!-- PLAYER TAB -->
+
+<div id="tab-players" class="tab-content">
+
+<div class="leaderboards">
+
+<div class="leaderboard-box">
+<h4>Top Level</h4>
+<div id="topLevel"></div>
+</div>
+
+<div class="leaderboard-box">
+<h4>Top PvP</h4>
+<div id="topPvP"></div>
+</div>
+
+<div class="leaderboard-box">
+<h4>Top PK</h4>
+<div id="topPK"></div>
+</div>
+
+<div class="leaderboard-box">
+<h4>Top Adena</h4>
+<div id="topAdena"></div>
+</div>
+
+<div class="leaderboard-box">
+<h4>Top Playtime</h4>
+<div id="topTime"></div>
+</div>
+
+</div>
+
+</div>
+
+<!-- RAIDBOSS TAB -->
+
+<div id="tab-raidboss" class="tab-content">
+
+<div class="sub-tabs">
+
+<button class="subtab-btn active" data-subtab="raid">
+Raid Boss
+</button>
+
+<button class="subtab-btn" data-subtab="grand">
+Grand Boss
+</button>
+
+</div>
+
+<div id="subtab-raid" class="subtab-content active">
+<div id="raidBossList"></div>
+</div>
+
+<div id="subtab-grand" class="subtab-content">
+<div id="grandBossList"></div>
+</div>
+
+</div>
+
+</div>
     <!-- ✅ FOOTER STEJNÝ JAKO NA OSTATNÍCH STRÁNKÁCH -->
      <div class="page-footer">
 
@@ -140,6 +221,6 @@ async function updateServerStatus() {
 updateServerStatus();
 setInterval(updateServerStatus, 10000);
 </script>
-
+<script src="/js/world_stats.js"></script>
 </body>
 </html>

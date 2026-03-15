@@ -1,4 +1,54 @@
 /* =========================
+   LANGUAGE DETECTION
+========================= */
+
+const LANG = document.documentElement.lang || "en";
+
+const TEXT = {
+
+cs: {
+
+alive: "NAŽIVU",
+dead: "MRTVÝ",
+window: "RESPAWN OKNO",
+
+spawnWindowIn: "Spawn okno za",
+spawnWindow: "Spawn okno",
+bossAlive: "Boss je naživu",
+bossShouldBeAlive: "Boss by měl být naživu",
+noKill: "Boss ještě nebyl zabit",
+
+day:"D",
+hour:"H",
+min:"M",
+sec:"S"
+
+},
+
+en: {
+
+alive: "ALIVE",
+dead: "DEAD",
+window: "RESPAWN WINDOW",
+
+spawnWindowIn: "Spawn window in",
+spawnWindow: "Spawn window",
+bossAlive: "Boss is alive",
+bossShouldBeAlive: "Boss should be alive",
+noKill: "No kill recorded",
+
+day:"D",
+hour:"H",
+min:"M",
+sec:"S"
+
+}
+
+};
+
+const T = TEXT[LANG] || TEXT.en;
+
+/* =========================
    WORLD STATS LOADER
 ========================= */
 
@@ -240,10 +290,10 @@ timerClass = "danger";
 
 return `
 <span class="timer ${timerClass}">
-<span class="timer-days">D ${String(d).padStart(2,"0")}</span>
-<span class="timer-hours">H ${String(h).padStart(2,"0")}</span>
-<span class="timer-minutes">M ${String(m).padStart(2,"0")}</span>
-<span class="timer-seconds">S ${String(s).padStart(2,"0")}</span>
+<span class="timer-days">${T.day} ${String(d).padStart(2,"0")}</span>
+<span class="timer-hours">${T.hour} ${String(h).padStart(2,"0")}</span>
+<span class="timer-minutes">${T.min} ${String(m).padStart(2,"0")}</span>
+<span class="timer-seconds">${T.sec} ${String(s).padStart(2,"0")}</span>
 </span>
 `;
 
@@ -290,9 +340,9 @@ let info = "";
 
 if(spawnTime > killTime){
 
-    status = "ALIVE";
+    status = T.alive;
     statusClass = "alive";
-    info = "Boss is alive";
+    info = T.bossAlive;
 
 }
 
@@ -302,31 +352,33 @@ else if(killTime > 0){
 
     if(now < windowStart){
 
-        status = "DEAD";
+        status = T.dead;
         statusClass = "dead";
 
         const diff = windowStart - now;
-        info = `Spawn window in ${formatCountdown(diff)}`;
+        info = `${T.spawnWindowIn} ${formatCountdown(diff)}`;
 
     }
 
     else if(now >= windowStart && now <= windowEnd){
 
-        status = "RESPAWN WINDOW";
+        status = T.window;
         statusClass = "window";
 
-        const start = new Date(windowStart*1000).toLocaleString("cs-CZ");
-        const end = new Date(windowEnd*1000).toLocaleString("cs-CZ");
+        const locale = LANG === "cs" ? "cs-CZ" : "en-US";
 
-        info = `Spawn window: ${start} – ${end}`;
+const start = new Date(windowStart*1000).toLocaleString(locale);
+const end = new Date(windowEnd*1000).toLocaleString(locale);
+
+info = `${T.spawnWindow}: ${start} – ${end}`;
 
     }
 
     else{
 
-        status = "ALIVE";
+        status = T.alive;
         statusClass = "alive";
-        info = "Boss should be alive";
+        info = T.bossShouldBeAlive;
 
     }
 
@@ -336,9 +388,9 @@ else if(killTime > 0){
 
 else{
 
-    status = "ALIVE";
+    status = T.alive;
     statusClass = "alive";
-    info = "No kill recorded";
+    info = T.noKill;
 
 }
 
