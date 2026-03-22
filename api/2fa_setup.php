@@ -3,6 +3,12 @@ header('Content-Type: application/json; charset=utf-8');
 
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/_bootstrap.php';
+echo json_encode([
+    "ok" => true,
+    "session_user_id" => $_SESSION['web_user_id'] ?? null,
+    "session_email" => $_SESSION['web_email'] ?? null,
+]);
+exit;
 
 use PragmaRX\Google2FA\Google2FA;
 
