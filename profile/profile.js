@@ -234,10 +234,40 @@ function init2FA() {
     if (!confirm('Opravdu chceš vypnout 2FA?')) return;
 
     try {
-      const res = await fetch('/api/2fa_disable.php', {
-        method: 'POST',
-        credentials: 'same-origin'
-      });
+      if (btn.dataset.mode === 'disable') {
+
+  const code = prompt('Zadej kód z aplikace');
+
+  if (!code) return;
+
+  try {
+    const res = await fetch('/api/2fa_disable.php', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code })
+    });
+
+    const data = await res.json();
+
+    if (data.ok) {
+      alert('2FA vypnuto');
+
+      if (typeof window.refreshMeAndUi === 'function') {
+        await window.refreshMeAndUi();
+      }
+
+    } else {
+      alert(data.error || 'Chyba');
+    }
+
+  } catch (err) {
+    console.error(err);
+    alert('Server error');
+  }
+
+  return;
+}
 
       const data = await res.json();
 
@@ -276,11 +306,14 @@ function init2FA() {
     if (data.ok && qrBox) {
       qrBox.innerHTML = '';
 
-      new QRCode(qrBox, {
-        text: data.qr_url,
-        width: 220,
-        height: 220
-      });
+      if (data.ok && qrBox) {
+  qrBox.innerHTML = `
+    <img 
+      src="https://quickchart.io/qr?text=${encodeURIComponent(data.qr_url)}&size=260&margin=2"
+      style="background:#fff;padding:10px;border-radius:8px;"
+    >
+  `;
+}
     } else {
       qrBox.innerHTML = 'Chyba QR';
     }
