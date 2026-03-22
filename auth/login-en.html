@@ -114,6 +114,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const confirmBtn = document.getElementById('twofaLoginConfirm');
   const cancelBtn = document.getElementById('twofaLoginCancel');
   const codeInput = document.getElementById('twofaLoginCode');
+codeInput?.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') {
+    confirmBtn.click();
+  }
+});
+
 
   const errorMessages = {
     INVALID_CREDENTIALS: 'Incorrect email or password.',

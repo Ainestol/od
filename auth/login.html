@@ -82,7 +82,13 @@
   <div class="modal-box">
     <h3>Zadej kód z aplikace</h3>
 
-    <input id="twofaLoginCode" type="text" placeholder="6místný kód">
+    <input 
+  id="twofaLoginCode" 
+  type="text" 
+  placeholder="123 456"
+  inputmode="numeric"
+  maxlength="6"
+/>
 
     <div class="modal-actions">
       <button id="twofaLoginCancel" class="btn">Zrušit</button>
@@ -117,6 +123,22 @@ document.addEventListener('DOMContentLoaded', () => {
   const confirmBtn = document.getElementById('twofaLoginConfirm');
   const cancelBtn = document.getElementById('twofaLoginCancel');
   const codeInput = document.getElementById('twofaLoginCode');
+codeInput?.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') {
+    confirmBtn.click();
+  }
+});
+
+// 🔥 auto formát 123 456
+codeInput?.addEventListener('input', () => {
+  let value = codeInput.value.replace(/\D/g, '').slice(0, 6);
+
+  if (value.length > 3) {
+    value = value.slice(0, 3) + ' ' + value.slice(3);
+  }
+
+  codeInput.value = value;
+});
 
   const errorMessages = {
     INVALID_CREDENTIALS: 'Nesprávný e-mail nebo heslo.',
@@ -170,7 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setLoading(false);
         return;
       }
-
+setTimeout(() => codeInput?.focus(), 100);
       const message = errorMessages[data.error] || data.error || 'Přihlášení se nezdařilo.';
       showError(message);
 
@@ -186,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 2FA CONFIRM
   // =========================
   confirmBtn?.addEventListener('click', async () => {
-    const code = codeInput.value.trim();
+    const code = codeInput.value.replace(/\s/g, '');
 
     if (!code) {
       alert('Zadej kód');
