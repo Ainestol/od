@@ -240,7 +240,7 @@ function init2FA() {
       const data = await res.json();
 
       if (data.ok && qrBox) {
-        qrBox.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data.qr_url)}">`;
+        qrBox.innerHTML = `<img src="https://quickchart.io/qr?text=${data.qr_url}&size=200">`;
       }
     }
   });
