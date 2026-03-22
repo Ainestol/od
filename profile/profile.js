@@ -226,13 +226,16 @@ function init2FA() {
   if (!btn || !modal) return;
 
   // 👉 OPEN MODAL + QR
-  btn.addEventListener('click', async () => {
-    modal.classList.remove('hidden');
+btn.addEventListener('click', async () => {
+  modal.classList.remove('hidden');
 
-    const qrBox = document.getElementById('twofaQr');
-    if (qrBox) qrBox.innerHTML = 'Načítám QR...';
+  const qrBox = document.getElementById('twofaQr');
+  if (qrBox) {
+    qrBox.innerHTML = 'Načítám QR...';
+  }
 
-    if (btn.dataset.mode === 'enable') {
+  if (btn.dataset.mode === 'enable') {
+    try {
       const res = await fetch('/api/2fa_setup.php', {
         credentials: 'same-origin'
       });
@@ -240,10 +243,23 @@ function init2FA() {
       const data = await res.json();
 
       if (data.ok && qrBox) {
-        qrBox.innerHTML = `<img src="https://quickchart.io/qr?text=${data.qr_url}&size=200">`;
+        qrBox.innerHTML = '';
+
+        new QRCode(qrBox, {
+          text: data.qr_url,
+          width: 200,
+          height: 200
+        });
+      } else {
+        if (qrBox) qrBox.innerHTML = 'Chyba při načítání QR';
       }
+
+    } catch (err) {
+      console.error('2FA QR error:', err);
+      if (qrBox) qrBox.innerHTML = 'Chyba spojení';
     }
-  });
+  }
+});
 
   // 👉 CLOSE MODAL
   cancel?.addEventListener('click', () => {
