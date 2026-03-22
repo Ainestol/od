@@ -227,45 +227,69 @@ function init2FA() {
   if (!btn || !modal) return;
 
   // 👉 OPEN MODAL + QR
-  btn.addEventListener('click', async () => {
-    modal.classList.remove('hidden');
+ btn.addEventListener('click', async () => {
+  // 👉 DISABLE režim
+  if (btn.dataset.mode === 'disable') {
 
-    if (qrBox) {
-      qrBox.innerHTML = 'Načítám QR...';
-    }
+    if (!confirm('Opravdu chceš vypnout 2FA?')) return;
 
-    if (btn.dataset.mode === 'enable') {
-      try {
-        const res = await fetch('/api/2fa_setup.php', {
-          credentials: 'same-origin'
-        });
+    try {
+      const res = await fetch('/api/2fa_disable.php', {
+        method: 'POST',
+        credentials: 'same-origin'
+      });
 
-        const data = await res.json();
+      const data = await res.json();
 
-      if (data.ok && qrBox) {
-  qrBox.innerHTML = `
-    <img src="https://quickchart.io/qr?text=${encodeURIComponent(data.qr_url)}&size=220">
-  `;
+      if (data.ok) {
+        alert('2FA vypnuto');
 
-  qrBox.style.background = "#fff";
-  qrBox.style.padding = "10px";
-  qrBox.style.display = "flex";
-  qrBox.style.justifyContent = "center";
-  qrBox.style.alignItems = "center";
-  qrBox.style.width = "240px";
-  qrBox.style.margin = "0 auto";
-}
-
-else {
-          if (qrBox) qrBox.innerHTML = 'Chyba při načítání QR';
+        if (typeof window.refreshMeAndUi === 'function') {
+          await window.refreshMeAndUi();
         }
 
-      } catch (err) {
-        console.error('2FA QR error:', err);
-        if (qrBox) qrBox.innerHTML = 'Chyba spojení';
+      } else {
+        alert(data.error || 'Chyba');
       }
+
+    } catch (err) {
+      console.error(err);
+      alert('Server error');
     }
-  });
+
+    return;
+  }
+
+  // 👉 ENABLE režim (to co už máš)
+  modal.classList.remove('hidden');
+
+  const qrBox = document.getElementById('twofaQr');
+  if (qrBox) qrBox.innerHTML = 'Načítám QR...';
+
+  try {
+    const res = await fetch('/api/2fa_setup.php', {
+      credentials: 'same-origin'
+    });
+
+    const data = await res.json();
+
+    if (data.ok && qrBox) {
+      qrBox.innerHTML = '';
+
+      new QRCode(qrBox, {
+        text: data.qr_url,
+        width: 220,
+        height: 220
+      });
+    } else {
+      qrBox.innerHTML = 'Chyba QR';
+    }
+
+  } catch (err) {
+    console.error(err);
+    if (qrBox) qrBox.innerHTML = 'Chyba spojení';
+  }
+});
 
   // 👉 CLOSE MODAL
  cancel?.addEventListener('click', async () => {
