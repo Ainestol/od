@@ -320,7 +320,19 @@ let status = "";
 let statusClass = "";
 let info = "";
 
- if(type === "GRAND"){
+/* filtr typu */
+if((b.boss_type || "").toLowerCase() !== type.toLowerCase()) return;
+
+const killTime = Number(b.kill_time) || 0;
+const delay = Number(b.respawn_delay) || 0;
+const random = Number(b.respawn_random) || 0;
+const spawnTime = Number(b.spawn_time) || 0;
+
+const windowStart = killTime + delay;
+const windowEnd = windowStart + random;
+
+/* ================= GRAND ================= */
+if(type === "GRAND"){
 
     if(b.grand_status === 0){
         status = T.alive;
@@ -340,96 +352,52 @@ let info = "";
         info = T.spawnWindow;
     }
 
-    const div = document.createElement("div");
-
-    div.className = "raid-row";
-
-    div.innerHTML = `
-    <span class="raid-name">${b.boss_name}</span>
-    <span class="raid-level">Lv ${b.level ?? "?"}</span>
-    <span class="raid-status ${statusClass}">${status}</span>
-    <div class="raid-extra">${info}</div>
-    `;
-
-    box.appendChild(div);
-
-    return; // 🔥 KRITICKÉ - přeskočí starou logiku
-}   
-console.log(
-b.boss_name,
-"kill:", Number(b.kill_time),
-"delay:", Number(b.respawn_delay),
-"random:", Number(b.respawn_random),
-"spawn:", Number(b.spawn_time)
-);
-if((b.boss_type || "").toLowerCase() !== type.toLowerCase()) return;
-
-const killTime = Number(b.kill_time) || 0;
-const delay = Number(b.respawn_delay) || 0;
-const random = Number(b.respawn_random) || 0;
-const spawnTime = Number(b.spawn_time) || 0;
-
-const windowStart = killTime + delay;
-const windowEnd = windowStart + random;
-
-
-/* boss je živý (spawnul po posledním killu) */
-
-if(spawnTime > killTime){
-
-    status = T.alive;
-    statusClass = "alive";
-    info = T.bossAlive;
-
 }
 
-/* boss byl zabit */
-
-else if(killTime > 0){
-
-    if(now < windowStart){
-
-        status = T.dead;
-        statusClass = "dead";
-
-        const diff = windowStart - now;
-        info = `${T.spawnWindowIn} ${formatCountdown(diff)}`;
-
-    }
-
-    else if(now >= windowStart && now <= windowEnd){
-
-        status = T.window;
-        statusClass = "window";
-
-        const locale = LANG === "cs" ? "cs-CZ" : "en-US";
-
-const start = new Date(windowStart*1000).toLocaleString(locale);
-const end = new Date(windowEnd*1000).toLocaleString(locale);
-
-info = `${T.spawnWindow}: ${start} – ${end}`;
-
-    }
-
-    else{
-
-        status = T.alive;
-        statusClass = "alive";
-        info = T.bossShouldBeAlive;
-
-    }
-
-}
-
-/* boss nikdy nebyl zabit */
-
+/* ================= RAID ================= */
 else{
 
-    status = T.alive;
-    statusClass = "alive";
-    info = T.noKill;
+    if(spawnTime > killTime){
+        status = T.alive;
+        statusClass = "alive";
+        info = T.bossAlive;
+    }
+    else if(killTime > 0){
+
+        if(now < windowStart){
+            status = T.dead;
+            statusClass = "dead";
+
+            const diff = windowStart - now;
+            info = `${T.spawnWindowIn} ${formatCountdown(diff)}`;
+        }
+        else if(now >= windowStart && now <= windowEnd){
+
+            status = T.window;
+            statusClass = "window";
+
+            const locale = LANG === "cs" ? "cs-CZ" : "en-US";
+
+            const start = new Date(windowStart*1000).toLocaleString(locale);
+            const end = new Date(windowEnd*1000).toLocaleString(locale);
+
+            info = `${T.spawnWindow}: ${start} – ${end}`;
+        }
+        else{
+            status = T.alive;
+            statusClass = "alive";
+            info = T.bossShouldBeAlive;
+        }
+    }
+    else{
+        status = T.alive;
+        statusClass = "alive";
+        info = T.noKill;
+    }
 
 }
+
+/* render */
 
 const div = document.createElement("div");
 
