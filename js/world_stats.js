@@ -370,7 +370,7 @@ if(type === "GRAND"){
 /* ================= RAID ================= */
 else{
 
-    if(spawnTime > killTime){
+    if(spawnTime > killTime || spawnTime === 0){
         status = T.alive;
         statusClass = "alive";
         info = T.bossAlive;
