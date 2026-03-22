@@ -16,7 +16,10 @@ COALESCE(k.kill_time,0) AS kill_time,
 COALESCE(s.spawn_time,0) AS spawn_time,
 
 b.respawn_delay,
-b.respawn_random
+b.respawn_random,
+
+g.status AS grand_status,
+g.respawn_time AS grand_respawn_time
 
 FROM boss_list b
 
@@ -36,9 +39,13 @@ LEFT JOIN (
 ) s
 ON s.boss_id = b.boss_id
 
+LEFT JOIN grandboss_data g
+ON g.boss_id = b.boss_id
+
 WHERE
 b.type='raid'
 OR b.boss_id IN (29001,29006,29014,29019,29020,29028,29045)
+
 
 ORDER BY b.level ASC
 ";
@@ -52,7 +59,8 @@ $b['kill_time'] = intval($b['kill_time'] ?? 0);
 $b['spawn_time'] = intval($b['spawn_time'] ?? 0);
 $b['respawn_delay'] = intval($b['respawn_delay'] ?? 0);
 $b['respawn_random'] = intval($b['respawn_random'] ?? 0);
-
+$b['grand_status'] = intval($b['grand_status'] ?? 0);
+$b['grand_respawn_time'] = intval(($b['grand_respawn_time'] ?? 0) / 1000);
 }
 
 echo json_encode([

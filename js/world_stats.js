@@ -338,61 +338,97 @@ let info = "";
 
 /* boss je živý (spawnul po posledním killu) */
 
-if(spawnTime > killTime){
+/* ================= GRAND + RAID LOGIKA ================= */
 
-    status = T.alive;
-    statusClass = "alive";
-    info = T.bossAlive;
+if(type === "GRAND"){
 
-}
+    if(b.grand_status === 0){
 
-/* boss byl zabit */
+        status = T.alive;
+        statusClass = "alive";
+        info = T.bossAlive;
 
-else if(killTime > 0){
+    }
 
-    if(now < windowStart){
+    else if(b.grand_status === 1){
 
         status = T.dead;
         statusClass = "dead";
 
-        const diff = windowStart - now;
+        const diff = b.grand_respawn_time - now;
         info = `${T.spawnWindowIn} ${formatCountdown(diff)}`;
-
-    }
-
-    else if(now >= windowStart && now <= windowEnd){
-
-        status = T.window;
-        statusClass = "window";
-
-        const locale = LANG === "cs" ? "cs-CZ" : "en-US";
-
-const start = new Date(windowStart*1000).toLocaleString(locale);
-const end = new Date(windowEnd*1000).toLocaleString(locale);
-
-info = `${T.spawnWindow}: ${start} – ${end}`;
 
     }
 
     else{
 
+        status = T.window;
+        statusClass = "window";
+        info = T.spawnWindow;
+
+    }
+
+}
+else{
+
+    /* boss je živý (spawnul po posledním killu) */
+    if(spawnTime > killTime){
+
         status = T.alive;
         statusClass = "alive";
-        info = T.bossShouldBeAlive;
+        info = T.bossAlive;
+
+    }
+
+    /* boss byl zabit */
+    else if(killTime > 0){
+
+        if(now < windowStart){
+
+            status = T.dead;
+            statusClass = "dead";
+
+            const diff = windowStart - now;
+            info = `${T.spawnWindowIn} ${formatCountdown(diff)}`;
+
+        }
+
+        else if(now >= windowStart && now <= windowEnd){
+
+            status = T.window;
+            statusClass = "window";
+
+            const locale = LANG === "cs" ? "cs-CZ" : "en-US";
+
+            const start = new Date(windowStart*1000).toLocaleString(locale);
+            const end = new Date(windowEnd*1000).toLocaleString(locale);
+
+            info = `${T.spawnWindow}: ${start} – ${end}`;
+
+        }
+
+        else{
+
+            status = T.alive;
+            statusClass = "alive";
+            info = T.bossShouldBeAlive;
+
+        }
+
+    }
+
+    /* boss nikdy nebyl zabit */
+    else{
+
+        status = T.alive;
+        statusClass = "alive";
+        info = T.noKill;
 
     }
 
 }
 
-/* boss nikdy nebyl zabit */
-
-else{
-
-    status = T.alive;
-    statusClass = "alive";
-    info = T.noKill;
-
-}
+/* ================= RENDER (NECHAT!) ================= */
 
 const div = document.createElement("div");
 
@@ -408,23 +444,4 @@ div.innerHTML = `
 box.appendChild(div);
 
 });
-
 }
-/* =========================
-   INITIAL LOAD
-========================= */
-
-loadWorldStats();
-loadBoss("RAID");
-loadBoss("GRAND");
-
-/* =========================
-   AUTO REFRESH
-========================= */
-
-setInterval(loadWorldStats,60000);
-setInterval(()=>{
-loadBoss("RAID");
-loadBoss("GRAND");
-},1000);
-
