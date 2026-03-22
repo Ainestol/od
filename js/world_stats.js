@@ -399,7 +399,7 @@ else{
         else{
             status = T.alive;
             statusClass = "alive";
-            info = T.bossShouldBeAlive;
+            info = T.bossAlive;
         }
     }
     else{
