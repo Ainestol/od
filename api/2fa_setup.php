@@ -4,11 +4,6 @@ header('Content-Type: application/json; charset=utf-8');
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/_bootstrap.php';
 
-echo json_encode([
-    "email_raw" => $_SESSION['web_email']
-]);
-exit;
-
 use PragmaRX\Google2FA\Google2FA;
 
 if (empty($_SESSION['web_user_id'])) {
@@ -19,14 +14,11 @@ if (empty($_SESSION['web_user_id'])) {
 
 $google2fa = new Google2FA();
 
-// 🔑 vygeneruj secret
 $secret = $google2fa->generateSecretKey();
 
-// uložíme DOČASNĚ do session (ne do DB!)
 $_SESSION['2fa_setup_secret'] = $secret;
 
-// vytvoření QR URL
-$email = rawurlencode($_SESSION['web_email']);
+$email = $_SESSION['web_email']; // 🔥 TADY NEENCODOVAT
 
 $qrUrl = $google2fa->getQRCodeUrl(
     'OrdoDraconis',
