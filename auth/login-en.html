@@ -82,12 +82,19 @@
   <div class="modal-box">
     <h3>Enter code from authenticator</h3>
 
-    <input id="twofaLoginCode" type="text" placeholder="6-digit code">
+    <input 
+      id="twofaLoginCode" 
+      type="text" 
+      placeholder="123 456"
+      inputmode="numeric"
+      maxlength="6"
+    />
 
-    <button id="twofaLoginCancel">Cancel</button>
-    <button id="twofaLoginConfirm">Verify</button>
+    <div class="modal-actions">
+      <button id="twofaLoginCancel" class="btn">Cancel</button>
+      <button id="twofaLoginConfirm" class="btn btn-primary">Verify</button>
+    </div>
   </div>
-</div>
 </div>
 
     <div class="auth-footer">
