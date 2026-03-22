@@ -7,8 +7,6 @@ require_once __DIR__ . '/../lib/session.php';
 
 use PragmaRX\Google2FA\Google2FA;
 
-session_start();
-
 if (!isset($_SESSION['2fa_user_id'])) {
     http_response_code(401);
     echo json_encode(["error" => "No 2FA session"]);
