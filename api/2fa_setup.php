@@ -3,6 +3,12 @@ header('Content-Type: application/json; charset=utf-8');
 
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/_bootstrap.php';
+
+echo json_encode([
+    "email_raw" => $_SESSION['web_email']
+]);
+exit;
+
 use PragmaRX\Google2FA\Google2FA;
 
 if (empty($_SESSION['web_user_id'])) {
