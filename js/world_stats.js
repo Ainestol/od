@@ -331,45 +331,40 @@ const spawnTime = Number(b.spawn_time) || 0;
 const windowStart = killTime + delay;
 const windowEnd = windowStart + random;
 
-/* ================= GRAND ================= */
+//* ================= GRAND ================= */
 if(type === "GRAND"){
 
     const gStatus = Number(b.grand_status ?? -1);
     const gRespawn = Number(b.grand_respawn_time ?? 0);
 
-    if(gStatus === 0){
+    // 🟢 ALIVE
+    if(gStatus === 0 || gRespawn <= now){
         status = T.alive;
         statusClass = "alive";
         info = T.bossAlive;
     }
 
+    // 🔴 DEAD (čekání na respawn)
     else if(gStatus === 1){
 
-        if(gRespawn > 0 && gRespawn > now){
-            status = T.dead;
-            statusClass = "dead";
-
-            const diff = gRespawn - now;
-            info = `${T.spawnWindowIn} ${formatCountdown(diff)}`;
-        }
-        else{
-            status = T.alive;
-            statusClass = "alive";
-            info = T.bossShouldBeAlive;
-        }
+        const diff = gRespawn - now;
+        status = T.dead;
+        statusClass = "dead";
+        info = `${T.spawnWindowIn} ${formatCountdown(diff)}`;
     }
 
+    // 🟡 WINDOW
     else if(gStatus === 3){
         status = T.window;
         statusClass = "window";
         info = T.spawnWindow;
     }
 
+    // fallback (když něco chybí)
     else{
-        // 🔥 fallback když chybí data
         status = T.alive;
         statusClass = "alive";
-        info = T.noKill;
+        info = T.bossAlive;
     }
 }
 /* ================= RAID ================= */
