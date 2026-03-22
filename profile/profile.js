@@ -192,6 +192,19 @@ function notify(type, message, timeout = 3000) {
         const btn = document.getElementById('adminBtn');
         if (btn) btn.style.display = 'inline-flex';
       }
+
+      // 🔐 2FA button state
+      const btn2fa = document.getElementById('enable2faBtn');
+      if (btn2fa) {
+        if (me.twofa_enabled === 1) {
+          btn2fa.textContent = 'Vypnout 2FA';
+          btn2fa.dataset.mode = 'disable';
+        } else {
+          btn2fa.textContent = 'Zapnout 2FA';
+          btn2fa.dataset.mode = 'enable';
+        }
+      }
+
     } catch (e) {
       redirectToLogin();
     }
@@ -199,6 +212,75 @@ function notify(type, message, timeout = 3000) {
 
   window.refreshMeAndUi = window.refreshMeAndUi || (async () => initMeAndUi(true));
 
+
+/* -----------------------------
+  2FA
+ * ----------------------------- */
+function init2FA() {
+  const btn = document.getElementById('enable2faBtn');
+  const modal = document.getElementById('twofaModal');
+  const cancel = document.getElementById('twofaCancel');
+  const confirmBtn = document.getElementById('twofaConfirm');
+  const codeInput = document.getElementById('twofaCode');
+
+  if (!btn || !modal) return;
+
+  // 👉 OPEN MODAL + QR
+  btn.addEventListener('click', async () => {
+    modal.classList.remove('hidden');
+
+    const qrBox = document.getElementById('twofaQr');
+    if (qrBox) qrBox.innerHTML = 'Načítám QR...';
+
+    if (btn.dataset.mode === 'enable') {
+      const res = await fetch('/api/2fa_setup.php', {
+        credentials: 'same-origin'
+      });
+
+      const data = await res.json();
+
+      if (data.ok && qrBox) {
+        qrBox.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data.qr_url)}">`;
+      }
+    }
+  });
+
+  // 👉 CLOSE MODAL
+  cancel?.addEventListener('click', () => {
+    modal.classList.add('hidden');
+  });
+
+  // 👉 CONFIRM 2FA ENABLE
+  confirmBtn?.addEventListener('click', async () => {
+    const code = codeInput.value.trim();
+
+    if (!code) {
+      alert('Zadej kód');
+      return;
+    }
+
+    const res = await fetch('/api/2fa_enable.php', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code })
+    });
+
+    const data = await res.json();
+
+    if (data.ok) {
+      alert('2FA zapnuto');
+      modal.classList.add('hidden');
+
+      if (typeof window.refreshMeAndUi === 'function') {
+        await window.refreshMeAndUi();
+      }
+
+    } else {
+      alert(data.error || 'Chyba');
+    }
+  });
+}
    /* -----------------------------
    * tabs (main profile tabs)
    * ----------------------------- */
@@ -1499,5 +1581,7 @@ if (!ok) return;
 
     // 10) shop
     initShop();
+    // 11) 2FA
+    init2FA();
   });
 })();

@@ -31,10 +31,21 @@ if ($vipEnd) {
   ];
 }
 
+// 🔐 2FA status
+$st2fa = $pdo->prepare("
+  SELECT twofa_enabled
+  FROM users
+  WHERE id = ?
+  LIMIT 1
+");
+$st2fa->execute([$_SESSION['web_user_id']]);
+$twofaEnabled = (int)$st2fa->fetchColumn();
+
 echo json_encode([
   "ok"      => true,
   "email"   => $_SESSION['web_email'],
   "lang"    => $_SESSION['lang'] ?? 'cs',
   "role"    => $_SESSION['role'] ?? 'user', // 🔥 čárka
-  "web_vip" => $webVip
+  "web_vip" => $webVip,
+  "twofa_enabled" => $twofaEnabled
 ]);

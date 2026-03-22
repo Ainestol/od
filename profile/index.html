@@ -30,6 +30,16 @@
    <div class="profile-header">
     <h1>Můj profil</h1>
 
+<div class="profile-card">
+  <h2>Zabezpečení účtu</h2>
+  <p class="muted">Dvoufaktorové ověření (Google Authenticator, Microsoft Authenticator)</p>
+
+  <button id="enable2faBtn" class="btn btn-primary">
+    Zapnout 2FA
+  </button>
+</div>
+
+
     <div class="wallet-top">
       <div id="voteBalanceTop" class="wallet-pill">
         <img src="/img/vote-coin.png" alt="" class="coin-icon coin-icon--top">
@@ -256,6 +266,23 @@
   </div>
 </div>
 <script src="./profile.js" defer></script>
+
+<div id="twofaModal" class="modal hidden">
+  <div class="modal-box">
+    <h3>Zapnout 2FA</h3>
+
+    <p>Naskenuj QR kód do aplikace (Microsoft Authenticator apod.)</p>
+
+    <div id="twofaQr" style="text-align:center; margin:15px 0;"></div>
+
+    <input id="twofaCode" type="text" placeholder="Zadej 6místný kód">
+
+    <div class="modal-actions">
+      <button id="twofaCancel" class="btn">Zrušit</button>
+      <button id="twofaConfirm" class="btn btn-primary">Potvrdit</button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>

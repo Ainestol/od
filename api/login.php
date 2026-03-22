@@ -110,7 +110,7 @@ if ($emailAttempts >= 5) {
 // SELECT USER
 // ================================
 $stUser = $pdo->prepare(
-    "SELECT id, email, password_hash, role, is_verified 
+    "SELECT id, email, password_hash, role, is_verified, twofa_secret, twofa_enabled 
      FROM users 
      WHERE email = ? 
      LIMIT 1"
@@ -172,6 +172,20 @@ if (!password_verify($pass, $user['password_hash'])) {
 if ((int)($user['is_verified'] ?? 0) !== 1) {
     http_response_code(403);
     echo json_encode(["error" => "Email not verified"]);
+    exit;
+}
+
+// ================================
+// 2FA CHECK
+// ================================
+if ((int)$user['twofa_enabled'] === 1 && !empty($user['twofa_secret'])) {
+
+    // uložíme user do session jen dočasně
+    $_SESSION['2fa_user_id'] = (int)$user['id'];
+    $_SESSION['2fa_verified'] = false;
+    echo json_encode([
+        "status" => "2fa_required"
+    ]);
     exit;
 }
 

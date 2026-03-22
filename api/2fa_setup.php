@@ -1,38 +1,36 @@
 <?php
+header('Content-Type: application/json; charset=utf-8');
 
 require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/_bootstrap.php';
 
 use PragmaRX\Google2FA\Google2FA;
 
-session_start();
-
-// musí být přihlášený user
-if (!isset($_SESSION['user_id'])) {
+if (empty($_SESSION['web_user_id'])) {
     http_response_code(401);
-    echo json_encode(["error" => "Not logged in"]);
+    echo json_encode(["ok" => false]);
     exit;
 }
 
-$userId = $_SESSION['user_id'];
-
-// vytvoření 2FA
 $google2fa = new Google2FA();
+
+// 🔑 vygeneruj secret
 $secret = $google2fa->generateSecretKey();
 
-// uložit do DB (zatím NEaktivujeme)
-$stmt = $pdo->prepare("UPDATE users SET twofa_secret = ? WHERE id = ?");
-$stmt->execute([$secret, $userId]);
+// uložíme DOČASNĚ do session (ne do DB!)
+$_SESSION['2fa_setup_secret'] = $secret;
 
 // vytvoření QR URL
+$email = $_SESSION['web_email'];
+
 $qrUrl = $google2fa->getQRCodeUrl(
     'OrdoDraconis',
-    'user_' . $userId,
+    $email,
     $secret
 );
 
-// vrátíme data
 echo json_encode([
+    "ok" => true,
     "secret" => $secret,
-    "qr" => $qrUrl
+    "qr_url" => $qrUrl
 ]);
