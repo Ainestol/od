@@ -78,6 +78,18 @@
       </button>
     </form>
 
+<div id="twofaLoginModal" class="modal hidden">
+  <div class="modal-box">
+    <h3>Enter code from authenticator</h3>
+
+    <input id="twofaLoginCode" type="text" placeholder="6-digit code">
+
+    <button id="twofaLoginCancel">Cancel</button>
+    <button id="twofaLoginConfirm">Verify</button>
+  </div>
+</div>
+</div>
+
     <div class="auth-footer">
       <p><a href="/auth/forgot-password-en.html">Forgot password?</a></p>
         <p>
@@ -91,65 +103,125 @@
     <p>© Ordo Draconis</p>
   </footer>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const form = document.getElementById('loginForm');
-      const errorBox = document.getElementById('loginError');
-      const btn = document.getElementById('loginBtn');
+ <script>
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('loginForm');
+  const errorBox = document.getElementById('loginError');
+  const btn = document.getElementById('loginBtn');
 
-      const errorMessages = {
-        INVALID_CREDENTIALS: 'Incorrect email or password.',
-        INVALID_EMAIL: 'Please enter a valid email address.',
-        TOO_MANY_ATTEMPTS: 'Too many attempts. Please try again later.',
-        SERVER_ERROR: 'Server error. Please try again later.'
-      };
+  // 🔐 2FA modal elements
+  const modal = document.getElementById('twofaLoginModal');
+  const confirmBtn = document.getElementById('twofaLoginConfirm');
+  const cancelBtn = document.getElementById('twofaLoginCancel');
+  const codeInput = document.getElementById('twofaLoginCode');
 
-      function showError(msg) {
-        errorBox.textContent = msg;
-        errorBox.style.display = 'block';
-      }
+  const errorMessages = {
+    INVALID_CREDENTIALS: 'Incorrect email or password.',
+    INVALID_EMAIL: 'Please enter a valid email address.',
+    TOO_MANY_ATTEMPTS: 'Too many attempts. Please try again later.',
+    SERVER_ERROR: 'Server error. Please try again later.'
+  };
 
-      function setLoading(isLoading) {
-        btn.disabled = isLoading;
-        btn.style.opacity = isLoading ? '0.75' : '1';
-        btn.textContent = isLoading ? 'Signing in…' : 'Login';
-      }
+  function showError(msg) {
+    errorBox.textContent = msg;
+    errorBox.style.display = 'block';
+  }
 
-      if (!form || !errorBox || !btn) return;
+  function setLoading(isLoading) {
+    btn.disabled = isLoading;
+    btn.style.opacity = isLoading ? '0.75' : '1';
+    btn.textContent = isLoading ? 'Signing in…' : 'Login';
+  }
 
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        errorBox.style.display = 'none';
+  if (!form || !errorBox || !btn) return;
 
-        const formData = new FormData(form);
-        formData.set('remember', document.getElementById('remember').checked ? '1' : '0');
+  // =========================
+  // LOGIN
+  // =========================
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorBox.style.display = 'none';
 
-        setLoading(true);
+    const formData = new FormData(form);
+    formData.set('remember', document.getElementById('remember').checked ? '1' : '0');
 
-        try {
-          const res = await fetch('/api/login.php', {
-            method: 'POST',
-            body: formData
-          });
+    setLoading(true);
 
-          const data = await res.json().catch(() => ({}));
-
-          if (data.status === 'ok') {
-            window.location.href = '/profile/index-en.html';
-            return;
-          }
-
-          const message = errorMessages[data.error] || data.error || 'Login failed.';
-          showError(message);
-        } catch (err) {
-          console.error(err);
-          showError('Login failed — please check your connection and try again.');
-        } finally {
-          setLoading(false);
-        }
+    try {
+      const res = await fetch('/api/login.php', {
+        method: 'POST',
+        body: formData
       });
-    });
-  </script>
+
+      const data = await res.json().catch(() => ({}));
+
+      // ✅ normal login
+      if (data.status === 'ok') {
+        window.location.href = '/profile/index-en.html';
+        return;
+      }
+
+      // 🔐 2FA required
+      if (data.status === '2fa_required') {
+        modal.classList.remove('hidden');
+        setLoading(false);
+        return;
+      }
+
+      const message = errorMessages[data.error] || data.error || 'Login failed.';
+      showError(message);
+
+    } catch (err) {
+      console.error(err);
+      showError('Login failed — please check your connection and try again.');
+    } finally {
+      setLoading(false);
+    }
+  });
+
+  // =========================
+  // 2FA CONFIRM
+  // =========================
+  confirmBtn?.addEventListener('click', async () => {
+    const code = codeInput.value.trim();
+
+    if (!code) {
+      alert('Enter the code');
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/2fa_verify.php', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code })
+      });
+
+      const data = await res.json();
+
+      if (data.status === 'ok') {
+        window.location.href = '/profile/index-en.html';
+      } else {
+        alert(data.error || 'Invalid code');
+      }
+
+    } catch (err) {
+      console.error(err);
+      alert('Server error');
+    }
+  });
+
+  // =========================
+  // 2FA CANCEL
+  // =========================
+  cancelBtn?.addEventListener('click', () => {
+    modal.classList.add('hidden');
+    codeInput.value = '';
+  });
+
+});
+</script>
 
 </body>
 </html>

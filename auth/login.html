@@ -78,6 +78,19 @@
       </button>
     </form>
 
+<div id="twofaLoginModal" class="modal hidden">
+  <div class="modal-box">
+    <h3>Zadej kód z aplikace</h3>
+
+    <input id="twofaLoginCode" type="text" placeholder="6místný kód">
+
+    <div class="modal-actions">
+      <button id="twofaLoginCancel" class="btn">Zrušit</button>
+      <button id="twofaLoginConfirm" class="btn btn-primary">Ověřit</button>
+    </div>
+  </div>
+</div>
+
     <div class="auth-footer">
   <p>
     <a href="/auth/forgot-password.html">Zapomenuté heslo?</a>
@@ -94,65 +107,124 @@
   </footer>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const form = document.getElementById('loginForm');
-      const errorBox = document.getElementById('loginError');
-      const btn = document.getElementById('loginBtn');
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('loginForm');
+  const errorBox = document.getElementById('loginError');
+  const btn = document.getElementById('loginBtn');
 
-      const errorMessages = {
-        INVALID_CREDENTIALS: 'Nesprávný e-mail nebo heslo.',
-        INVALID_EMAIL: 'Zadej platnou e-mailovou adresu.',
-        TOO_MANY_ATTEMPTS: 'Příliš mnoho pokusů. Zkus to prosím později.',
-        SERVER_ERROR: 'Došlo k chybě serveru. Zkus to prosím později.'
-      };
+  // 🔐 2FA modal prvky
+  const modal = document.getElementById('twofaLoginModal');
+  const confirmBtn = document.getElementById('twofaLoginConfirm');
+  const cancelBtn = document.getElementById('twofaLoginCancel');
+  const codeInput = document.getElementById('twofaLoginCode');
 
-      function showError(msg) {
-        errorBox.textContent = msg;
-        errorBox.style.display = 'block';
-      }
+  const errorMessages = {
+    INVALID_CREDENTIALS: 'Nesprávný e-mail nebo heslo.',
+    INVALID_EMAIL: 'Zadej platnou e-mailovou adresu.',
+    TOO_MANY_ATTEMPTS: 'Příliš mnoho pokusů. Zkus to prosím později.',
+    SERVER_ERROR: 'Došlo k chybě serveru. Zkus to prosím později.'
+  };
 
-      function setLoading(isLoading) {
-        btn.disabled = isLoading;
-        btn.style.opacity = isLoading ? '0.75' : '1';
-        btn.textContent = isLoading ? 'Přihlašuji…' : 'Přihlásit se';
-      }
+  function showError(msg) {
+    errorBox.textContent = msg;
+    errorBox.style.display = 'block';
+  }
 
-      if (!form || !errorBox || !btn) return;
+  function setLoading(isLoading) {
+    btn.disabled = isLoading;
+    btn.style.opacity = isLoading ? '0.75' : '1';
+    btn.textContent = isLoading ? 'Přihlašuji…' : 'Přihlásit se';
+  }
 
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        errorBox.style.display = 'none';
+  if (!form || !errorBox || !btn) return;
 
-        const formData = new FormData(form);
-        // ✅ přidáme explicitně hodnotu, ať je to v PHP čitelné
-        formData.set('remember', document.getElementById('remember').checked ? '1' : '0');
+  // =========================
+  // LOGIN
+  // =========================
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorBox.style.display = 'none';
 
-        setLoading(true);
+    const formData = new FormData(form);
+    formData.set('remember', document.getElementById('remember').checked ? '1' : '0');
 
-        try {
-          const res = await fetch('/api/login.php', {
-            method: 'POST',
-            body: formData
-          });
+    setLoading(true);
 
-          const data = await res.json().catch(() => ({}));
-
-          if (data.status === 'ok') {
-            window.location.href = '/profile/index.html';
-            return;
-          }
-
-          const message = errorMessages[data.error] || data.error || 'Přihlášení se nezdařilo.';
-          showError(message);
-        } catch (err) {
-          console.error(err);
-          showError('Přihlášení se nezdařilo – zkontroluj připojení a zkus to znovu.');
-        } finally {
-          setLoading(false);
-        }
+    try {
+      const res = await fetch('/api/login.php', {
+        method: 'POST',
+        body: formData
       });
-    });
-  </script>
+
+      const data = await res.json().catch(() => ({}));
+
+      // ✅ normální login
+      if (data.status === 'ok') {
+        window.location.href = '/profile/index.html';
+        return;
+      }
+
+      // 🔐 2FA required → otevři modal
+      if (data.status === '2fa_required') {
+        modal.classList.remove('hidden');
+        setLoading(false);
+        return;
+      }
+
+      const message = errorMessages[data.error] || data.error || 'Přihlášení se nezdařilo.';
+      showError(message);
+
+    } catch (err) {
+      console.error(err);
+      showError('Přihlášení se nezdařilo – zkontroluj připojení a zkus to znovu.');
+    } finally {
+      setLoading(false);
+    }
+  });
+
+  // =========================
+  // 2FA CONFIRM
+  // =========================
+  confirmBtn?.addEventListener('click', async () => {
+    const code = codeInput.value.trim();
+
+    if (!code) {
+      alert('Zadej kód');
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/2fa_verify.php', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code })
+      });
+
+      const data = await res.json();
+
+      if (data.status === 'ok') {
+        window.location.href = '/profile/index.html';
+      } else {
+        alert(data.error || 'Chybný kód');
+      }
+
+    } catch (err) {
+      console.error(err);
+      alert('Chyba serveru');
+    }
+  });
+
+  // =========================
+  // 2FA CANCEL
+  // =========================
+  cancelBtn?.addEventListener('click', () => {
+    modal.classList.add('hidden');
+    codeInput.value = '';
+  });
+
+});
+</script>
 
 </body>
 </html>
