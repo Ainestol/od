@@ -371,45 +371,35 @@ if(type === "GRAND"){
 }
 /* ================= RAID ================= */
 else{
-/***** IXION = VALAKAS LOGIKA *****/
-if([29040].includes(b.boss_id) && valakas){
+if(b.boss_id === 29040 && valakas){
 
-    const valakasKill = Number(valakas.kill_time) || 0;
-    const valakasDelay = Number(valakas.respawn_delay) || 0;
-    const valakasRandom = Number(valakas.respawn_random) || 0;
+    const gStatus = Number(valakas.grand_status ?? -1);
+    const gRespawn = Number(valakas.grand_respawn_time ?? 0);
 
-    const vStart = valakasKill + valakasDelay;
-    const vEnd = vStart + valakasRandom;
+    // 🟢 ALIVE
+    if(gStatus === 0 || gRespawn <= now){
+        status = T.alive;
+        statusClass = "alive";
+        info = T.bossAlive;
+    }
 
-    if(now < vStart){
+    // 🔴 DEAD
+    else if(gStatus === 1){
+
+        const diff = gRespawn - now;
 
         status = T.dead;
         statusClass = "dead";
-
-        const diff = vStart - now;
         info = `${T.spawnWindowIn} ${formatCountdown(diff)}`;
-
     }
-    else if(now >= vStart && now <= vEnd){
 
+    // 🟡 WINDOW
+    else if(gStatus === 3){
         status = T.window;
         statusClass = "window";
-
-        const locale = LANG === "cs" ? "cs-CZ" : "en-US";
-
-        const start = new Date(vStart*1000).toLocaleString(locale);
-        const end = new Date(vEnd*1000).toLocaleString(locale);
-
-        info = `${T.spawnWindow}: ${start} – ${end}`;
-    }
-    else{
-
-        status = T.alive;
-        statusClass = "alive";
-        info = T.bossShouldBeAlive;
+        info = T.spawnWindow;
     }
 
-    // 🔥 důležité: přeskočí normální RB logiku
     const div = document.createElement("div");
 
     div.className = "raid-row";
