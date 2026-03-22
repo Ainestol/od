@@ -573,3 +573,10 @@ body.auth-page.profile-page { overflow: auto; }
   height: 42px;
   padding: 10px 14px;
 }
+
+#twofaQr img,
+#twofaQr canvas {
+  image-rendering: pixelated;
+  width: 300px !important;
+  height: 300px !important;
+}
