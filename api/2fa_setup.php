@@ -20,11 +20,9 @@ $_SESSION['2fa_setup_secret'] = $secret;
 
 $email = $_SESSION['web_email']; // 🔥 TADY NEENCODOVAT
 
-$qrUrl = $google2fa->getQRCodeUrl(
-    'OrdoDraconis',
-    $email,
-    $secret
-);
+$company = 'OrdoDraconis';
+
+$qrUrl = "otpauth://totp/{$company}:{$email}?secret={$secret}&issuer={$company}&algorithm=SHA1&digits=6&period=30";
 
 echo json_encode([
     "ok" => true,
