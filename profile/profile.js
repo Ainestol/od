@@ -242,20 +242,21 @@ function init2FA() {
 
         const data = await res.json();
 
-        if (data.ok && qrBox) {
-          qrBox.innerHTML = '';
+      if (data.ok && qrBox) {
+  qrBox.innerHTML = `
+    <img src="https://quickchart.io/qr?text=${encodeURIComponent(data.qr_url)}&size=220">
+  `;
 
-          qrBox.style.background = "#fff";
-          qrBox.style.padding = "10px";
+  qrBox.style.background = "#fff";
+  qrBox.style.padding = "10px";
+  qrBox.style.display = "flex";
+  qrBox.style.justifyContent = "center";
+  qrBox.style.alignItems = "center";
+  qrBox.style.width = "240px";
+  qrBox.style.margin = "0 auto";
+}
 
-          new QRCode(qrBox, {
-            text: data.qr_url,
-            width: 220,
-            height: 220
-          });
-
-
-        } else {
+else {
           if (qrBox) qrBox.innerHTML = 'Chyba při načítání QR';
         }
 
