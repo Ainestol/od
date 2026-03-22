@@ -314,6 +314,8 @@ box.innerHTML = "";
 
 const now = Math.floor(Date.now()/1000);
 
+const valakas = json.data.find(x => x.boss_id == 29028);
+
 json.data.forEach(b => {
 
 let status = "";
@@ -369,7 +371,60 @@ if(type === "GRAND"){
 }
 /* ================= RAID ================= */
 else{
+/***** IXION = VALAKAS LOGIKA *****/
+if([29040].includes(b.boss_id) && valakas){
 
+    const valakasKill = Number(valakas.kill_time) || 0;
+    const valakasDelay = Number(valakas.respawn_delay) || 0;
+    const valakasRandom = Number(valakas.respawn_random) || 0;
+
+    const vStart = valakasKill + valakasDelay;
+    const vEnd = vStart + valakasRandom;
+
+    if(now < vStart){
+
+        status = T.dead;
+        statusClass = "dead";
+
+        const diff = vStart - now;
+        info = `${T.spawnWindowIn} ${formatCountdown(diff)}`;
+
+    }
+    else if(now >= vStart && now <= vEnd){
+
+        status = T.window;
+        statusClass = "window";
+
+        const locale = LANG === "cs" ? "cs-CZ" : "en-US";
+
+        const start = new Date(vStart*1000).toLocaleString(locale);
+        const end = new Date(vEnd*1000).toLocaleString(locale);
+
+        info = `${T.spawnWindow}: ${start} – ${end}`;
+    }
+    else{
+
+        status = T.alive;
+        statusClass = "alive";
+        info = T.bossShouldBeAlive;
+    }
+
+    // 🔥 důležité: přeskočí normální RB logiku
+    const div = document.createElement("div");
+
+    div.className = "raid-row";
+
+    div.innerHTML = `
+    <span class="raid-name">${b.boss_name}</span>
+    <span class="raid-level">Lv ${b.level ?? "?"}</span>
+    <span class="raid-status ${statusClass}">${status}</span>
+    <div class="raid-extra">${info}</div>
+    `;
+
+    box.appendChild(div);
+
+    return;
+}
     if(spawnTime > killTime){
         status = T.alive;
         statusClass = "alive";
