@@ -16,7 +16,12 @@ $google2fa = new Google2FA();
 
 $secret = $google2fa->generateSecretKey();
 
-$_SESSION['2fa_setup_secret'] = $secret;
+$stmt = $pdo->prepare("
+  UPDATE users 
+  SET twofa_temp_secret = ?
+  WHERE id = ?
+");
+$stmt->execute([$secret, $_SESSION['web_user_id']]);
 
 $email = $_SESSION['web_email']; // 🔥 TADY NEENCODOVAT
 

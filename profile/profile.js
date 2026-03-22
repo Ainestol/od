@@ -268,9 +268,18 @@ else {
   });
 
   // 👉 CLOSE MODAL
-  cancel?.addEventListener('click', () => {
-    modal.classList.add('hidden');
-  });
+ cancel?.addEventListener('click', async () => {
+  modal.classList.add('hidden');
+
+  try {
+    await fetch('/api/2fa_cancel.php', {
+      method: 'POST',
+      credentials: 'same-origin'
+    });
+  } catch (err) {
+    console.error('2FA cancel error:', err);
+  }
+});
 
   // 👉 CONFIRM 2FA ENABLE
   confirmBtn?.addEventListener('click', async () => {
