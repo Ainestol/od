@@ -162,9 +162,10 @@ codeInput?.addEventListener('keypress', (e) => {
 
     try {
       const res = await fetch('/api/login.php', {
-        method: 'POST',
-        body: formData
-      });
+  method: 'POST',
+  body: formData,
+  credentials: 'same-origin'
+});
 
       const data = await res.json().catch(() => ({}));
 
