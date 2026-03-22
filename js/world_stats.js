@@ -315,6 +315,46 @@ box.innerHTML = "";
 const now = Math.floor(Date.now()/1000);
 
 json.data.forEach(b => {
+
+let status = "";
+let statusClass = "";
+let info = "";
+
+ if(type === "GRAND"){
+
+    if(b.grand_status === 0){
+        status = T.alive;
+        statusClass = "alive";
+        info = T.bossAlive;
+    }
+    else if(b.grand_status === 1){
+        status = T.dead;
+        statusClass = "dead";
+
+        const diff = b.grand_respawn_time - now;
+        info = `${T.spawnWindowIn} ${formatCountdown(diff)}`;
+    }
+    else{
+        status = T.window;
+        statusClass = "window";
+        info = T.spawnWindow;
+    }
+
+    const div = document.createElement("div");
+
+    div.className = "raid-row";
+
+    div.innerHTML = `
+    <span class="raid-name">${b.boss_name}</span>
+    <span class="raid-level">Lv ${b.level ?? "?"}</span>
+    <span class="raid-status ${statusClass}">${status}</span>
+    <div class="raid-extra">${info}</div>
+    `;
+
+    box.appendChild(div);
+
+    return; // 🔥 KRITICKÉ - přeskočí starou logiku
+}   
 console.log(
 b.boss_name,
 "kill:", Number(b.kill_time),
@@ -332,103 +372,64 @@ const spawnTime = Number(b.spawn_time) || 0;
 const windowStart = killTime + delay;
 const windowEnd = windowStart + random;
 
-let status = "";
-let statusClass = "";
-let info = "";
 
 /* boss je živý (spawnul po posledním killu) */
 
-/* ================= GRAND + RAID LOGIKA ================= */
+if(spawnTime > killTime){
 
-if(type === "GRAND"){
+    status = T.alive;
+    statusClass = "alive";
+    info = T.bossAlive;
 
-    if(b.grand_status === 0){
+}
 
-        status = T.alive;
-        statusClass = "alive";
-        info = T.bossAlive;
+/* boss byl zabit */
 
-    }
+else if(killTime > 0){
 
-    else if(b.grand_status === 1){
+    if(now < windowStart){
 
         status = T.dead;
         statusClass = "dead";
 
-        const diff = b.grand_respawn_time - now;
+        const diff = windowStart - now;
         info = `${T.spawnWindowIn} ${formatCountdown(diff)}`;
 
     }
 
-    else{
+    else if(now >= windowStart && now <= windowEnd){
 
         status = T.window;
         statusClass = "window";
-        info = T.spawnWindow;
+
+        const locale = LANG === "cs" ? "cs-CZ" : "en-US";
+
+const start = new Date(windowStart*1000).toLocaleString(locale);
+const end = new Date(windowEnd*1000).toLocaleString(locale);
+
+info = `${T.spawnWindow}: ${start} – ${end}`;
 
     }
 
-}
-else{
-
-    /* boss je živý (spawnul po posledním killu) */
-    if(spawnTime > killTime){
-
-        status = T.alive;
-        statusClass = "alive";
-        info = T.bossAlive;
-
-    }
-
-    /* boss byl zabit */
-    else if(killTime > 0){
-
-        if(now < windowStart){
-
-            status = T.dead;
-            statusClass = "dead";
-
-            const diff = windowStart - now;
-            info = `${T.spawnWindowIn} ${formatCountdown(diff)}`;
-
-        }
-
-        else if(now >= windowStart && now <= windowEnd){
-
-            status = T.window;
-            statusClass = "window";
-
-            const locale = LANG === "cs" ? "cs-CZ" : "en-US";
-
-            const start = new Date(windowStart*1000).toLocaleString(locale);
-            const end = new Date(windowEnd*1000).toLocaleString(locale);
-
-            info = `${T.spawnWindow}: ${start} – ${end}`;
-
-        }
-
-        else{
-
-            status = T.alive;
-            statusClass = "alive";
-            info = T.bossShouldBeAlive;
-
-        }
-
-    }
-
-    /* boss nikdy nebyl zabit */
     else{
 
         status = T.alive;
         statusClass = "alive";
-        info = T.noKill;
+        info = T.bossShouldBeAlive;
 
     }
 
 }
 
-/* ================= RENDER (NECHAT!) ================= */
+/* boss nikdy nebyl zabit */
+
+else{
+
+    status = T.alive;
+    statusClass = "alive";
+    info = T.noKill;
+
+}
 
 const div = document.createElement("div");
 
@@ -444,4 +445,23 @@ div.innerHTML = `
 box.appendChild(div);
 
 });
+
 }
+/* =========================
+   INITIAL LOAD
+========================= */
+
+loadWorldStats();
+loadBoss("RAID");
+loadBoss("GRAND");
+
+/* =========================
+   AUTO REFRESH
+========================= */
+
+setInterval(loadWorldStats,60000);
+setInterval(()=>{
+loadBoss("RAID");
+loadBoss("GRAND");
+},1000);
+
