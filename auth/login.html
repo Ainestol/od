@@ -129,17 +129,6 @@ codeInput?.addEventListener('keypress', (e) => {
   }
 });
 
-// 🔥 auto formát 123 456
-codeInput?.addEventListener('input', () => {
-  let value = codeInput.value.replace(/\D/g, '').slice(0, 6);
-
-  if (value.length > 3) {
-    value = value.slice(0, 3) + ' ' + value.slice(3);
-  }
-
-  codeInput.value = value;
-});
-
   const errorMessages = {
     INVALID_CREDENTIALS: 'Nesprávný e-mail nebo heslo.',
     INVALID_EMAIL: 'Zadej platnou e-mailovou adresu.',
