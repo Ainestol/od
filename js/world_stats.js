@@ -340,20 +340,21 @@ if(type === "GRAND"){
         info = T.bossAlive;
     }
     else if(b.grand_status === 1){
+
+    if(b.grand_respawn_time <= now){
+        status = T.alive;
+        statusClass = "alive";
+        info = T.bossShouldBeAlive;
+    }
+    else{
         status = T.dead;
         statusClass = "dead";
 
         const diff = b.grand_respawn_time - now;
         info = `${T.spawnWindowIn} ${formatCountdown(diff)}`;
     }
-    else{
-        status = T.window;
-        statusClass = "window";
-        info = T.spawnWindow;
-    }
-
 }
-
+}
 /* ================= RAID ================= */
 else{
 
