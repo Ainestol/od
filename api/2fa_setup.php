@@ -22,7 +22,7 @@ $email = $_SESSION['web_email']; // 🔥 TADY NEENCODOVAT
 
 $company = 'OrdoDraconis';
 
-$qrUrl = "otpauth://totp/{$company}:{$email}?secret={$secret}&issuer={$company}&algorithm=SHA1&digits=6&period=30";
+$qrUrl = "otpauth://totp/{$company}:{$email}?secret={$secret}&issuer={$company}";
 
 echo json_encode([
     "ok" => true,

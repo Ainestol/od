@@ -245,11 +245,16 @@ function init2FA() {
         if (data.ok && qrBox) {
           qrBox.innerHTML = '';
 
+          qrBox.style.background = "#fff";
+          qrBox.style.padding = "10px";
+
           new QRCode(qrBox, {
             text: data.qr_url,
-            width: 300,
-            height: 300
+            width: 220,
+            height: 220
           });
+
+
         } else {
           if (qrBox) qrBox.innerHTML = 'Chyba při načítání QR';
         }
