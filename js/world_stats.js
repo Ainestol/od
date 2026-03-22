@@ -334,26 +334,43 @@ const windowEnd = windowStart + random;
 /* ================= GRAND ================= */
 if(type === "GRAND"){
 
-    if(b.grand_status === 0){
+    const gStatus = Number(b.grand_status ?? -1);
+    const gRespawn = Number(b.grand_respawn_time ?? 0);
+
+    if(gStatus === 0){
         status = T.alive;
         statusClass = "alive";
         info = T.bossAlive;
     }
-    else if(b.grand_status === 1){
 
-    if(b.grand_respawn_time <= now){
+    else if(gStatus === 1){
+
+        if(gRespawn > 0 && gRespawn > now){
+            status = T.dead;
+            statusClass = "dead";
+
+            const diff = gRespawn - now;
+            info = `${T.spawnWindowIn} ${formatCountdown(diff)}`;
+        }
+        else{
+            status = T.alive;
+            statusClass = "alive";
+            info = T.bossShouldBeAlive;
+        }
+    }
+
+    else if(gStatus === 3){
+        status = T.window;
+        statusClass = "window";
+        info = T.spawnWindow;
+    }
+
+    else{
+        // 🔥 fallback když chybí data
         status = T.alive;
         statusClass = "alive";
-        info = T.bossShouldBeAlive;
+        info = T.noKill;
     }
-    else{
-        status = T.dead;
-        statusClass = "dead";
-
-        const diff = b.grand_respawn_time - now;
-        info = `${T.spawnWindowIn} ${formatCountdown(diff)}`;
-    }
-}
 }
 /* ================= RAID ================= */
 else{
