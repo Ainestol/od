@@ -123,11 +123,33 @@ document.addEventListener('DOMContentLoaded', () => {
   const confirmBtn = document.getElementById('twofaLoginConfirm');
   const cancelBtn = document.getElementById('twofaLoginCancel');
   const codeInput = document.getElementById('twofaLoginCode');
-codeInput?.addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') {
-    confirmBtn.click();
-  }
-});
+
+  // 🔥 reset po reloadu (fix session bug)
+  if (modal) modal.classList.add('hidden');
+  if (codeInput) codeInput.value = '';
+
+  // 🔥 ENTER = potvrzení
+  codeInput?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      confirmBtn.click();
+    }
+  });
+
+  // 🔥 formátování 123 456
+  codeInput?.addEventListener('input', () => {
+    let value = codeInput.value.replace(/\D/g, '').slice(0, 6);
+
+    if (value.length > 3) {
+      value = value.slice(0, 3) + ' ' + value.slice(3);
+    }
+
+    codeInput.value = value;
+
+    // 🚀 auto submit po 6 číslech
+    if (value.replace(/\s/g, '').length === 6) {
+      confirmBtn.click();
+    }
+  });
 
   const errorMessages = {
     INVALID_CREDENTIALS: 'Nesprávný e-mail nebo heslo.',
@@ -162,11 +184,11 @@ codeInput?.addEventListener('keypress', (e) => {
     setLoading(true);
 
     try {
-     const res = await fetch('/api/login.php', {
-  method: 'POST',
-  body: formData,
-  credentials: 'same-origin'
-});
+      const res = await fetch('/api/login.php', {
+        method: 'POST',
+        body: formData,
+        credentials: 'same-origin'
+      });
 
       const data = await res.json().catch(() => ({}));
 
@@ -176,13 +198,16 @@ codeInput?.addEventListener('keypress', (e) => {
         return;
       }
 
-      // 🔐 2FA required → otevři modal
+      // 🔐 2FA required
       if (data.status === '2fa_required') {
         modal.classList.remove('hidden');
         setLoading(false);
+
+        setTimeout(() => codeInput?.focus(), 100); // 🔥 fix focus
+
         return;
       }
-setTimeout(() => codeInput?.focus(), 100);
+
       const message = errorMessages[data.error] || data.error || 'Přihlášení se nezdařilo.';
       showError(message);
 
@@ -198,10 +223,17 @@ setTimeout(() => codeInput?.focus(), 100);
   // 2FA CONFIRM
   // =========================
   confirmBtn?.addEventListener('click', async () => {
+
+    // 🔥 ochrana proti ručnímu kliknutí
+    if (!modal || modal.classList.contains('hidden')) {
+      alert('Nejprve se přihlas');
+      return;
+    }
+
     const code = codeInput.value.replace(/\s/g, '');
 
-    if (!code) {
-      alert('Zadej kód');
+    if (!code || code.length !== 6) {
+      alert('Zadej 6místný kód');
       return;
     }
 
