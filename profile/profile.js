@@ -16,6 +16,51 @@ async function initCsrf() {
   }
 }
 
+
+function showTwofaModal({ text, requireCode = false }) {
+  return new Promise((resolve) => {
+    const modal = document.getElementById('twofaConfirmModal');
+    const textEl = document.getElementById('twofaConfirmText');
+    const input = document.getElementById('twofaConfirmCode');
+    const ok = document.getElementById('twofaConfirmOk');
+    const cancel = document.getElementById('twofaConfirmCancel');
+
+    textEl.textContent = text;
+
+    if (requireCode) {
+      input.style.display = 'block';
+      input.value = '';
+      input.focus();
+    } else {
+      input.style.display = 'none';
+    }
+
+    const cleanup = (val) => {
+      modal.classList.add('hidden');
+      ok.onclick = null;
+      cancel.onclick = null;
+      resolve(val);
+    };
+
+    ok.onclick = () => {
+      if (requireCode) {
+        const code = input.value.trim();
+        if (!code) return;
+        cleanup(code);
+      } else {
+        cleanup(true);
+      }
+    };
+
+    cancel.onclick = () => cleanup(false);
+    modal.onclick = (e) => { if (e.target === modal) cleanup(false); };
+
+    modal.classList.remove('hidden');
+  });
+}
+
+
+
 /* 🔥 ZABLOKUJ start dokud není token */
 (async function bootstrap() {
   await initCsrf();
@@ -242,14 +287,18 @@ function init2FA() {
   // 👉 OPEN MODAL + QR
  btn.addEventListener('click', async () => {
   // 👉 DISABLE režim
-  if (btn.dataset.mode === 'disable') {
+if (btn.dataset.mode === 'disable') {
 
-    if (!confirm('Opravdu chceš vypnout 2FA?')) return;
+  const confirmDisable = await showTwofaModal({
+    text: 'Opravdu chceš vypnout 2FA?'
+  });
 
-    try {
-      if (btn.dataset.mode === 'disable') {
+  if (!confirmDisable) return;
 
-  const code = prompt('Zadej kód z aplikace');
+  const code = await showTwofaModal({
+    text: 'Zadej kód z aplikace',
+    requireCode: true
+  });
 
   if (!code) return;
 
@@ -264,44 +313,23 @@ function init2FA() {
     const data = await res.json();
 
     if (data.ok) {
-      alert('2FA vypnuto');
+      notify('success', '2FA vypnuto');
 
       if (typeof window.refreshMeAndUi === 'function') {
         await window.refreshMeAndUi();
       }
 
     } else {
-      alert(data.error || 'Chyba');
+      notify('error', data.error || 'Chyba');
     }
 
   } catch (err) {
     console.error(err);
-    alert('Server error');
+    notify('error', 'Server error');
   }
 
   return;
 }
-
-      const data = await res.json();
-
-      if (data.ok) {
-        alert('2FA vypnuto');
-
-        if (typeof window.refreshMeAndUi === 'function') {
-          await window.refreshMeAndUi();
-        }
-
-      } else {
-        alert(data.error || 'Chyba');
-      }
-
-    } catch (err) {
-      console.error(err);
-      alert('Server error');
-    }
-
-    return;
-  }
 
 
   // 👉 ENABLE režim (to co už máš)
