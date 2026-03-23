@@ -12,15 +12,7 @@
 <header class="main-header">
   <div class="logo"><a href="/">Ordo Draconis</a></div>
   <div class="auth auth-center">
-    <div class="profile-card">
-  <h2>Zabezpečení účtu</h2>
-  <p class="muted">Dvoufaktorové ověření (Google Authenticator, Microsoft Authenticator)</p>
-
-  <button id="enable2faBtn" class="btn btn-primary">
-    Zapnout 2FA
-  </button>
-</div>
-  <a href="/profile/index.html" class="btn active">Profil</a>
+   <a href="/profile/index.html" class="btn active">Profil</a>
   <a href="/admin/index.php"
    class="btn admin-btn"
    id="adminBtn"
@@ -31,7 +23,13 @@
 
   <a href="/api/logout.php" class="btn">Odhlásit se</a>
 </div>
+<div class="twofa-bar">
+  <span class="twofa-label">2FA zabezpečení</span>
 
+  <button id="twofaToggle" class="twofa-btn off">
+    Zapnout
+  </button>
+</div>
 </header>
 
 <main class="auth-container profile-shell">

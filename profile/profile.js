@@ -289,6 +289,25 @@ function init2FA() {
 
     return;
   }
+// 2Fa toogle.. //
+
+const btn = document.getElementById('twofaToggle');
+
+fetch('/api/profile.php')
+  .then(res => res.json())
+  .then(data => {
+    if (data.twofa_enabled) {
+      btn.classList.add('on');
+      btn.classList.remove('off');
+      btn.textContent = 'Vypnout';
+    } else {
+      btn.classList.add('off');
+      btn.classList.remove('on');
+      btn.textContent = 'Zapnout';
+    }
+  });
+
+
 
   // 👉 ENABLE režim (to co už máš)
   modal.classList.remove('hidden');
