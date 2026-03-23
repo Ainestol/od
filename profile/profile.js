@@ -194,16 +194,21 @@ function notify(type, message, timeout = 3000) {
       }
 
       // 🔐 2FA button state
-      const btn2fa = document.getElementById('enable2faBtn');
-      if (btn2fa) {
-        if (me.twofa_enabled === 1) {
-          btn2fa.textContent = 'Vypnout 2FA';
-          btn2fa.dataset.mode = 'disable';
-        } else {
-          btn2fa.textContent = 'Zapnout 2FA';
-          btn2fa.dataset.mode = 'enable';
-        }
-      }
+     const btn2fa = document.getElementById('twofaToggle');
+
+if (btn2fa) {
+  if (me.twofa_enabled === 1) {
+    btn2fa.textContent = 'Vypnout';
+    btn2fa.classList.add('on');
+    btn2fa.classList.remove('off');
+    btn2fa.dataset.mode = 'disable';
+  } else {
+    btn2fa.textContent = 'Zapnout';
+    btn2fa.classList.add('off');
+    btn2fa.classList.remove('on');
+    btn2fa.dataset.mode = 'enable';
+  }
+}
 
     } catch (e) {
       redirectToLogin();
