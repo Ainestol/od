@@ -174,6 +174,8 @@ if ((int)($user['is_verified'] ?? 0) !== 1) {
     echo json_encode(["error" => "Email not verified"]);
     exit;
 }
+unset($_SESSION['2fa_user_id']);
+unset($_SESSION['2fa_verified']);
 
 // ================================
 // 2FA CHECK

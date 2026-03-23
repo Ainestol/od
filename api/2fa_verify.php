@@ -8,7 +8,10 @@ use PragmaRX\Google2FA\Google2FA;
 
 if (!isset($_SESSION['2fa_user_id'])) {
     http_response_code(401);
-    echo json_encode(["error" => "No 2FA session"]);
+    echo json_encode([
+        "error" => "No 2FA session",
+        "session_id" => session_id() // 🔥 debug (můžeš pak smazat)
+    ]);
     exit;
 }
 
