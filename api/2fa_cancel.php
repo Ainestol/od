@@ -1,7 +1,8 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
 
-require_once __DIR__ . '/_bootstrap.php';
+require_once __DIR__ . '/../lib/session.php';
+require_once __DIR__ . '/../config/db.php';
 
 if (empty($_SESSION['web_user_id'])) {
     http_response_code(401);
