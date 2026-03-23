@@ -217,7 +217,7 @@ function notify(type, message, timeout = 3000) {
   2FA
  * ----------------------------- */
 function init2FA() {
-  const btn = document.getElementById('enable2faBtn');
+  const btn = document.getElementById('twofaToggle');
   const modal = document.getElementById('twofaModal');
   const cancel = document.getElementById('twofaCancel');
   const confirmBtn = document.getElementById('twofaConfirm');
@@ -289,24 +289,6 @@ function init2FA() {
 
     return;
   }
-// 2Fa toogle.. //
-
-const btn = document.getElementById('twofaToggle');
-
-fetch('/api/profile.php')
-  .then(res => res.json())
-  .then(data => {
-    if (data.twofa_enabled) {
-      btn.classList.add('on');
-      btn.classList.remove('off');
-      btn.textContent = 'Vypnout';
-    } else {
-      btn.classList.add('off');
-      btn.classList.remove('on');
-      btn.textContent = 'Zapnout';
-    }
-  });
-
 
 
   // 👉 ENABLE režim (to co už máš)
