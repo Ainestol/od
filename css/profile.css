@@ -644,11 +644,20 @@ body.auth-page.profile-page { overflow: auto; }
   text-align: center;
   padding: 12px 20px;
   border-radius: 10px;
-  border: 1px solid #1e90ff;
+  border: 1px solid #444;
+  background: rgba(0,0,0,0.4);
+  box-shadow: none;
+  transition: all 0.2s ease;
+}
+.twofa-box.active {
+  border-color: #1e90ff;
   background: rgba(30, 144, 255, 0.08);
-  box-shadow: 0 0 12px rgba(30, 144, 255, 0.4);
+  box-shadow: 0 0 15px rgba(30,144,255,0.8);
 }
 
+.twofa-box.inactive {
+  opacity: 0.7;
+}
 .twofa-btn {
   background: transparent;
   border: 1px solid #1e90ff;

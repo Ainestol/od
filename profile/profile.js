@@ -238,38 +238,38 @@ function notify(type, message, timeout = 3000) {
         if (btn) btn.style.display = 'inline-flex';
       }
 
-      // 🔐 2FA button state
- const btn2fa = document.getElementById('twofaToggle');
-const status = document.getElementById('twofaStatus');
-const box = document.getElementById('twofaBox');
+       // 🔐 2FA button state
+      const btn2fa = document.getElementById('twofaToggle');
+      const status = document.getElementById('twofaStatus');
+      const box = document.getElementById('twofaBox');
 
-if (btn2fa) {
-  if (Number(me.twofa_enabled) === 1) {
-    btn2fa.textContent = 'Vypnout';
-    btn2fa.classList.add('on');
-    btn2fa.classList.remove('off');
-    btn2fa.dataset.mode = 'disable';
+      if (btn2fa) {
+        const isEnabled = Number(me.twofa_enabled) === 1;
 
-    if (status) status.textContent = 'Dvoufaktorová ochrana je aktivní';
-    if (box) box.style.boxShadow = '0 0 15px rgba(30,144,255,0.8)';
-  } else {
-    btn2fa.textContent = 'Zapnout';
-    btn2fa.classList.add('off');
-    btn2fa.classList.remove('on');
-    btn2fa.dataset.mode = 'enable';
+        btn2fa.textContent = isEnabled ? 'Vypnout' : 'Zapnout';
+        btn2fa.classList.toggle('on', isEnabled);
+        btn2fa.classList.toggle('off', !isEnabled);
+        btn2fa.dataset.mode = isEnabled ? 'disable' : 'enable';
 
-    if (status) status.textContent = 'Dvoufaktorová ochrana je vypnutá';
-    if (box) box.style.boxShadow = '0 0 5px rgba(30,144,255,0.2)';
-  }
-}
+        if (status) {
+          status.textContent = isEnabled
+            ? 'Dvoufaktorová ochrana je aktivní'
+            : 'Dvoufaktorová ochrana je vypnutá';
+        }
+
+        if (box) {
+          box.classList.remove('active', 'inactive');
+          box.classList.add(isEnabled ? 'active' : 'inactive');
+        }
+      }
 
     } catch (e) {
       redirectToLogin();
     }
   }
 
+  // ✅ MUSÍ být až mimo funkci
   window.refreshMeAndUi = window.refreshMeAndUi || (async () => initMeAndUi(true));
-
 
 /* -----------------------------
   2FA
@@ -1283,25 +1283,6 @@ function showShopConfirm({ title, text, okLabel, cancelLabel }) {
   });
 }
 
-
-
-function notify(type, message, timeout = 3000) {
-  const box = document.getElementById('notifications');
-  if (!box) return;
-
-  const el = document.createElement('div');
-  el.className = `notify ${type}`;
-  el.textContent = message;
-
-  box.appendChild(el);
-
-  setTimeout(() => {
-    el.style.opacity = '0';
-    setTimeout(() => el.remove(), 300);
-  }, timeout);
-}
-
-window.notify = notify; // ✅ důležité
 
   /* -----------------------------
    * shop
