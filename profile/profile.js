@@ -246,16 +246,18 @@ function notify(type, message, timeout = 3000) {
       if (btn2fa) {
         const isEnabled = Number(me.twofa_enabled) === 1;
 
-        btn2fa.textContent = isEnabled ? 'Vypnout' : 'Zapnout';
+        btn2fa.textContent = isEnabled
+  ? (isEn ? 'Disable' : 'Vypnout')
+  : (isEn ? 'Enable' : 'Zapnout');
         btn2fa.classList.toggle('on', isEnabled);
         btn2fa.classList.toggle('off', !isEnabled);
         btn2fa.dataset.mode = isEnabled ? 'disable' : 'enable';
 
-        if (status) {
-          status.textContent = isEnabled
-            ? 'Dvoufaktorová ochrana je aktivní'
-            : 'Dvoufaktorová ochrana je vypnutá';
-        }
+       if (status) {
+  status.textContent = isEnabled
+    ? (isEn ? 'Two-factor authentication is active' : 'Dvoufaktorová ochrana je aktivní')
+    : (isEn ? 'Two-factor authentication is disabled' : 'Dvoufaktorová ochrana je vypnutá');
+}
 
         if (box) {
           box.classList.remove('active', 'inactive');
@@ -313,7 +315,7 @@ if (btn.dataset.mode === 'disable') {
     const data = await res.json();
 
     if (data.ok) {
-      notify('success', '2FA vypnuto');
+      notify('success', isEn ? '2FA disabled' : '2FA vypnuto');
 
       if (typeof window.refreshMeAndUi === 'function') {
         await window.refreshMeAndUi();
@@ -399,7 +401,7 @@ if (btn.dataset.mode === 'disable') {
     const data = await res.json();
 
     if (data.ok) {
-      notify('success', '2FA zapnuto');
+      notify('success', isEn ? '2FA enabled' : '2FA zapnuto');
       modal.classList.add('hidden');
 
       if (typeof window.refreshMeAndUi === 'function') {
