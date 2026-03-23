@@ -399,7 +399,7 @@ if (btn.dataset.mode === 'disable') {
     const data = await res.json();
 
     if (data.ok) {
-      alert('2FA zapnuto');
+      notify('success', '2FA zapnuto');
       modal.classList.add('hidden');
 
       if (typeof window.refreshMeAndUi === 'function') {
