@@ -194,19 +194,27 @@ function notify(type, message, timeout = 3000) {
       }
 
       // 🔐 2FA button state
-     const btn2fa = document.getElementById('twofaToggle');
+ const btn2fa = document.getElementById('twofaToggle');
+const status = document.getElementById('twofaStatus');
+const box = document.getElementById('twofaBox');
 
 if (btn2fa) {
-  if (me.twofa_enabled === 1) {
+  if (Number(me.twofa_enabled) === 1) {
     btn2fa.textContent = 'Vypnout';
     btn2fa.classList.add('on');
     btn2fa.classList.remove('off');
     btn2fa.dataset.mode = 'disable';
+
+    if (status) status.textContent = 'Dvoufaktorová ochrana je aktivní';
+    if (box) box.style.boxShadow = '0 0 15px rgba(30,144,255,0.8)';
   } else {
     btn2fa.textContent = 'Zapnout';
     btn2fa.classList.add('off');
     btn2fa.classList.remove('on');
     btn2fa.dataset.mode = 'enable';
+
+    if (status) status.textContent = 'Dvoufaktorová ochrana je vypnutá';
+    if (box) box.style.boxShadow = '0 0 5px rgba(30,144,255,0.2)';
   }
 }
 

@@ -23,12 +23,18 @@
 
   <a href="/api/logout.php" class="btn">Odhlásit se</a>
 </div>
-<div class="twofa-bar">
-  <span class="twofa-label">2FA zabezpečení</span>
+<div class="twofa-wrapper">
+  <div class="twofa-box" id="twofaBox">
+    
+    <button id="twofaToggle" class="twofa-btn">
+      Zapnout
+    </button>
 
-  <button id="twofaToggle" class="twofa-btn off">
-    Zapnout
-  </button>
+    <div id="twofaStatus" class="twofa-status">
+      Dvoufaktorová ochrana je vypnutá
+    </div>
+
+  </div>
 </div>
 </header>
 
