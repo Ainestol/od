@@ -3,6 +3,7 @@ header('Content-Type: application/json; charset=utf-8');
 
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../lib/logger.php';
+require_once __DIR__ . '/../lib/twofa.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
   http_response_code(405);
@@ -21,6 +22,7 @@ if (!is_array($input) || empty($input)) {
 
 $token = (string)($input['token'] ?? '');
 $newPw = (string)($input['password'] ?? '');
+$code = trim((string)($input['code'] ?? ''));
 
 if ($token === '' || !preg_match('/^[a-f0-9]{64}$/', $token)) {
   http_response_code(400);
@@ -44,7 +46,25 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$tokenHash]);
 $row = $stmt->fetch(PDO::FETCH_ASSOC);
+// 🔐 2FA kontrola
+$st = $pdo->prepare("SELECT twofa_enabled, twofa_secret FROM users WHERE id=? LIMIT 1");
+$st->execute([(int)$row['user_id']]);
+$u2fa = $st->fetch(PDO::FETCH_ASSOC);
 
+if ($u2fa && (int)$u2fa['twofa_enabled'] === 1) {
+
+  if (!$code) {
+    http_response_code(400);
+    echo json_encode(["error" => "2FA_REQUIRED"]);
+    exit;
+  }
+
+  if (!verify_totp($u2fa['twofa_secret'], $code)) {
+    http_response_code(400);
+    echo json_encode(["error" => "2FA_INVALID"]);
+    exit;
+  }
+}
 if (!$row) {
   system_log(
       $pdo,
