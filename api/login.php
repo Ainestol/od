@@ -143,7 +143,7 @@ if (!$user) {
     );
 
     http_response_code(401);
-    echo json_encode(["error" => "Invalid credentials"]);
+    echo json_encode(["error" => "INVALID_CREDENTIALS"]);
     exit;
 }
 
@@ -165,7 +165,7 @@ if (!password_verify($pass, $user['password_hash'])) {
     );
 
     http_response_code(401);
-    echo json_encode(["error" => "Invalid credentials"]);
+    echo json_encode(["error" => "INVALID_CREDENTIALS"]);
     exit;
 }
 
