@@ -59,8 +59,43 @@ $_SESSION['role']       = $user['role'];
 $_SESSION['2fa_verified'] = true;
 
 unset($_SESSION['2fa_user_id']);
+// TRUST DEVICE (14 dní)
+// ================================
+$deviceToken = bin2hex(random_bytes(32));
+$deviceHash  = hash('sha256', $deviceToken);
+
+$expires = (new DateTime('+14 days'))->format('Y-m-d H:i:s');
+
+$pdo->prepare("
+  INSERT INTO trusted_devices (user_id, device_token, expires_at, ip, user_agent)
+  VALUES (?, ?, ?, ?, ?)
+")->execute([
+  $userId,
+  $deviceHash,
+  $expires,
+  $_SERVER['REMOTE_ADDR'] ?? null,
+  substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 255)
+]);
+
+// 🍪 cookie
+setcookie(
+  'trusted_device',
+  $deviceToken,
+  [
+    'expires' => time() + (60*60*24*14),
+    'path' => '/',
+    'secure' => true,
+    'httponly' => true,
+    'samesite' => 'Lax'
+  ]
+);
+
+
+$redirect = ($_SESSION['lang'] ?? 'cs') === 'en'
+    ? "/profile/index-en.html"
+    : "/profile/index.html";
 
 echo json_encode([
     "status" => "ok",
-    "redirect" => "/profile/index.html"
+    "redirect" => $redirect
 ]);

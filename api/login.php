@@ -178,19 +178,51 @@ unset($_SESSION['2fa_user_id']);
 unset($_SESSION['2fa_verified']);
 
 // ================================
-// 2FA CHECK
+// ================================
+// 2FA CHECK + TRUSTED DEVICE
 // ================================
 if ((int)$user['twofa_enabled'] === 1 && !empty($user['twofa_secret'])) {
 
-    // uložíme user do session jen dočasně
+    $trustedToken = $_COOKIE['trusted_device'] ?? '';
+
+    if ($trustedToken) {
+        $st = $pdo->prepare("
+            SELECT id FROM trusted_devices
+            WHERE user_id = ?
+              AND device_token = ?
+              AND expires_at > NOW()
+            LIMIT 1
+        ");
+        $st->execute([$user['id'], hash('sha256', $trustedToken)]);
+        $trusted = $st->fetch();
+
+        if ($trusted) {
+            // ✅ TRUSTED → pustíme bez 2FA
+            session_regenerate_id(true);
+
+            $_SESSION['web_user_id'] = (int)$user['id'];
+            $_SESSION['web_email']  = $user['email'];
+            $_SESSION['lang']       = ($lang === 'en') ? 'en' : 'cs';
+            $_SESSION['role']       = $user['role'];
+            $_SESSION['2fa_verified'] = true;
+
+            echo json_encode([
+                "status" => "ok",
+                "redirect" => "/profile/index.html"
+            ]);
+            exit;
+        }
+    }
+
+    // ❌ není trusted → klasické 2FA
     $_SESSION['2fa_user_id'] = (int)$user['id'];
     $_SESSION['2fa_verified'] = false;
+
     echo json_encode([
         "status" => "2fa_required"
     ]);
     exit;
 }
-
 /* session OK */
 
 session_regenerate_id(true);
