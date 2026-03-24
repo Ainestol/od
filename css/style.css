@@ -337,7 +337,23 @@ body.no-auth-emblem::before {
 .auth-page::after { 
   display: none !important;
 }
+.auth-input {
+  width: 100%;
+  background: #0e0d0d;
+  border: 1px solid #554827;
 
+  color: #e6d8a3;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: inherit;
+}
+.auth-input:focus {
+  outline: none;
+  border-color: #d4af37;
+  box-shadow:
+    0 0 0 1px rgba(129, 110, 45, 0.35),
+    0 0 10px rgba(212,175,55,0.15);
+}
 .auth-page input[type="email"],
 .auth-page input[type="password"] {
     width: 100%;
