@@ -2043,3 +2043,16 @@ padding-left:20px;
   background: #ffffff;
   color: #000;
 }
+
+.reset-page input {
+  background: #fff !important;
+  color: #000 !important;
+  border: 1px solid #ccc !important;
+}
+
+.reset-page input:focus {
+  background: #fff !important;
+  color: #000 !important;
+  border-color: #d4af37 !important;
+  box-shadow: 0 0 8px rgba(212,175,55,0.2);
+}
