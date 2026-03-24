@@ -63,12 +63,12 @@
       </div>
 
       <!-- ✅ Remember me -->
-      <div class="form-check">
-        <label class="checkline">
-          <input type="checkbox" id="remember" name="remember">
-          <span>Stay signed in</span>
-        </label>
-      </div>
+     <div class="form-check">
+  <label class="checkline">
+    <input type="checkbox" id="remember" name="remember">
+    <span>Stay logged in (trusted device)</span>
+  </label>
+</div>
 
       <!-- error -->
       <div class="form-error" id="loginError" style="display:none;"></div>
@@ -111,23 +111,38 @@
   </footer>
 
  <script>
-document.addEventListener('DOMContentLoaded', () => {
-document.body.classList.remove('pre-auth');
-fetch('/api/me.php', { credentials: 'same-origin' })
-  .then(async (r) => {
-    if (!r.ok) return null; // 🔥 TADY JE FIX
-    return r.json();
-  })
-  .then(data => {
-    if (data && data.ok) {
-      window.location.href = data.lang === 'en'
-        ? '/profile/index-en.html'
-        : '/profile/index.html';
+document.addEventListener('DOMContentLoaded', async () => {
+
+  let isLogged = false;
+
+  try {
+    const res = await fetch('/api/me.php', { credentials: 'same-origin' });
+
+    if (res.ok) {
+      const data = await res.json();
+
+      if (data.ok) {
+        isLogged = true;
+
+        window.location.href = data.lang === 'en'
+          ? '/profile/index-en.html'
+          : '/profile/index.html';
+        return;
+      }
     }
-  })
-  .catch(() => {
-    // 🔥 nic nedělej → nech login normálně zobrazit
-  });
+  } catch (e) {
+    console.error(e);
+  } finally {
+    // 🔥 vždy odemkni stránku
+    if (!isLogged) {
+      document.body.classList.remove('pre-auth');
+    }
+  }
+
+  // ⬇️ zbytek tvého login scriptu
+
+  // 🔓 fallback → zobraz login
+  document.body.classList.remove('pre-auth');
 
   const form = document.getElementById('loginForm');
   const errorBox = document.getElementById('loginError');

@@ -2064,7 +2064,11 @@ padding-left:20px;
   border-color: #d4af37 !important;
 }
 body.pre-auth {
-  visibility: hidden;
+  opacity: 0;
+}
+
+body {
+  transition: opacity 0.2s ease;
 }
 body {
   transition: opacity 0.2s ease;
