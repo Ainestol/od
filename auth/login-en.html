@@ -112,7 +112,7 @@
 
  <script>
 document.addEventListener('DOMContentLoaded', () => {
-
+document.body.classList.remove('pre-auth');
 fetch('/api/me.php', { credentials: 'same-origin' })
   .then(async (r) => {
     if (!r.ok) return null; // 🔥 TADY JE FIX
