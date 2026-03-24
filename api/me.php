@@ -5,7 +5,10 @@ require_once __DIR__ . '/_bootstrap.php';
 
 if (empty($_SESSION['web_user_id'])) {
   http_response_code(401);
-  echo json_encode(["ok" => false]);
+  echo json_encode([
+  "ok" => false,
+  "logged_in" => false
+]);
   exit;
 }
 
@@ -43,6 +46,7 @@ $twofaEnabled = (int)$st2fa->fetchColumn();
 
 echo json_encode([
   "ok"      => true,
+  "logged_in" => true,
   "email"   => $_SESSION['web_email'],
   "lang"    => $_SESSION['lang'] ?? 'cs',
   "role"    => $_SESSION['role'] ?? 'user', // 🔥 čárka

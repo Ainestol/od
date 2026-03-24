@@ -112,6 +112,17 @@
 
  <script>
 document.addEventListener('DOMContentLoaded', () => {
+
+fetch('/api/me.php', {
+  credentials: 'same-origin'
+})
+.then(res => res.json())
+.then(data => {
+  if (data && data.logged_in) {
+    window.location.href = '/profile/index-en.html';
+  }
+});
+
   const form = document.getElementById('loginForm');
   const errorBox = document.getElementById('loginError');
   const btn = document.getElementById('loginBtn');
