@@ -718,3 +718,15 @@ body.auth-page.profile-page { overflow: auto; }
 .donate-card.premium {
   border-color: #ffd700;
 }
+.donate-card .dc {
+  color: #d4af37;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.donate-card .bonus {
+  display: block;
+  margin-top: 4px;
+  color: #6fffa1;
+  font-size: 13px;
+}

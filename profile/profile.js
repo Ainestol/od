@@ -1699,22 +1699,37 @@ if (!ok) return;
   });
 })();
 
+const confirmBtn = document.getElementById('shopConfirmOk');
+const cancelBtn = document.getElementById('shopConfirmCancel');
+const modal = document.getElementById('shopConfirmModal');
+
+let selectedAmount = null;
+
+// BUY BUTTONS
 document.querySelectorAll('.buy-dc').forEach(btn => {
   btn.addEventListener('click', () => {
-    const amount = btn.dataset.pack;
+
+    selectedAmount = btn.dataset.pack;
 
     const text = isEn
-      ? `Do you want to purchase ${amount} DC?\n\nYou will be redirected to the payment gateway.`
-      : `Chceš koupit ${amount} DC?\n\nPo kliknutí budeš přesměrován na platební bránu.`;
-
-    const modal = document.getElementById('shopConfirmModal');
+      ? `Do you want to purchase ${selectedAmount} DC?\n\nYou will be redirected to the payment gateway.`
+      : `Chceš koupit ${selectedAmount} DC?\n\nPo kliknutí budeš přesměrován na platební bránu.`;
 
     document.getElementById('shopConfirmText').textContent = text;
 
     modal.classList.remove('hidden');
-
-    document.getElementById('shopConfirmOk').onclick = () => {
-      window.location.href = `/api/payment_start.php?dc=${amount}`;
-    };
   });
+});
+
+// CONFIRM
+confirmBtn?.addEventListener('click', () => {
+  if (!selectedAmount) return;
+
+  window.location.href = `/api/payment_start.php?dc=${selectedAmount}`;
+});
+
+// CANCEL
+cancelBtn?.addEventListener('click', () => {
+  modal.classList.add('hidden');
+  selectedAmount = null;
 });
