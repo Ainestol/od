@@ -759,3 +759,8 @@ body.auth-page.profile-page { overflow: auto; }
 .donate-card.premium {
   border-color: #ffd700;
 }
+.donate-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 15px rgba(212,175,55,0.2);
+  transition: all 0.2s ease;
+}

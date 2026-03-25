@@ -126,9 +126,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (data.ok) {
         isLogged = true;
 
-        window.location.href = data.lang === 'en'
-          ? '/profile/index-en.html'
-          : '/profile/index.html';
+       const isEnPage = document.documentElement.lang === 'en';
+
+window.location.href = isEnPage
+  ? '/profile/index-en.html'
+  : '/profile/index.html';
         return;
       }
     }
