@@ -228,9 +228,14 @@ window.location.href = isEnPage
 
       // ✅ normální login
       if (data.status === 'ok') {
-        window.location.href = '/profile/index.html';
-        return;
-      }
+  const isEnPage = document.documentElement.lang === 'en';
+
+  window.location.href = isEnPage
+    ? '/profile/index-en.html'
+    : '/profile/index.html';
+
+  return;
+}
 
       // 🔐 2FA required
       if (data.status === '2fa_required') {
@@ -281,8 +286,14 @@ window.location.href = isEnPage
       const data = await res.json();
 
       if (data.status === 'ok') {
-        window.location.href = '/profile/index.html';
-      } else {
+  const isEnPage = document.documentElement.lang === 'en';
+
+  window.location.href = isEnPage
+    ? '/profile/index-en.html'
+    : '/profile/index.html';
+} 
+      
+      else {
         alert(data.error || 'Chybný kód');
       }
 
