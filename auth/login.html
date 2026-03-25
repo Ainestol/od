@@ -214,7 +214,7 @@ window.location.href = isEnPage
 
     const formData = new FormData(form);
     formData.set('remember', document.getElementById('remember').checked ? '1' : '0');
-
+    formData.set('lang', 'cs');
     setLoading(true);
 
     try {
