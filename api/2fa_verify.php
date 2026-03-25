@@ -91,11 +91,6 @@ setcookie(
 );
 
 
-$redirect = ($_SESSION['lang'] ?? 'cs') === 'en'
-    ? "/profile/index-en.html"
-    : "/profile/index.html";
-
 echo json_encode([
-    "status" => "ok",
-    "redirect" => $redirect
+    "status" => "ok"
 ]);

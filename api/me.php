@@ -44,11 +44,27 @@ $st2fa = $pdo->prepare("
 $st2fa->execute([$_SESSION['web_user_id']]);
 $twofaEnabled = (int)$st2fa->fetchColumn();
 
+// 🌍 LANGUAGE DETECTION (FIX)
+$lang = 'cs';
+
+if (!empty($_GET['lang'])) {
+    $lang = $_GET['lang'] === 'en' ? 'en' : 'cs';
+}
+elseif (!empty($_COOKIE['lang'])) {
+    $lang = $_COOKIE['lang'] === 'en' ? 'en' : 'cs';
+}
+elseif (!empty($_SESSION['lang'])) {
+    $lang = $_SESSION['lang'] === 'en' ? 'en' : 'cs';
+}
+
+// 🔁 synchronizace session
+$_SESSION['lang'] = $lang;
+
 echo json_encode([
   "ok"      => true,
   "logged_in" => true,
   "email"   => $_SESSION['web_email'],
-  "lang"    => $_SESSION['lang'] ?? 'cs',
+  "lang" => $lang,
   "role"    => $_SESSION['role'] ?? 'user', // 🔥 čárka
   "web_vip" => $webVip,
   "twofa_enabled" => $twofaEnabled

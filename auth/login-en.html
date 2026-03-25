@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (data.ok) {
         isLogged = true;
 
-       const isEnPage = document.documentElement.lang === 'en';
+const isEnPage = location.pathname.includes('-en');
 
 window.location.href = isEnPage
   ? '/profile/index-en.html'
