@@ -1703,19 +1703,17 @@ document.querySelectorAll('.buy-dc').forEach(btn => {
   btn.addEventListener('click', () => {
     const amount = btn.dataset.pack;
 
-    const text = `
-Chceš koupit ${amount} DC?
+    const text = isEn
+      ? `Do you want to purchase ${amount} DC?\n\nYou will be redirected to the payment gateway.`
+      : `Chceš koupit ${amount} DC?\n\nPo kliknutí budeš přesměrován na platební bránu.`;
 
-Po kliknutí budeš přesměrován na platební bránu.
-`;
+    const modal = document.getElementById('shopConfirmModal');
 
     document.getElementById('shopConfirmText').textContent = text;
 
-    const modal = document.getElementById('shopConfirmModal');
     modal.classList.remove('hidden');
 
     document.getElementById('shopConfirmOk').onclick = () => {
-      // 🔥 zatím fake redirect
       window.location.href = `/api/payment_start.php?dc=${amount}`;
     };
   });
