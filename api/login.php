@@ -207,9 +207,8 @@ if ((int)$user['twofa_enabled'] === 1 && !empty($user['twofa_secret'])) {
             $_SESSION['2fa_verified'] = true;
 
             echo json_encode([
-                "status" => "ok",
-                "redirect" => "/profile/index.html"
-            ]);
+    "status" => "ok"
+]);
             exit;
         }
     }
