@@ -1698,3 +1698,25 @@ if (!ok) return;
     init2FA();
   });
 })();
+
+document.querySelectorAll('.buy-dc').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const amount = btn.dataset.pack;
+
+    const text = `
+Chceš koupit ${amount} DC?
+
+Po kliknutí budeš přesměrován na platební bránu.
+`;
+
+    document.getElementById('shopConfirmText').textContent = text;
+
+    const modal = document.getElementById('shopConfirmModal');
+    modal.classList.remove('hidden');
+
+    document.getElementById('shopConfirmOk').onclick = () => {
+      // 🔥 zatím fake redirect
+      window.location.href = `/api/payment_start.php?dc=${amount}`;
+    };
+  });
+});
