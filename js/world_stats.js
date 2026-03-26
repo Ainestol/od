@@ -314,8 +314,6 @@ box.innerHTML = "";
 
 const now = Math.floor(Date.now()/1000);
 
-const valakas = json.data.find(x => x.boss_id == 29028);
-
 json.data.forEach(b => {
 
 let status = "";
@@ -371,50 +369,7 @@ if(type === "GRAND"){
 }
 /* ================= RAID ================= */
 else{
-if(b.boss_id === 29040 && valakas){
 
-    const gStatus = Number(valakas.grand_status ?? -1);
-    const gRespawn = Number(valakas.grand_respawn_time ?? 0);
-
-    // 🟢 ALIVE
-    if(gStatus === 0 || gRespawn <= now){
-        status = T.alive;
-        statusClass = "alive";
-        info = T.bossAlive;
-    }
-
-    // 🔴 DEAD
-    else if(gStatus === 1){
-
-        const diff = gRespawn - now;
-
-        status = T.dead;
-        statusClass = "dead";
-        info = `${T.spawnWindowIn} ${formatCountdown(diff)}`;
-    }
-
-    // 🟡 WINDOW
-    else if(gStatus === 3){
-        status = T.window;
-        statusClass = "window";
-        info = T.spawnWindow;
-    }
-
-    const div = document.createElement("div");
-
-    div.className = "raid-row";
-
-    div.innerHTML = `
-    <span class="raid-name">${b.boss_name}</span>
-    <span class="raid-level">Lv ${b.level ?? "?"}</span>
-    <span class="raid-status ${statusClass}">${status}</span>
-    <div class="raid-extra">${info}</div>
-    `;
-
-    box.appendChild(div);
-
-    return;
-}
     if(spawnTime > killTime){
         status = T.alive;
         statusClass = "alive";
