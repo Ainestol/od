@@ -22,9 +22,9 @@ if (!empty($chars)) {
 }
 
 
-// === GAME VIP (SPRÁVNÁ LOGIKA) ===
+// === GAME VIP (správná logika) ===
 $st = $pdo->query("
-    SELECT ga.login
+    SELECT ga.login, ga.id
     FROM game_accounts ga
     WHERE EXISTS (
         SELECT 1
@@ -49,22 +49,36 @@ $st = $pdo->query("
     )
 ");
 
-$accounts = $st->fetchAll(PDO::FETCH_COLUMN);
+$rows = $st->fetchAll(PDO::FETCH_ASSOC);
 
-if (!empty($accounts)) {
+if (!empty($rows)) {
+    $accounts = array_column($rows, 'login');
+    $ids = array_column($rows, 'id');
+
     $in = implode(',', array_map(fn($a) => $pdo->quote($a), $accounts));
+    $idsIn = implode(',', array_map('intval', $ids));
 
+    // GAME DB
     $pdoGame->exec("
         UPDATE account_premium
         SET enddate = 0
         WHERE account_name IN ($in)
     ");
+
+    // WEB DB sync
+    $pdo->exec("
+        UPDATE vip_grants
+        SET end_at = NOW()
+        WHERE scope = 'GAME'
+          AND target_id IN ($idsIn)
+          AND end_at > NOW()
+    ");
 }
 
 
-// === WEB VIP (jen pokud user nemá žádný aktivní WEB VIP) ===
+// === WEB VIP ===
 $st = $pdo->query("
-    SELECT ga.login
+    SELECT ga.login, ga.web_user_id
     FROM game_accounts ga
     WHERE NOT EXISTS (
         SELECT 1
@@ -75,14 +89,28 @@ $st = $pdo->query("
     )
 ");
 
-$accounts = $st->fetchAll(PDO::FETCH_COLUMN);
+$rows = $st->fetchAll(PDO::FETCH_ASSOC);
 
-if (!empty($accounts)) {
+if (!empty($rows)) {
+    $accounts = array_unique(array_column($rows, 'login'));
+    $userIds = array_unique(array_column($rows, 'web_user_id'));
+
     $in = implode(',', array_map(fn($a) => $pdo->quote($a), $accounts));
+    $userIn = implode(',', array_map('intval', $userIds));
 
+    // GAME DB
     $pdoGame->exec("
         UPDATE account_premium
         SET enddate = 0
         WHERE account_name IN ($in)
+    ");
+
+    // WEB DB sync
+    $pdo->exec("
+        UPDATE vip_grants
+        SET end_at = NOW()
+        WHERE scope = 'WEB'
+          AND target_id IN ($userIn)
+          AND end_at > NOW()
     ");
 }
