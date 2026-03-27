@@ -3,6 +3,12 @@
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../config/db_game.php';
 $pdoGame = $gamePdo;
+if (!$pdoGame) {
+    die('DB GAME not connected');
+}
+
+
+
 // === CHAR VIP ===
 $st = $pdo->query("
     SELECT target_id
