@@ -16,18 +16,20 @@ if (!isset($_SESSION['user_id'])) {
 <html lang="cs">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profil | Ordo Draconis</title>
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/mobile.css">
 </head>
 <body>
 
 <div style="padding: 40px; max-width: 800px; margin: auto;">
-    <h1>Profil hráèe</h1>
+    <h1>Profil hrï¿½ï¿½e</h1>
 
     <p><strong>Email:</strong> <?= htmlspecialchars($_SESSION['email']) ?></p>
 
     <form method="post" action="/api/logout.php">
-        <button type="submit">Odhlásit se</button>
+        <button type="submit">Odhlï¿½sit se</button>
     </form>
 </div>
 

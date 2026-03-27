@@ -12,8 +12,9 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  overflow-y: hidden;
-  overflow-x: auto;
+
+  overflow-x: auto;   /* 🔥 DŮLEŽITÉ */
+  overflow-y: auto;
 }
 body {
   margin: 0;
@@ -24,10 +25,12 @@ body {
 
 
 .hero-bg {
-  flex: 0 0 750px;
+  flex: 0 0 50%;
+  min-width: 300px;
   height: 100vh;
   background: url("../img/war.webp") center top / cover no-repeat;
-  position: relative;
+  position: sticky;
+  top: 0;
 }
 .hero-server {
   background-image: url("../img/ee.png");
@@ -58,8 +61,7 @@ body {
   pointer-events: none;
 }
 .hero-gap {
-  flex: 1;
-  max-width: 120px;
+  flex: 0 0 120px;
 
   background: linear-gradient(
     to right,
@@ -80,7 +82,7 @@ nav a:hover {
    ========================= */
 
 main {
-    max-width: 1100px;
+    max-width: 1000px;
     margin: 0 auto;
     padding: 60px 40px;
 }
@@ -175,17 +177,19 @@ nav a:hover {
 }
 .layout {
   display: flex;
-  min-width: 1800px;
-  height: 100vh;
+  width: 100%;
+  min-height: 100vh;
 }
-
 .right {
-  width: 1100px;
-  flex-shrink: 0;
-  padding: 40px 40px;
-  position: relative;
-  display: flex;
-  flex-direction: column;
+  flex: 1 1 50%;
+  min-width: 300px;
+
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: auto;
+
+  font-size: 12px;
+  padding: 20px;
 }
 .side-nav {
   display: flex;
@@ -814,7 +818,8 @@ a.btn:active {
   content: "";
   position: absolute;
   top: 120px;
-  right: 80px;
+  left: 50%;
+  transform: translateX(-50%);
 
   width: 750px;
   height: 750px;
@@ -1262,7 +1267,7 @@ body.scroll-right .hero-bg {
 body.scroll-right .right {
   height: 100vh;
   overflow-y: auto;
-  overflow-x: hidden;
+  overflow-x: auto;
 
   /* aby scroll nepřetahoval celou stránku (lepší pocit) */
   overscroll-behavior: contain;
@@ -1447,7 +1452,7 @@ html, body {
 body.auth-page {
   min-height: 100vh;
   overflow-y: auto;          /* povol scroll */
-  overflow-x: hidden;
+  overflow-x: auto;
 }
 
 /* auth-container se nesmí snažit vejít do 100vh za každou cenu */
@@ -1457,7 +1462,7 @@ body.auth-page .auth-container {
 }
 body.auth-page {
   overflow-y: auto !important;
-  overflow-x: hidden !important;
+  overflow-x: auto !important;
   min-height: 100vh;
 }
 
@@ -2073,3 +2078,4 @@ body {
 body {
   transition: opacity 0.2s ease;
 }
+
