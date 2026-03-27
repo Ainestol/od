@@ -1,10 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../config/db.php';
-
-// použijeme stejné PDO jako web
-$pdoGame = $pdo;
-
+$pdoGame = require __DIR__ . '/../config/db_game.php';
 
 // === CHAR VIP ===
 $st = $pdo->query("
