@@ -13,8 +13,8 @@ require_once __DIR__ . '/../lib/vip_guard.php';
 require_once __DIR__ . '/../config/db.php';              // $pdo
 require_once __DIR__ . '/../config/db_game_write.php';   // $pdoPremium
 
-// 🔧 helper: prodloužení / nastavení VIP
-function setOrExtendVip($pdoPremium, $login, $durationSeconds) {
+// 🔧 helper: nastav / prodluž VIP
+function setOrExtendVip($pdoPremium, $login, $durationSeconds, $forceOverride = false) {
     $stmt = $pdoPremium->prepare("
         SELECT enddate FROM account_premium WHERE account_name = ?
     ");
@@ -24,10 +24,15 @@ function setOrExtendVip($pdoPremium, $login, $durationSeconds) {
     $nowMs = time() * 1000;
     $addMs = $durationSeconds * 1000;
 
-    if ($current && $current > $nowMs) {
-        $newEnd = $current + $addMs;
-    } else {
+    if ($forceOverride) {
+        // WEB VIP → přepis
         $newEnd = $nowMs + $addMs;
+    } else {
+        if ($current && $current > $nowMs) {
+            $newEnd = $current + $addMs;
+        } else {
+            $newEnd = $nowMs + $addMs;
+        }
     }
 
     $stmt = $pdoPremium->prepare("
@@ -82,45 +87,29 @@ try {
         $levelId
     );
 
-    // 🔥 délka (zatím jednoduchá)
+    // 🔥 délka VIP
     if ($levelId == 1) {
         $duration = 24 * 60 * 60; // 24h
     } else {
         $duration = 30 * 24 * 60 * 60; // 30 dní
     }
 
-    $accounts = [];
-
     // === GAME ===
     if ($scope === 'GAME') {
 
-        // ❗ pokud má WEB VIP → ignoruj
-        $stmt = $pdo->prepare("
-            SELECT 1
-            FROM vip_grants
-            WHERE scope = 'WEB'
-              AND target_id = (
-                  SELECT web_user_id FROM game_accounts WHERE id = ?
-              )
-              AND end_at > NOW()
-            LIMIT 1
-        ");
+        $stmt = $pdo->prepare("SELECT login FROM game_accounts WHERE id = ?");
         $stmt->execute([$targetId]);
-        $hasWebVip = $stmt->fetchColumn();
+        $login = $stmt->fetchColumn();
 
-        if (!$hasWebVip) {
-            $stmt = $pdo->prepare("SELECT login FROM game_accounts WHERE id = ?");
-            $stmt->execute([$targetId]);
-            $login = $stmt->fetchColumn();
-
-            if ($login) {
-                setOrExtendVip($pdoPremium, $login, $duration);
-            }
+        if ($login) {
+            // GAME vždy jen extend
+            setOrExtendVip($pdoPremium, $login, $duration, false);
         }
     }
 
     // === WEB ===
     if ($scope === 'WEB') {
+
         $stmt = $pdo->prepare("
             SELECT login FROM game_accounts WHERE web_user_id = ?
         ");
@@ -129,7 +118,8 @@ try {
 
         if (!empty($accounts)) {
             foreach ($accounts as $login) {
-                setOrExtendVip($pdoPremium, $login, $duration);
+                // WEB vždy přepisuje (override)
+                setOrExtendVip($pdoPremium, $login, $duration, true);
             }
         }
     }
