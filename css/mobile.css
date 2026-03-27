@@ -169,24 +169,3 @@
   }
 
 }
-@media (max-width: 900px) {
-
-  #createAccBtn {
-    width: 100% !important;
-    font-size: 14px !important;
-    padding: 10px 12px !important;
-
-    white-space: nowrap;       /* ❗ zabrání zalomení */
-    overflow: hidden;
-    text-overflow: ellipsis;   /* když by bylo moc dlouhé */
-  }
-
-}
-@media (max-width: 900px) {
-
-  #createAccBtn {
-    font-size: 13px !important;
-    padding: 8px 10px !important;
-  }
-
-}
