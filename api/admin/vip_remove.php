@@ -59,5 +59,40 @@ if ($scope === 'CHAR') {
         ':charId' => $targetId
     ]);
 }
+// 4️⃣ pokud GAME → zruš account_premium
+if ($scope === 'GAME') {
+    $stmt = $pdo->prepare("
+        SELECT login FROM game_accounts WHERE id = ?
+    ");
+    $stmt->execute([$targetId]);
+    $login = $stmt->fetchColumn();
 
+    if ($login) {
+        $stmt = $pdoPremium->prepare("
+            UPDATE account_premium
+            SET enddate = 0
+            WHERE account_name = ?
+        ");
+        $stmt->execute([$login]);
+    }
+}
+
+// 5️⃣ pokud WEB → zruš všem účtům usera
+if ($scope === 'WEB') {
+    $stmt = $pdo->prepare("
+        SELECT login FROM game_accounts WHERE web_user_id = ?
+    ");
+    $stmt->execute([$targetId]);
+    $accounts = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+    if (!empty($accounts)) {
+        $in = implode(',', array_map(fn($a) => $pdo->quote($a), $accounts));
+
+        $pdoPremium->exec("
+            UPDATE account_premium
+            SET enddate = 0
+            WHERE account_name IN ($in)
+        ");
+    }
+}
 echo json_encode(['ok'=>true]);

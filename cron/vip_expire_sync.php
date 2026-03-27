@@ -41,3 +41,25 @@ if ($accounts) {
     WHERE account_name IN ($in)
 ");
 }
+// === WEB VIP sync (all accounts under user) ===
+$st = $pdo->query("
+    SELECT u.id, ga.login
+    FROM vip_grants vg
+    JOIN users u ON vg.target_id = u.id
+    JOIN game_accounts ga ON ga.web_user_id = u.id
+    WHERE vg.scope = 'WEB'
+      AND vg.end_at <= NOW()
+");
+
+$rows = $st->fetchAll();
+
+if ($rows) {
+    $accounts = array_unique(array_column($rows, 'login'));
+    $in = implode(',', array_map(fn($a) => $pdo->quote($a), $accounts));
+
+    $pdoGame->exec("
+        UPDATE account_premium
+        SET enddate = 0
+        WHERE account_name IN ($in)
+    ");
+}
