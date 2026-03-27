@@ -97,16 +97,19 @@ try {
     // === GAME ===
     if ($scope === 'GAME') {
 
-        $stmt = $pdo->prepare("SELECT login FROM game_accounts WHERE id = ?");
-        $stmt->execute([$targetId]);
-        $login = $stmt->fetchColumn();
+    $stmt = $pdo->prepare("SELECT login FROM game_accounts WHERE id = ?");
+    $stmt->execute([$targetId]);
+    $login = $stmt->fetchColumn();
 
-        if ($login) {
-            // GAME vždy jen extend
-            setOrExtendVip($pdoPremium, $login, $duration, false);
-        }
+    if (!$login) {
+        throw new Exception("GAME_ACCOUNT_NOT_FOUND");
     }
 
+    // DEBUG (dočasně)
+    // file_put_contents('/tmp/vip_debug.log', $login . PHP_EOL, FILE_APPEND);
+
+    setOrExtendVip($pdoPremium, $login, $duration, false);
+}
     // === WEB ===
     if ($scope === 'WEB') {
 

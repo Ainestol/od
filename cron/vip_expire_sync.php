@@ -22,20 +22,31 @@ if (!empty($chars)) {
 }
 
 
-// === GAME VIP ===
+// === GAME VIP (SPRÁVNÁ LOGIKA) ===
 $st = $pdo->query("
     SELECT ga.login
-    FROM vip_grants vg
-    JOIN game_accounts ga ON vg.target_id = ga.id
-    WHERE vg.scope = 'GAME'
-      AND vg.end_at <= NOW()
-      AND NOT EXISTS (
-          SELECT 1
-          FROM vip_grants vg2
-          WHERE vg2.scope = 'WEB'
-            AND vg2.target_id = ga.web_user_id
-            AND vg2.end_at > NOW()
-      )
+    FROM game_accounts ga
+    WHERE EXISTS (
+        SELECT 1
+        FROM vip_grants vg
+        WHERE vg.scope = 'GAME'
+          AND vg.target_id = ga.id
+          AND vg.end_at <= NOW()
+    )
+    AND NOT EXISTS (
+        SELECT 1
+        FROM vip_grants vg2
+        WHERE vg2.scope = 'GAME'
+          AND vg2.target_id = ga.id
+          AND vg2.end_at > NOW()
+    )
+    AND NOT EXISTS (
+        SELECT 1
+        FROM vip_grants vg3
+        WHERE vg3.scope = 'WEB'
+          AND vg3.target_id = ga.web_user_id
+          AND vg3.end_at > NOW()
+    )
 ");
 
 $accounts = $st->fetchAll(PDO::FETCH_COLUMN);
