@@ -1,16 +1,9 @@
 <?php
 
 require_once __DIR__ . '/../config/db.php';
-$pdoGame = new PDO(
-    'mysql:host=localhost;dbname=l2game;charset=utf8mb4',
-    'l2_reader',
-    '@Heslojeheslo08',
-    [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    ]
-);
 
+// použijeme stejné PDO jako web
+$pdoGame = $pdo;
 
 
 // === CHAR VIP ===
