@@ -34,6 +34,15 @@ if (!$st->fetchColumn()) {
 
 try {
 
+  /* 🔥 načtení PREMIUM (account_premium) */
+  $st = $pdoGame->prepare("
+    SELECT enddate
+    FROM account_premium
+    WHERE account_name = ?
+  ");
+  $st->execute([$account]);
+  $premiumEndMs = (int)$st->fetchColumn(); // ms
+
   /* načtení postav */
   $st = $pdoGame->prepare("
     SELECT
@@ -59,13 +68,24 @@ try {
       (int)$row['charId']
     );
 
+    // VIP čas (z web DB)
+    $vipTs = isset($vip['end_at']) ? strtotime($vip['end_at']) : 0;
+
+    // PREMIUM čas (ms → s)
+    $premiumTs = $premiumEndMs ? (int)($premiumEndMs / 1000) : 0;
+
+    // 🔥 KLÍČ: bereme vždy DELŠÍ
+    $finalTs = max($vipTs, $premiumTs);
+
     $characters[] = [
       'charId'     => (int)$row['charId'],
       'char_name'  => $row['char_name'],
       'level'      => (int)$row['level'],
       'online'     => (int)$row['online'],
-      'has_vip'    => $vip['found'] ?? false,
-      'vip_end_at' => $vip['end_at'] ?? null
+
+      // 🔥 sjednocený výsledek
+      'has_vip'    => $finalTs > 0,
+      'vip_end_at' => $finalTs > 0 ? date('Y-m-d H:i:s', $finalTs) : null
     ];
   }
 

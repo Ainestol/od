@@ -50,6 +50,8 @@ $stmt->execute([$vipGrantId]);
 
 // 3️⃣ pokud to byl CHAR, smaž VIP flag z postavy
 if ($scope === 'CHAR') {
+
+    // smaž VIP flag ve hře
     $stmt = $pdoPremium->prepare("
         DELETE FROM character_variables
         WHERE charId = :charId
@@ -58,6 +60,16 @@ if ($scope === 'CHAR') {
     $stmt->execute([
         ':charId' => $targetId
     ]);
+
+    // 🔥 navíc: ukonči všechny CHAR VIP granty (aby zmizelo z adminu)
+    $stmt = $pdo->prepare("
+        UPDATE vip_grants
+        SET end_at = NOW()
+        WHERE scope = 'CHAR'
+          AND target_id = ?
+          AND end_at > NOW()
+    ");
+    $stmt->execute([$targetId]);
 }
 // 4️⃣ pokud GAME → zruš account_premium
 if ($scope === 'GAME') {
