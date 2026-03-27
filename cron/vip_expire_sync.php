@@ -3,7 +3,7 @@
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../config/db_game.php';
 
-// najdeme všechny postavy kde VIP vypršel
+// === CHAR VIP ===
 $st = $pdo->query("
     SELECT target_id
     FROM vip_grants
@@ -13,15 +13,16 @@ $st = $pdo->query("
 
 $chars = $st->fetchAll(PDO::FETCH_COLUMN);
 
-if ($chars) {
-
-    $pdo->exec("
-        DELETE FROM l2game.character_variables
+if (!empty($chars)) {
+    $pdoGame->exec("
+        DELETE FROM character_variables
         WHERE var = 'VIP_CHAR'
-          AND charId IN (" . implode(',', array_map('intval',$chars)) . ")
+          AND charId IN (" . implode(',', array_map('intval', $chars)) . ")
     ");
 }
-// === GAME VIP sync (account_premium) ===
+
+
+// === GAME VIP ===
 $st = $pdo->query("
     SELECT ga.login
     FROM vip_grants vg
@@ -32,29 +33,33 @@ $st = $pdo->query("
 
 $accounts = $st->fetchAll(PDO::FETCH_COLUMN);
 
-if ($accounts) {
+if (!empty($accounts)) {
     $in = implode(',', array_map(fn($a) => $pdo->quote($a), $accounts));
 
     $pdoGame->exec("
-    UPDATE account_premium
-    SET enddate = 0
-    WHERE account_name IN ($in)
-");
+        UPDATE account_premium
+        SET enddate = 0
+        WHERE account_name IN ($in)
+    ");
 }
-// === WEB VIP sync (all accounts under user) ===
+
+
+// === WEB VIP (jen pokud user nemá žádný aktivní WEB VIP) ===
 $st = $pdo->query("
-    SELECT u.id, ga.login
-    FROM vip_grants vg
-    JOIN users u ON vg.target_id = u.id
-    JOIN game_accounts ga ON ga.web_user_id = u.id
-    WHERE vg.scope = 'WEB'
-      AND vg.end_at <= NOW()
+    SELECT ga.login
+    FROM game_accounts ga
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM vip_grants vg
+        WHERE vg.scope = 'WEB'
+          AND vg.target_id = ga.web_user_id
+          AND vg.end_at > NOW()
+    )
 ");
 
-$rows = $st->fetchAll();
+$accounts = $st->fetchAll(PDO::FETCH_COLUMN);
 
-if ($rows) {
-    $accounts = array_unique(array_column($rows, 'login'));
+if (!empty($accounts)) {
     $in = implode(',', array_map(fn($a) => $pdo->quote($a), $accounts));
 
     $pdoGame->exec("
