@@ -114,3 +114,8 @@ if (!empty($rows)) {
           AND end_at > NOW()
     ");
 }
+// 🔥 CLEANUP expired premium v game DB
+$pdoGame->exec("
+    DELETE FROM account_premium
+    WHERE enddate < UNIX_TIMESTAMP()*1000
+");
