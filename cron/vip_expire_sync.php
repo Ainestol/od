@@ -29,6 +29,13 @@ $st = $pdo->query("
     JOIN game_accounts ga ON vg.target_id = ga.id
     WHERE vg.scope = 'GAME'
       AND vg.end_at <= NOW()
+      AND NOT EXISTS (
+          SELECT 1
+          FROM vip_grants vg2
+          WHERE vg2.scope = 'WEB'
+            AND vg2.target_id = ga.web_user_id
+            AND vg2.end_at > NOW()
+      )
 ");
 
 $accounts = $st->fetchAll(PDO::FETCH_COLUMN);
