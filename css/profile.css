@@ -770,24 +770,20 @@ body.auth-page.profile-page { overflow: auto; }
 
 .vote-btn {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; /* 🔥 TOHLE JE HLAVNÍ */
   align-items: center;
 
+  width: 100%;
   padding: 12px 16px;
-  margin-bottom: 10px;
 
-  background: linear-gradient(145deg, #111, #1a1a1a);
-  border: 1px solid rgba(212, 175, 55, 0.4);
+  background: linear-gradient(145deg, #0a0a0a, #111);
+  border: 1px solid #2a2a2a;
+  border-radius: 10px;
 
-  color: #ddd;
-  text-decoration: none;
-  font-size: 14px;
-
-  border-radius: 8px;
+  color: #d4af37;
+  font-weight: 600;
 
   transition: all 0.2s ease;
-  position: relative;
-  overflow: hidden;
 }
 
 /* GOLD GLOW */
@@ -841,4 +837,12 @@ body.auth-page.profile-page { overflow: auto; }
 .vote-btn.cooldown {
   opacity: 0.5;
   cursor: not-allowed;
+}
+.vote-name {
+  text-align: left;
+}
+
+.vote-time {
+  text-align: right;
+  min-width: 60px; /* aby to neskákalo */
 }
