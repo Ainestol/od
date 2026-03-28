@@ -802,13 +802,11 @@ body.auth-page.profile-page { overflow: auto; }
 
 /* HOVER */
 .vote-btn:hover {
-  transform: translateY(-2px);
   border-color: #d4af37;
-  color: #fff;
-
-  box-shadow:
-    0 0 8px rgba(212,175,55,0.4),
-    0 0 20px rgba(212,175,55,0.2);
+  box-shadow: 0 0 12px rgba(212,175,55,0.4);
+  transform: translateY(-1px);
+  position: relative;
+  z-index: 2; /* 🔥 KLÍČ */
 }
 
 /* SITE NAME */
@@ -845,4 +843,11 @@ body.auth-page.profile-page { overflow: auto; }
 .vote-time {
   text-align: right;
   min-width: 60px; /* aby to neskákalo */
+}
+.link-list {
+  position: relative;
+}
+
+.vote-btn {
+  position: relative;
 }
