@@ -764,3 +764,81 @@ body.auth-page.profile-page { overflow: auto; }
   box-shadow: 0 0 15px rgba(212,175,55,0.2);
   transition: all 0.2s ease;
 }
+/* =========================
+   VOTE BUTTONS (EPIC STYLE)
+   ========================= */
+
+.vote-btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 12px 16px;
+  margin-bottom: 10px;
+
+  background: linear-gradient(145deg, #111, #1a1a1a);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+
+  color: #ddd;
+  text-decoration: none;
+  font-size: 14px;
+
+  border-radius: 8px;
+
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* GOLD GLOW */
+.vote-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at left, rgba(212,175,55,0.15), transparent 60%);
+  opacity: 0;
+  transition: 0.3s;
+}
+
+.vote-btn:hover::before {
+  opacity: 1;
+}
+
+/* HOVER */
+.vote-btn:hover {
+  transform: translateY(-2px);
+  border-color: #d4af37;
+  color: #fff;
+
+  box-shadow:
+    0 0 8px rgba(212,175,55,0.4),
+    0 0 20px rgba(212,175,55,0.2);
+}
+
+/* SITE NAME */
+.vote-btn .vote-name {
+  font-weight: 600;
+  color: #d4af37;
+}
+
+/* TIMER */
+.vote-btn .vote-time {
+  font-size: 12px;
+  color: #888;
+}
+
+/* ACTIVE / READY */
+.vote-btn.ready {
+  border-color: #4caf50;
+}
+
+.vote-btn.ready .vote-time {
+  color: #4caf50;
+  font-weight: bold;
+}
+
+/* COOLDOWN */
+.vote-btn.cooldown {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

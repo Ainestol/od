@@ -963,13 +963,18 @@ if (btn.dataset.mode === 'disable') {
           return `${h}h ${m}m`;
         })();
 
-        const disabled = Number(site.remaining || 0) > 0 ? 'disabled' : '';
+       const isReady = Number(site.remaining || 0) <= 0;
 
-        el.innerHTML = `
-          <button class="btn vote-btn" data-id="${site.id}" ${disabled}>
-            ${site.name} – ${status}
-          </button>
-        `;
+el.innerHTML = `
+  <button 
+    class="vote-btn ${isReady ? 'ready' : 'cooldown'}"
+    data-id="${site.id}"
+    ${!isReady ? 'disabled' : ''}
+  >
+    <span class="vote-name">${site.name}</span>
+    <span class="vote-time">${isReady ? (T.voteReady || 'READY') : status}</span>
+  </button>
+`;
         box.appendChild(el);
       });
     } catch (err) {
