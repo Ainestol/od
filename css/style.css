@@ -730,14 +730,14 @@ a.btn:active {
   text-align: center;
   margin-bottom: 40px;
 }
-.start-page .content-box a,
-.start-page .content-box a:visited {
-  color: #d4af37;
-  text-decoration: underline;
+.gold-link,
+.gold-link:visited {
+  color: #d4af37 !important;
+  text-decoration: underline !important;
 }
 
-.start-page .content-box a:hover {
-  color: #ffd36a;
+.gold-link:hover {
+  color: #ffd36a !important;
 }
 .rates-grid {
   display: grid;
