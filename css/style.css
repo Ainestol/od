@@ -730,7 +730,15 @@ a.btn:active {
   text-align: center;
   margin-bottom: 40px;
 }
+.start-page .content-box a,
+.start-page .content-box a:visited {
+  color: #d4af37;
+  text-decoration: underline;
+}
 
+.start-page .content-box a:hover {
+  color: #ffd36a;
+}
 .rates-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
