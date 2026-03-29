@@ -710,27 +710,21 @@ a.btn:active {
   line-height: 1;
   transform: translateY(-1px);
 }
-.download-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 10px;
-}
-
 .download-link {
   display: inline-block;
-  padding: 12px 20px;
-  background: linear-gradient(135deg, #c89b3c, #f0c75e);
-  color: black;
+  margin: 0px 0 30px;
+  padding: 3px 38px;
+  border: 3px solid #3a3322;
+  color: #d4af37;
   text-decoration: none;
-  font-weight: bold;
-  border-radius: 5px;
-  transition: 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: #111;
 }
 
 .download-link:hover {
-  transform: scale(1.03);
-  box-shadow: 0 0 10px rgba(200,155,60,0.5);
+  border-color: #d4af37;
+  background: #1a1a1a;
 }
 .center {
   text-align: center;
