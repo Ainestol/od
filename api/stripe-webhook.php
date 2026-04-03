@@ -1,8 +1,5 @@
 <?php
 
-header('Content-Type: text/plain');
-
-echo "OK WEBHOOK";
 require_once __DIR__ . '/../vendor/autoload.php';
 
 // 🔐 ENV
@@ -13,7 +10,7 @@ $endpoint_secret = $env['STRIPE_WEBHOOK_SECRET'] ?? '';
 $payload = @file_get_contents('php://input');
 $sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'] ?? '';
 
-// 📝 DEBUG RAW (doporučeno)
+// 📝 DEBUG RAW
 file_put_contents(__DIR__.'/webhook_debug.log', $payload.PHP_EOL, FILE_APPEND);
 
 // 🔒 VERIFY STRIPE SIGNATURE
@@ -24,8 +21,9 @@ try {
         $endpoint_secret
     );
 } catch (\Exception $e) {
+    file_put_contents(__DIR__.'/webhook_error.log', "SIGNATURE ERROR: ".$e->getMessage().PHP_EOL, FILE_APPEND);
     http_response_code(400);
-    exit('Invalid payload');
+    exit('Invalid signature');
 }
 
 // 🎯 MAIN EVENT
@@ -35,6 +33,7 @@ if ($event->type === 'checkout.session.completed') {
 
     // 🛑 musí být zaplaceno
     if ($session->payment_status !== 'paid') {
+        file_put_contents(__DIR__.'/webhook_error.log', "NOT PAID\n", FILE_APPEND);
         http_response_code(400);
         exit('Not paid');
     }
@@ -44,6 +43,7 @@ if ($event->type === 'checkout.session.completed') {
 
     // 🔒 VALIDACE
     if ($user_id <= 0 || $dc <= 0) {
+        file_put_contents(__DIR__.'/webhook_error.log', "INVALID METADATA\n", FILE_APPEND);
         http_response_code(400);
         exit('Invalid metadata');
     }
@@ -54,13 +54,10 @@ if ($event->type === 'checkout.session.completed') {
     try {
         $pdo->beginTransaction();
 
-        // 🧠 ID eventu (pro duplicity)
         $event_id = $event->id;
 
-        // 🔁 kontrola duplicity
-        $stmt = $pdo->prepare("
-            SELECT id FROM wallet_ledger WHERE note = ?
-        ");
+        // 🔁 duplicita
+        $stmt = $pdo->prepare("SELECT id FROM wallet_ledger WHERE note = ?");
         $stmt->execute(["stripe:$event_id"]);
 
         if ($stmt->fetch()) {
@@ -68,14 +65,14 @@ if ($event->type === 'checkout.session.completed') {
             exit('Already processed');
         }
 
-        // 🧾 ledger zápis
+        // 🧾 ledger
         $stmt = $pdo->prepare("
             INSERT INTO wallet_ledger (user_id, currency, amount, type, note)
             VALUES (?, 'DC', ?, 'CREDIT', ?)
         ");
         $stmt->execute([$user_id, $dc, "stripe:$event_id"]);
 
-        // 💰 balance update
+        // 💰 balance
         $stmt = $pdo->prepare("
             INSERT INTO wallet_balances (user_id, currency, balance)
             VALUES (?, 'DC', ?)
@@ -85,12 +82,11 @@ if ($event->type === 'checkout.session.completed') {
 
         $pdo->commit();
 
-        // 📝 log OK
         file_put_contents(__DIR__.'/webhook.log', "OK user:$user_id DC:$dc event:$event_id\n", FILE_APPEND);
 
     } catch (Exception $e) {
         $pdo->rollBack();
-        file_put_contents(__DIR__.'/webhook_error.log', $e->getMessage().PHP_EOL, FILE_APPEND);
+        file_put_contents(__DIR__.'/webhook_error.log', "DB ERROR: ".$e->getMessage().PHP_EOL, FILE_APPEND);
     }
 }
 
