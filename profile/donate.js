@@ -39,14 +39,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
 const res = await fetch('/api/create-checkout.php', {
   method: 'POST',
-  credentials: 'same-origin',
+  credentials: 'same-origin', // 🔥 TOTO JE KLÍČ
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
     pack: selectedAmount,
     currency: isEn ? 'eur' : 'czk'
   })
 });
-
      const data = await res.json();
 
 console.log('Stripe response:', data);
