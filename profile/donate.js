@@ -59,47 +59,47 @@ console.log('confirmBtn:', confirmBtn);
 });
 
   // 👉 CONFIRM
-  confirmBtn?.addEventListener('click', async () => {
+  document.addEventListener('click', async (e) => {
+  const btn = e.target.closest('#donateConfirmOk');
+  if (!btn) return;
 
-    console.log('🔥 CONFIRM CLICK');
+  console.log('🔥 CONFIRM CLICK');
 
-    if (!selectedAmount) {
-      alert('No pack selected');
+  if (!selectedAmount) {
+    alert('No pack selected');
+    return;
+  }
+
+  try {
+    btn.disabled = true;
+
+    const res = await fetch('/api/create-checkout.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        pack: selectedAmount,
+        currency: 'eur'
+      })
+    });
+
+    const data = await res.json();
+
+    console.log('Stripe response:', data);
+
+    if (data && data.url) {
+      window.location.href = data.url;
       return;
     }
 
-    try {
-      confirmBtn.disabled = true;
+    alert(data?.error || 'Stripe error');
 
-      const res = await nativeFetch('/api/create-checkout.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          pack: selectedAmount,
-          currency: 'eur'
-        })
-      });
-
-      const data = await res.json();
-
-      console.log('Stripe response:', data);
-
-      if (data && data.url) {
-        window.location.href = data.url;
-        return;
-      }
-
-      console.error('Stripe error:', data);
-      alert(data?.error || 'Stripe error');
-
-    } catch (err) {
-      console.error('❌ ERROR DETAIL:', err);
-      alert('Payment error');
-    } finally {
-      confirmBtn.disabled = false;
-    }
-  });
-
+  } catch (err) {
+    console.error('❌ ERROR DETAIL:', err);
+    alert('Payment error');
+  } finally {
+    btn.disabled = false;
+  }
+});
   // 👉 CANCEL
   cancelBtn?.addEventListener('click', () => {
     modal.classList.add('hidden');
