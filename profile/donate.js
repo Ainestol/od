@@ -35,14 +35,17 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       confirmBtn.disabled = true;
 
-      const res = await fetch('/api/create-checkout.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          pack: selectedAmount,
-          currency: 'eur'
-        })
-      });
+      const isEn = (document.documentElement.lang || '').toLowerCase() === 'en';
+
+const res = await fetch('/api/create-checkout.php', {
+  method: 'POST',
+  credentials: 'same-origin',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    pack: selectedAmount,
+    currency: isEn ? 'eur' : 'czk'
+  })
+});
 
      const data = await res.json();
 
