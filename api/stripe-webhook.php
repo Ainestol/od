@@ -1,5 +1,7 @@
 <?php
-
+http_response_code(200);
+echo "WEBHOOK HIT";
+exit;
 require_once __DIR__ . '/../vendor/autoload.php';
 
 // 🔐 ENV
