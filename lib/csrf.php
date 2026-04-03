@@ -12,6 +12,11 @@ if (empty($_SESSION['csrf_token'])) {
 // Funkce pro ověření
 function csrf_check(): void
 {
+      // 🔥 výjimka pro Stripe webhook
+    if (strpos($_SERVER['REQUEST_URI'], 'stripe-webhook.php') !== false) {
+        return;
+    }
+
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         return;
     }
