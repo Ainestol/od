@@ -1704,33 +1704,3 @@ if (!ok) return;
   });
 })();
 
-const confirmBtn = document.getElementById('shopConfirmOk');
-const cancelBtn = document.getElementById('shopConfirmCancel');
-const modal = document.getElementById('shopConfirmModal');
-
-let selectedAmount = null;
-
-// BUY BUTTONS
-document.querySelectorAll('.buy-dc').forEach(btn => {
-  btn.addEventListener('click', () => {
-
-    selectedAmount = btn.dataset.pack;
-
-    const text = isEn
-      ? `Do you want to purchase ${selectedAmount} DC?\n\nYou will be redirected to the payment gateway.`
-      : `Chceš koupit ${selectedAmount} DC?\n\nPo kliknutí budeš přesměrován na platební bránu.`;
-
-    document.getElementById('shopConfirmText').textContent = text;
-
-    modal.classList.remove('hidden');
-  });
-});
-
-// CONFIRM
-
-
-// CANCEL
-cancelBtn?.addEventListener('click', () => {
-  modal.classList.add('hidden');
-  selectedAmount = null;
-});

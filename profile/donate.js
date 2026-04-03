@@ -2,7 +2,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const isEn = (document.documentElement.lang || '').toLowerCase() === 'en';
 
-  // ✅ POUŽÍVEJ DONATE MODAL (NE shop!)
   const modal = document.getElementById('donateConfirmModal');
   const confirmBtn = document.getElementById('donateConfirmOk');
   const cancelBtn = document.getElementById('donateConfirmCancel');
@@ -10,12 +9,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let selectedAmount = null;
 
-  // 👉 CLICK NA BUY
+  // 👉 CLICK NA BUY (delegace)
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('.buy-dc');
     if (!btn) return;
 
-    selectedAmount = Number(btn.getAttribute('data-pack'));
+    selectedAmount = Number(btn.dataset.pack);
 
     if (!selectedAmount || isNaN(selectedAmount)) {
       alert('Invalid pack');
@@ -27,7 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
       : `Chceš koupit ${selectedAmount} DC?\n\nPo kliknutí budeš přesměrován na platební bránu.`;
 
     textEl.textContent = text;
-
     modal.classList.remove('hidden');
   });
 
@@ -52,27 +50,22 @@ document.addEventListener('DOMContentLoaded', () => {
         })
       });
 
-      const text = await res.text();
-      console.log('RAW RESPONSE:', text);
+      // 🔥 správně JSON (žádné text parse)
+      const data = await res.json();
 
-      let data;
-      try {
-        data = JSON.parse(text);
-      } catch (e) {
-        alert('Invalid JSON:\n' + text);
+      console.log('STRIPE RESPONSE:', data);
+
+      // 🔥 HLAVNÍ FIX – okamžitý exit
+      if (data && data.url) {
+        window.location.href = data.url;
         return;
       }
 
- if (data.url) {
-  window.location.href = data.url;
-  return; // 🔥 důležité – zastaví další kód
-}
-
-console.error('Stripe response error:', data);
-alert(data.error || 'Stripe error');
+      console.error('Stripe error:', data);
+      alert(data?.error || 'Stripe error');
 
     } catch (err) {
-      console.error(err);
+      console.error('Fetch error:', err);
       alert('Payment error');
     } finally {
       confirmBtn.disabled = false;
