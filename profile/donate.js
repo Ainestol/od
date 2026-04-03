@@ -2,61 +2,71 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const isEn = (document.documentElement.lang || '').toLowerCase() === 'en';
 
-  const modal = document.getElementById('shopConfirmModal');
-  const confirmBtn = document.getElementById('shopConfirmOk');
-  const cancelBtn = document.getElementById('shopConfirmCancel');
+  // ✅ POUŽÍVEJ DONATE MODAL (NE shop!)
+  const modal = document.getElementById('donateConfirmModal');
+  const confirmBtn = document.getElementById('donateConfirmOk');
+  const cancelBtn = document.getElementById('donateConfirmCancel');
+  const textEl = document.getElementById('donateConfirmText');
 
   let selectedAmount = null;
 
-  // 👉 DONATE tlačítka
-  document.querySelectorAll('.buy-dc').forEach(btn => {
-    btn.addEventListener('click', () => {
+  // 👉 CLICK NA BUY
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.buy-dc');
+    if (!btn) return;
 
-      selectedAmount = btn.dataset.pack;
+    selectedAmount = Number(btn.getAttribute('data-pack'));
 
-      const text = isEn
-        ? `Do you want to purchase ${selectedAmount} DC?\n\nYou will be redirected to the payment gateway.`
-        : `Chceš koupit ${selectedAmount} DC?\n\nPo kliknutí budeš přesměrován na platební bránu.`;
+    if (!selectedAmount || isNaN(selectedAmount)) {
+      alert('Invalid pack');
+      return;
+    }
 
-      document.getElementById('shopConfirmText').textContent = text;
+    const text = isEn
+      ? `Do you want to purchase ${selectedAmount} DC?\n\nYou will be redirected to the payment gateway.`
+      : `Chceš koupit ${selectedAmount} DC?\n\nPo kliknutí budeš přesměrován na platební bránu.`;
 
-      modal.classList.remove('hidden');
-    });
+    textEl.textContent = text;
+
+    modal.classList.remove('hidden');
   });
 
-  // 👉 CONFIRM (POUZE PRO DONATE)
+  // 👉 CONFIRM
   confirmBtn?.addEventListener('click', async () => {
-    if (!selectedAmount) return;
+    if (!selectedAmount || isNaN(selectedAmount)) {
+      alert('Invalid pack');
+      return;
+    }
 
     try {
       confirmBtn.disabled = true;
 
-      const currency = isEn ? 'eur' : 'czk';
+      const currency = 'eur'; // zatím fix
 
       const res = await fetch('/api/create-checkout.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          pack: parseInt(selectedAmount),
+          pack: selectedAmount,
           currency: currency
         })
       });
 
       const text = await res.text();
-console.log('RAW RESPONSE:', text);
+      console.log('RAW RESPONSE:', text);
 
-let data;
-try {
-  data = JSON.parse(text);
-} catch (e) {
-  alert('Invalid JSON:\n' + text);
-  return;
-}
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        alert('Invalid JSON:\n' + text);
+        return;
+      }
 
       if (data.url) {
         window.location.href = data.url;
       } else {
-        alert('Stripe error');
+        alert(data.error || 'Stripe error');
       }
 
     } catch (err) {
