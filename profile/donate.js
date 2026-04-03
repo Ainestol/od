@@ -9,16 +9,15 @@ confirmBtn?.addEventListener('click', async () => {
 
     const currency = 'eur';
 
-    const res = await fetch('/api/create-checkout.php', {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        pack: selectedAmount,
-        currency: currency
-      })
-    });
+   const res = await fetch('/api/create-checkout.php', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    pack: selectedAmount,
+    currency: currency
+  }),
+  skipCsrf: true // 🔥 TOHLE TAM PŘIDEJ
+});
 
     console.log('STATUS:', res.status);
 

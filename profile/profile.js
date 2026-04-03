@@ -69,18 +69,17 @@ function showTwofaModal({ text, requireCode = false }) {
 const _origFetch = window.fetch;
 
 window.fetch = function (url, options = {}) {
-   options.credentials = options.credentials || 'same-origin';
-   options.cache = 'no-store';
-  if (
-  options.method && 
-  options.method.toUpperCase() === 'POST' &&
-  !url.includes('create-checkout.php') // 🔥 výjimka
-) {
 
-    if (!window.CSRF_TOKEN) {
-      console.error('CSRF token not ready');
-    }
+  // 🔥 1) STRIPE / DONATE – BEZ CSRF
+  if (options.skipCsrf) {
+    return _origFetch(url, options);
+  }
 
+  // 🔐 2) normální chování
+  options.credentials = options.credentials || 'same-origin';
+  options.cache = 'no-store';
+
+  if (options.method && options.method.toUpperCase() === 'POST') {
     options.headers = options.headers || {};
     options.headers['X-CSRF-TOKEN'] = window.CSRF_TOKEN || '';
   }
