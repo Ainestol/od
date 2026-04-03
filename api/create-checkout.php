@@ -5,10 +5,9 @@ error_reporting(E_ALL);
 header('Content-Type: application/json');
 
 // 🔐 Autoload (Stripe)
+require_once __DIR__ . '/../lib/session.php'; // 🔥 MUSÍ být první
+require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../vendor/autoload.php';
-
-// 🔐 Session (tvůj vlastní handler)
-require_once __DIR__ . '/../lib/session.php';
 
 // 🔐 ENV
 $env = parse_ini_file('/var/www/.env');
