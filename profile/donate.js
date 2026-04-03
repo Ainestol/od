@@ -63,11 +63,13 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        alert(data.error || 'Stripe error');
-      }
+ if (data.url) {
+  window.location.href = data.url;
+  return; // 🔥 důležité – zastaví další kód
+}
+
+console.error('Stripe response error:', data);
+alert(data.error || 'Stripe error');
 
     } catch (err) {
       console.error(err);
