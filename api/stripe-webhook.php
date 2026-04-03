@@ -1,7 +1,8 @@
 <?php
-http_response_code(200);
-echo "WEBHOOK HIT";
-exit;
+
+header('Content-Type: text/plain');
+
+echo "OK WEBHOOK";
 require_once __DIR__ . '/../vendor/autoload.php';
 
 // 🔐 ENV
