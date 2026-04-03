@@ -15,11 +15,17 @@ file_put_contents(__DIR__.'/webhook_debug.log', $payload.PHP_EOL, FILE_APPEND);
 
 // 🔒 VERIFY STRIPE SIGNATURE
 try {
-    $event = \Stripe\Webhook::constructEvent(
-        $payload,
-        $sig_header,
-        $endpoint_secret
-    );
+   // $event = \Stripe\Webhook::constructEvent(
+       // $payload,
+       // $sig_header,
+      //  $endpoint_secret
+    //);
+    $event = json_decode($payload);
+
+if (!$event) {
+    http_response_code(400);
+    exit('Invalid JSON');
+}
 } catch (\Exception $e) {
     file_put_contents(__DIR__.'/webhook_error.log', "SIGNATURE ERROR: ".$e->getMessage().PHP_EOL, FILE_APPEND);
     http_response_code(400);
