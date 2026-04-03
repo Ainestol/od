@@ -1,5 +1,9 @@
 <?php
 file_put_contents(__DIR__.'/hit.log', "HIT\n", FILE_APPEND);
+http_response_code(200);
+echo "OK TEST";
+exit;
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 // 🔐 ENV
