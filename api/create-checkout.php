@@ -2,14 +2,16 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-$env = parse_ini_file('/var/www/.env');
-
 require_once __DIR__ . '/../vendor/autoload.php';
 
-// načtení .env
 $env = parse_ini_file('/var/www/.env');
-var_dump($env);
-exit;
+
+if (!$env || !isset($env['STRIPE_SECRET_KEY'])) {
+    http_response_code(500);
+    echo json_encode(['error' => 'ENV not loaded']);
+    exit;
+}
+
 \Stripe\Stripe::setApiKey($env['STRIPE_SECRET_KEY']);
 
 // načtení dat z requestu
