@@ -2,7 +2,8 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-$endpoint_secret = 'whsec_7QiTzW8VUxU6KPTInEVHvBMXhMvSrG65';
+$env = parse_ini_file('/var/www/.env');
+$endpoint_secret = $env['STRIPE_WEBHOOK_SECRET'] ?? '';
 
 $payload = @file_get_contents('php://input');
 $sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'] ?? '';
