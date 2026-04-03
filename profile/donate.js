@@ -48,12 +48,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
       console.log('Stripe response:', data);
 
-      if (data.url) {
-        window.location.href = data.url;
-        return;
-      }
+      if (!res.ok) {
+  console.error('HTTP ERROR:', data);
+  alert(data.error || 'Payment error');
+  return;
+}
 
-      alert(data.error || 'Stripe error');
+if (!data.url) {
+  console.error('NO URL:', data);
+  alert(data.error || 'Stripe error');
+  return;
+}
+
+window.location.href = data.url;
 
     } catch (err) {
       console.error('❌ ERROR DETAIL:', err);

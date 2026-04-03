@@ -75,6 +75,7 @@ try {
     echo json_encode(['url' => $session->url]);
 
 } catch (Exception $e) {
+    file_put_contents(__DIR__ . '/stripe_error.log', $e->getMessage() . PHP_EOL, FILE_APPEND);
     http_response_code(500);
     echo json_encode(['error' => $e->getMessage()]);
 }
