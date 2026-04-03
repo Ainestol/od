@@ -42,7 +42,16 @@ document.addEventListener('DOMContentLoaded', () => {
         })
       });
 
-      const data = await res.json();
+      const text = await res.text();
+console.log('RAW RESPONSE:', text);
+
+let data;
+try {
+  data = JSON.parse(text);
+} catch (e) {
+  alert('Invalid JSON:\n' + text);
+  return;
+}
 
       if (data.url) {
         window.location.href = data.url;
