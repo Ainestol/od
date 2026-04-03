@@ -10,6 +10,9 @@ $endpoint_secret = $env['STRIPE_WEBHOOK_SECRET'] ?? '';
 $payload = @file_get_contents('php://input');
 $sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'] ?? '';
 
+// 📝 DEBUG RAW (doporučeno)
+file_put_contents(__DIR__.'/webhook_debug.log', $payload.PHP_EOL, FILE_APPEND);
+
 // 🔒 VERIFY STRIPE SIGNATURE
 try {
     $event = \Stripe\Webhook::constructEvent(
@@ -27,6 +30,12 @@ if ($event->type === 'checkout.session.completed') {
 
     $session = $event->data->object;
 
+    // 🛑 musí být zaplaceno
+    if ($session->payment_status !== 'paid') {
+        http_response_code(400);
+        exit('Not paid');
+    }
+
     $dc = (int)($session->metadata->dc ?? 0);
     $user_id = (int)($session->metadata->user_id ?? 0);
 
@@ -42,12 +51,26 @@ if ($event->type === 'checkout.session.completed') {
     try {
         $pdo->beginTransaction();
 
+        // 🧠 ID eventu (pro duplicity)
+        $event_id = $event->id;
+
+        // 🔁 kontrola duplicity
+        $stmt = $pdo->prepare("
+            SELECT id FROM wallet_ledger WHERE note = ?
+        ");
+        $stmt->execute(["stripe:$event_id"]);
+
+        if ($stmt->fetch()) {
+            http_response_code(200);
+            exit('Already processed');
+        }
+
         // 🧾 ledger zápis
         $stmt = $pdo->prepare("
             INSERT INTO wallet_ledger (user_id, currency, amount, type, note)
-            VALUES (?, 'DC', ?, 'CREDIT', 'Stripe purchase')
+            VALUES (?, 'DC', ?, 'CREDIT', ?)
         ");
-        $stmt->execute([$user_id, $dc]);
+        $stmt->execute([$user_id, $dc, "stripe:$event_id"]);
 
         // 💰 balance update
         $stmt = $pdo->prepare("
@@ -59,8 +82,8 @@ if ($event->type === 'checkout.session.completed') {
 
         $pdo->commit();
 
-        // 📝 log
-        file_put_contents(__DIR__.'/webhook.log', "OK user:$user_id DC:$dc\n", FILE_APPEND);
+        // 📝 log OK
+        file_put_contents(__DIR__.'/webhook.log', "OK user:$user_id DC:$dc event:$event_id\n", FILE_APPEND);
 
     } catch (Exception $e) {
         $pdo->rollBack();
