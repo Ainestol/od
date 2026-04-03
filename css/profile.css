@@ -851,3 +851,9 @@ body.auth-page.profile-page { overflow: auto; }
 .vote-btn {
   position: relative;
 }
+.dc-price {
+  display: block;
+  margin-top: 4px;
+  font-size: 13px;
+  color: #aaa;
+}
