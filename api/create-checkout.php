@@ -55,7 +55,7 @@ if (!isset($packs[$currency]) || !isset($packs[$currency][$pack])) {
 $amount = $packs[$currency][$pack];
 
 // 👤 User ze session
-$user_id = $_SESSION['user_id'] ?? 0;
+$user_id = $_SESSION['web_user_id'] ?? 0;
 
 // 🔍 DEBUG (můžeš pak smazat)
 file_put_contents(__DIR__.'/debug_session.log', print_r($_SESSION, true));
