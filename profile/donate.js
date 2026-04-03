@@ -32,11 +32,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // 👉 CONFIRM
   confirmBtn?.addEventListener('click', async () => {
 
-    if (!selectedAmount) {
-      alert('No pack selected');
-      return;
-    }
+  console.log('🔥 CONFIRM CLICK'); // ← SEM
 
+  if (!selectedAmount) {
+    alert('No pack selected');
+    return;
+  }
     try {
       confirmBtn.disabled = true;
 
@@ -62,9 +63,9 @@ document.addEventListener('DOMContentLoaded', () => {
       alert(data.error || 'Stripe error');
 
     } catch (err) {
-      console.error(err);
-      alert('Payment error');
-    } finally {
+  console.error('❌ ERROR DETAIL:', err); // ← SEM
+  alert('Payment error');
+}finally {
       confirmBtn.disabled = false;
     }
   });
