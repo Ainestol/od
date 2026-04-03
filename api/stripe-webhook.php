@@ -1,5 +1,5 @@
 <?php
-
+file_put_contents(__DIR__.'/HIT.log', "HIT\n", FILE_APPEND);
 require_once __DIR__ . '/../vendor/autoload.php';
 
 // 🔐 ENV
