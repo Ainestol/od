@@ -84,3 +84,9 @@ $user_id = $_SESSION['user_id'] ?? 0;
     http_response_code(500);
     echo json_encode(['error' => $e->getMessage()]);
 }
+register_shutdown_function(function() {
+    $error = error_get_last();
+    if ($error !== null) {
+        file_put_contents(__DIR__.'/fatal_error.log', print_r($error, true), FILE_APPEND);
+    }
+});
