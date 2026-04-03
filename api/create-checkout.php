@@ -2,10 +2,15 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-header('Content-Type: application/json'); // 🔥 DŮLEŽITÉ
+header('Content-Type: application/json');
 
+// 🔐 Autoload (Stripe)
 require_once __DIR__ . '/../vendor/autoload.php';
 
+// 🔐 Session (tvůj vlastní handler)
+require_once __DIR__ . '/../lib/session.php';
+
+// 🔐 ENV
 $env = parse_ini_file('/var/www/.env');
 
 if (!$env || !isset($env['STRIPE_SECRET_KEY'])) {
@@ -14,14 +19,16 @@ if (!$env || !isset($env['STRIPE_SECRET_KEY'])) {
     exit;
 }
 
+// 🔐 Stripe init
 \Stripe\Stripe::setApiKey($env['STRIPE_SECRET_KEY']);
 
-// načtení dat
+// 📥 Načtení vstupu
 $input = json_decode(file_get_contents('php://input'), true);
 
 $pack = (int)($input['pack'] ?? 0);
 $currency = strtolower($input['currency'] ?? 'eur');
 
+// 💰 Ceník
 $packs = [
     'eur' => [
         20  => 499,
@@ -39,6 +46,7 @@ $packs = [
     ]
 ];
 
+// ❌ Validace
 if (!isset($packs[$currency]) || !isset($packs[$currency][$pack])) {
     http_response_code(400);
     echo json_encode(['error' => 'Invalid pack or currency']);
@@ -47,7 +55,21 @@ if (!isset($packs[$currency]) || !isset($packs[$currency][$pack])) {
 
 $amount = $packs[$currency][$pack];
 
+// 👤 User ze session
+$user_id = $_SESSION['user_id'] ?? 0;
+
+// 🔍 DEBUG (můžeš pak smazat)
+file_put_contents(__DIR__.'/debug_session.log', print_r($_SESSION, true));
+
+// ❌ Bez usera nepouštět platbu
+if ($user_id <= 0) {
+    http_response_code(401);
+    echo json_encode(['error' => 'User not logged in']);
+    exit;
+}
+
 try {
+
     $session = \Stripe\Checkout\Session::create([
         'payment_method_types' => ['card'],
         'mode' => 'payment',
@@ -66,27 +88,20 @@ try {
         'success_url' => 'https://l2ordo.net/profile/index.html?success=1',
         'cancel_url'  => 'https://l2ordo.net/profile/index.html?canceled=1',
 
-      session_start();
-
-$user_id = $_SESSION['user_id'] ?? 0;
-
-'metadata' => [
-    'dc' => $pack,
-    'currency' => $currency,
-    'user_id' => $user_id
-],
+        // 🔥 KLÍČOVÉ PRO WEBHOOK
+        'metadata' => [
+            'dc' => $pack,
+            'currency' => $currency,
+            'user_id' => $user_id
+        ],
     ]);
 
     echo json_encode(['url' => $session->url]);
 
-}catch (Exception $e) {
+} catch (Exception $e) {
+
     file_put_contents(__DIR__.'/stripe_error.log', $e->getMessage().PHP_EOL, FILE_APPEND);
+
     http_response_code(500);
     echo json_encode(['error' => $e->getMessage()]);
 }
-register_shutdown_function(function() {
-    $error = error_get_last();
-    if ($error !== null) {
-        file_put_contents(__DIR__.'/fatal_error.log', print_r($error, true), FILE_APPEND);
-    }
-});
