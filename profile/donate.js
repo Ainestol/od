@@ -1,3 +1,4 @@
+
 document.addEventListener('DOMContentLoaded', () => {
 
   console.log('DONATE JS LOADED');
@@ -8,36 +9,54 @@ document.addEventListener('DOMContentLoaded', () => {
   const confirmBtn = document.getElementById('donateConfirmOk');
   const cancelBtn = document.getElementById('donateConfirmCancel');
   const textEl = document.getElementById('donateConfirmText');
-
+console.log('confirmBtn:', confirmBtn);
   let selectedAmount = null;
 
   // 👉 originální fetch (obejde profile.js override)
   const nativeFetch = window.fetch.bind(window);
 
   // 👉 CLICK NA BUY
-  document.addEventListener('click', (e) => {
-    const btn = e.target.closest('.buy-dc');
-    if (!btn) return;
+  document.addEventListener('click', async (e) => {
+  const btn = e.target.closest('#donateConfirmOk');
+  if (!btn) return;
 
-    e.preventDefault();
-    e.stopImmediatePropagation();
+  console.log('🔥 CONFIRM CLICK');
 
-    console.log('CLICK HANDLER RUNNING');
+  if (!selectedAmount) {
+    alert('No pack selected');
+    return;
+  }
 
-    selectedAmount = Number(btn.dataset.pack);
+  try {
+    btn.disabled = true;
 
-    if (!selectedAmount || isNaN(selectedAmount)) {
-      alert('Invalid pack');
+    const res = await fetch('/api/create-checkout.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        pack: selectedAmount,
+        currency: 'eur'
+      })
+    });
+
+    const data = await res.json();
+
+    console.log('Stripe response:', data);
+
+    if (data && data.url) {
+      window.location.href = data.url;
       return;
     }
 
-    const text = isEn
-      ? `Do you want to purchase ${selectedAmount} DC?\n\nYou will be redirected to the payment gateway.`
-      : `Chceš koupit ${selectedAmount} DC?\n\nPo kliknutí budeš přesměrován na platební bránu.`;
+    alert(data?.error || 'Stripe error');
 
-    textEl.textContent = text;
-    modal.classList.remove('hidden');
-  });
+  } catch (err) {
+    console.error('❌ ERROR DETAIL:', err);
+    alert('Payment error');
+  } finally {
+    btn.disabled = false;
+  }
+});
 
   // 👉 CONFIRM
   confirmBtn?.addEventListener('click', async () => {
