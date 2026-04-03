@@ -1727,10 +1727,39 @@ document.querySelectorAll('.buy-dc').forEach(btn => {
 });
 
 // CONFIRM
-confirmBtn?.addEventListener('click', () => {
+confirmBtn?.addEventListener('click', async () => {
   if (!selectedAmount) return;
 
-  window.location.href = `/api/payment_start.php?dc=${selectedAmount}`;
+  try {
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = isEn ? 'Redirecting…' : 'Přesměrování…';
+
+    const currency = isEn ? 'eur' : 'czk';
+
+    const res = await fetch('/api/create-checkout.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        pack: parseInt(selectedAmount),
+        currency: currency
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      alert('Stripe error');
+    }
+
+  } catch (err) {
+    console.error(err);
+    alert('Payment error');
+  } finally {
+    confirmBtn.disabled = false;
+    confirmBtn.textContent = isEn ? 'Buy' : 'Koupit';
+  }
 });
 
 // CANCEL
