@@ -46,7 +46,10 @@ let currentSort = { key: null, dir: 1 };
 /* ===== LOAD DATA ===== */
 async function loadOnlinePlayers() {
   try {
-    const res = await fetch('/admin/api/list_online_players.php');
+     const res = await fetch('/admin/api/list_online_players.php?t=' + Date.now(), {
+      cache: 'no-store'
+    });
+
     const data = await res.json();
 
     if (!data.ok) return;
@@ -138,7 +141,7 @@ document.querySelectorAll('#onlineTable th').forEach(th => {
 
 /* ===== INIT ===== */
 loadOnlinePlayers();
-setInterval(loadOnlinePlayers, 7000);
+setInterval(loadOnlinePlayers, 5000);
 </script>
 
 <script>
