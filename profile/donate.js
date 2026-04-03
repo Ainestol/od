@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const res = await fetch('/api/create-checkout.php', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '' },
         body: JSON.stringify({
           pack: selectedAmount,
           currency: currency
