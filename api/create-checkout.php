@@ -1,5 +1,5 @@
 <?php
-ini_set('display_errors', 0);
+ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 header('Content-Type: application/json'); // 🔥 DŮLEŽITÉ
@@ -79,8 +79,8 @@ $user_id = $_SESSION['user_id'] ?? 0;
 
     echo json_encode(['url' => $session->url]);
 
-} catch (Exception $e) {
-    file_put_contents(__DIR__ . '/stripe_error.log', $e->getMessage() . PHP_EOL, FILE_APPEND);
+}catch (Exception $e) {
+    file_put_contents(__DIR__.'/stripe_error.log', $e->getMessage().PHP_EOL, FILE_APPEND);
     http_response_code(500);
     echo json_encode(['error' => $e->getMessage()]);
 }
