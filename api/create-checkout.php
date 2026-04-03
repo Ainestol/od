@@ -66,10 +66,15 @@ try {
         'success_url' => 'https://l2ordo.net/profile/index.html?success=1',
         'cancel_url'  => 'https://l2ordo.net/profile/index.html?canceled=1',
 
-        'metadata' => [
-            'dc' => $pack,
-            'currency' => $currency
-        ],
+      session_start();
+
+$user_id = $_SESSION['user_id'] ?? 0;
+
+'metadata' => [
+    'dc' => $pack,
+    'currency' => $currency,
+    'user_id' => $user_id
+],
     ]);
 
     echo json_encode(['url' => $session->url]);
