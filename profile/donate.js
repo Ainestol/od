@@ -1,5 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+  console.log('DONATE JS LOADED');
+
   const isEn = (document.documentElement.lang || '').toLowerCase() === 'en';
 
   const modal = document.getElementById('donateConfirmModal');
@@ -9,10 +11,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let selectedAmount = null;
 
+  // 👉 originální fetch (obejde profile.js override)
+  const nativeFetch = window.fetch.bind(window);
+
   // 👉 CLICK NA BUY
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('.buy-dc');
     if (!btn) return;
+
+    e.preventDefault();
+    e.stopImmediatePropagation();
+
+    console.log('CLICK HANDLER RUNNING');
 
     selectedAmount = Number(btn.dataset.pack);
 
@@ -32,40 +42,41 @@ document.addEventListener('DOMContentLoaded', () => {
   // 👉 CONFIRM
   confirmBtn?.addEventListener('click', async () => {
 
-  console.log('🔥 CONFIRM CLICK'); // ← SEM
+    console.log('🔥 CONFIRM CLICK');
 
-  if (!selectedAmount) {
-    alert('No pack selected');
-    return;
-  }
+    if (!selectedAmount) {
+      alert('No pack selected');
+      return;
+    }
+
     try {
       confirmBtn.disabled = true;
 
-      const res = await fetch('/api/create-checkout.php', {
+      const res = await nativeFetch('/api/create-checkout.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           pack: selectedAmount,
           currency: 'eur'
-        }),
-        skipCsrf: true
+        })
       });
 
       const data = await res.json();
 
       console.log('Stripe response:', data);
 
-      if (data.url) {
+      if (data && data.url) {
         window.location.href = data.url;
-        return; // 🔥 STOP
+        return;
       }
 
-      alert(data.error || 'Stripe error');
+      console.error('Stripe error:', data);
+      alert(data?.error || 'Stripe error');
 
     } catch (err) {
-  console.error('❌ ERROR DETAIL:', err); // ← SEM
-  alert('Payment error');
-}finally {
+      console.error('❌ ERROR DETAIL:', err);
+      alert('Payment error');
+    } finally {
       confirmBtn.disabled = false;
     }
   });
