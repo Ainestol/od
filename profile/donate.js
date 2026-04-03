@@ -44,23 +44,27 @@ document.addEventListener('DOMContentLoaded', () => {
         })
       });
 
-      const data = await res.json();
+     const data = await res.json();
 
-      console.log('Stripe response:', data);
+console.log('Stripe response:', data);
 
-      if (!res.ok) {
+// 🔴 nejdřív HTTP chyba
+if (!res.ok) {
   console.error('HTTP ERROR:', data);
   alert(data.error || 'Payment error');
   return;
 }
 
-if (!data.url) {
-  console.error('NO URL:', data);
-  alert(data.error || 'Stripe error');
+// 🔴 pak Stripe logika
+if (data.url) {
+  window.location.href = data.url;
   return;
 }
 
-window.location.href = data.url;
+// 🔴 fallback (když není URL)
+console.error('Stripe response error:', data);
+alert(data.error || 'Stripe error');
+
 
     } catch (err) {
       console.error('❌ ERROR DETAIL:', err);
