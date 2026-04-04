@@ -1432,7 +1432,7 @@ function renderRow(prod, extraSelectHtml = '') {
 
   const isImg = ['MOUNT','COSMETIC'].includes(String(prod.category || '').toUpperCase());
   const imgHtml = isImg
-  ? `<img class="shop-img" src="/img/shop/${prod.code}.png?v=3" alt="${prod.name}" loading="lazy">`
+  ? `<img class="shop-img" src="/img/shop/${prod.code}.png?v=4" alt="${prod.name}" loading="lazy">`
   : '';
 
   row.innerHTML = `
