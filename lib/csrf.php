@@ -13,7 +13,7 @@ if (empty($_SESSION['csrf_token'])) {
 function csrf_check(): void
 {
       // 🔥 výjimka pro Stripe webhook
-    if (strpos($_SERVER['REQUEST_URI'], 'stripe-webhook.php') !== false) {
+    if ($_SERVER['PHP_SELF'] === '/api/stripe-webhook.php') {
         return;
     }
 

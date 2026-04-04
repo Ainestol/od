@@ -2,7 +2,10 @@
 
 // bezpečné session
 require_once __DIR__ . '/../lib/session.php';
-
+// Security headers
+header('X-Frame-Options: SAMEORIGIN');
+header('X-Content-Type-Options: nosniff');
+header('Referrer-Policy: strict-origin-when-cross-origin');
 // databáze
 require_once __DIR__ . '/../config/db.php';
 
