@@ -301,7 +301,7 @@ if (btn.dataset.mode === 'disable') {
   if (!confirmDisable) return;
 
   const code = await showTwofaModal({
-    text: 'Zadej kód z aplikace',
+    text: document.documentElement.lang === 'en' ? 'Enter code from authenticator' : 'Zadej kód z aplikace',
     requireCode: true
   });
 
@@ -390,7 +390,7 @@ if (btn.dataset.mode === 'disable') {
     const code = codeInput.value.trim();
 
     if (!code) {
-      alert('Zadej kód');
+      alert(document.documentElement.lang === 'en' ? 'Enter 6-digit code' : 'Zadej kód');
       return;
     }
 
