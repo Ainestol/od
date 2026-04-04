@@ -18,7 +18,7 @@ try {
     SELECT
   id, code, item_id, category, price_dc, is_repeatable,
     name, description,
-    name AS name_en, description_en
+    name_en, description_en
     FROM shop_products
     WHERE is_active = 1
     ORDER BY category, price_dc, id
