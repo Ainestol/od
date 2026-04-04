@@ -72,19 +72,19 @@ if ($event->type === 'checkout.session.completed') {
         }
 
         // 🧾 ledger
-        $stmt = $pdo->prepare("
-            INSERT INTO wallet_ledger (user_id, currency, amount, type, note)
-            VALUES (?, 'DC', ?, 'CREDIT', ?)
-        ");
-        $stmt->execute([$user_id, $dc, "stripe:$event_id"]);
+$stmt = $pdo->prepare("
+    INSERT INTO wallet_ledger (owner_type, owner_id, currency, amount, reason, ref_type, note)
+    VALUES ('WEB', ?, 'DC', ?, 'STRIPE_PURCHASE', 'stripe_event', ?)
+");
+$stmt->execute([$user_id, $dc, "stripe:$event_id"]);
 
-        // 💰 balance
-        $stmt = $pdo->prepare("
-            INSERT INTO wallet_balances (user_id, currency, balance)
-            VALUES (?, 'DC', ?)
-            ON DUPLICATE KEY UPDATE balance = balance + VALUES(balance)
-        ");
-        $stmt->execute([$user_id, $dc]);
+// 💰 balance
+$stmt = $pdo->prepare("
+    INSERT INTO wallet_balances (owner_type, owner_id, currency, balance)
+    VALUES ('WEB', ?, 'DC', ?)
+    ON DUPLICATE KEY UPDATE balance = balance + VALUES(balance)
+");
+$stmt->execute([$user_id, $dc]);
 
         $pdo->commit();
 
