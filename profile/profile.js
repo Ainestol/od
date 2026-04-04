@@ -295,7 +295,7 @@ function init2FA() {
 if (btn.dataset.mode === 'disable') {
 
   const confirmDisable = await showTwofaModal({
-    text: 'Opravdu chceš vypnout 2FA?'
+    text: isEn ? 'Are you sure you want to disable 2FA?' : 'Opravdu chceš vypnout 2FA?'
   });
 
   if (!confirmDisable) return;
