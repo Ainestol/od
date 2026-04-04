@@ -86,7 +86,7 @@ try {
             'price_data' => [
                 'currency' => $currency,
                 'product_data' => [
-                    'name' => $pack . ' Dragon Coins',
+                    'name' => $total_dc . ' Dragon Coins',
                 ],
                 'unit_amount' => $amount,
             ],

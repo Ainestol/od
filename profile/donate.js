@@ -16,10 +16,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     selectedAmount = Number(btn.dataset.pack);
 
-    console.log('SELECTED PACK:', selectedAmount);
+console.log('SELECTED PACK:', selectedAmount);
 
-    textEl.textContent = `Chceš koupit ${selectedAmount} DC?`;
-    modal.classList.remove('hidden');
+const bonuses = {
+  20: 20, 55: 60, 120: 140, 260: 320, 600: 800
+};
+const totalDc = bonuses[selectedAmount] ?? selectedAmount;
+const isCz = (document.documentElement.lang || '').toLowerCase() !== 'en';
+
+// Načti cenu z karty
+const card = btn.closest('.donate-card');
+const priceText = card?.querySelector('.price')?.textContent?.trim() ?? '';
+
+if (isCz) {
+  textEl.textContent =
+    `Vážíme si tvé podpory! Rozhodl ses podpořit server Ordo Draconis dobrovolným příspěvkem ${priceText}. Na oplátku od nás dostaneš ${totalDc} Dragon Coinů jako náš dík.\n\nDragon Coiny nejsou zboží ani služba – jsou to naše poděkování za tvou podporu. Příspěvek je dobrovolný a nenárokový.\n\nPřeješ si pokračovat?`;
+} else {
+  textEl.textContent =
+    `We appreciate your support! You're about to support the Ordo Draconis server with a voluntary contribution of ${priceText}. As a token of our gratitude, you'll receive ${totalDc} Dragon Coins.\n\nDragon Coins are not a product or service – they are simply our way of saying thank you. This contribution is voluntary and non-refundable.\n\nDo you wish to continue?`;
+}
+
+modal.classList.remove('hidden');
   });
 
   // 👉 CONFIRM
