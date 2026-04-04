@@ -44,6 +44,15 @@ $packs = [
         600 => 200000,
     ]
 ];
+// 🎁 Bonusy DC (pack => celkový počet DC včetně bonusu)
+$bonuses = [
+    20  => 20,
+    55  => 60,
+    120 => 140,
+    260 => 320,
+    600 => 800,
+];
+$total_dc = $bonuses[$pack] ?? $pack;
 
 // ❌ Validace
 if (!isset($packs[$currency]) || !isset($packs[$currency][$pack])) {
@@ -89,7 +98,7 @@ try {
 
         // 🔥 KLÍČOVÉ PRO WEBHOOK
         'metadata' => [
-            'dc' => $pack,
+            'dc'       => $total_dc,
             'currency' => $currency,
             'user_id' => $user_id
         ],
