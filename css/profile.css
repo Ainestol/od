@@ -465,7 +465,8 @@ body.auth-page.profile-page { overflow: auto; }
   height:350px;
   object-fit:contain;
   flex:0 0 64px;
-  /* zvýraznění a schování “zbytků pozadí” */
+  background: #111;
+  border-radius: 6px;
   filter: drop-shadow(0 0 6px rgba(0,0,0,.85));
 }
 
