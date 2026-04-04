@@ -93,8 +93,8 @@ try {
             'quantity' => 1,
         ]],
 
-        'success_url' => 'https://l2ordo.net/profile/index.html?success=1',
-        'cancel_url'  => 'https://l2ordo.net/profile/index.html?canceled=1',
+        'success_url' => 'https://l2ordo.net/profile/' . ($currency === 'eur' ? 'index-en.html' : 'index.html') . '?success=1',
+'cancel_url'  => 'https://l2ordo.net/profile/' . ($currency === 'eur' ? 'index-en.html' : 'index.html') . '?canceled=1',
 
         // 🔥 KLÍČOVÉ PRO WEBHOOK
         'metadata' => [
