@@ -205,7 +205,17 @@ if ((int)$user['twofa_enabled'] === 1 && !empty($user['twofa_secret'])) {
             $_SESSION['lang']       = ($lang === 'en') ? 'en' : 'cs';
             $_SESSION['role']       = $user['role'];
             $_SESSION['2fa_verified'] = true;
-
+// 🍪 Remember email
+$remember = (string)($input['remember'] ?? $_POST['remember'] ?? '0');
+if ($remember === '1') {
+    setcookie('remembered_email', $email, [
+        'expires'  => time() + (30 * 24 * 3600),
+        'path'     => '/',
+        'secure'   => true,
+        'httponly' => false,
+        'samesite' => 'Lax'
+    ]);
+}
             echo json_encode([
     "status" => "ok"
 ]);
@@ -230,6 +240,18 @@ $_SESSION['web_user_id'] = (int)$user['id'];
 $_SESSION['web_email']  = $user['email'];
 $_SESSION['lang']       = ($lang === 'en') ? 'en' : 'cs';
 $_SESSION['role']       = $user['role'];
+
+// 🍪 Remember email
+$remember = (string)($input['remember'] ?? $_POST['remember'] ?? '0');
+if ($remember === '1') {
+    setcookie('remembered_email', $email, [
+        'expires'  => time() + (30 * 24 * 3600),
+        'path'     => '/',
+        'secure'   => true,
+        'httponly' => false,
+        'samesite' => 'Lax'
+    ]);
+}
 system_log(
     $pdo,
     'SECURITY',

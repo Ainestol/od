@@ -147,6 +147,19 @@ window.location.href = isEnPage
   // 🔓 fallback → zobraz login
   document.body.classList.remove('pre-auth');
 
+  // 🍪 Prefill email from cookie
+  const rememberedEmail = document.cookie
+    .split('; ')
+    .find(r => r.startsWith('remembered_email='));
+  if (rememberedEmail) {
+    const emailVal = decodeURIComponent(rememberedEmail.split('=')[1]);
+    const emailInput = document.getElementById('email');
+    if (emailInput) {
+      emailInput.value = emailVal;
+      document.getElementById('remember').checked = true;
+    }
+  }
+
   const form = document.getElementById('loginForm');
   const errorBox = document.getElementById('loginError');
   const btn = document.getElementById('loginBtn');
