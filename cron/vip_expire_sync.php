@@ -1,121 +1,156 @@
 <?php
-
 require_once __DIR__ . '/../config/db.php';
 $pdoGame = require __DIR__ . '/../config/db_game.php';
 
-// === CHAR VIP ===
-$st = $pdo->query("
-    SELECT target_id
-    FROM vip_grants
-    WHERE scope = 'CHAR'
-      AND end_at <= NOW()
-");
+// ================================================================
+// FILOZOFIE:
+// WEB VIP (lvl 3) > GAME VIP (lvl 2) > CHAR VIP (lvl 1)
+// Cron jen ODEBÍRÁ expirované VIP — nikdy nepřepisuje aktivní vyšší.
+// ================================================================
 
+// ================================================================
+// 1) CHAR VIP — odeber VIP_CHAR z character_variables
+//    pouze pokud postava nemá aktivní GAME ani WEB VIP
+// ================================================================
+$st = $pdo->query("
+    SELECT vg.target_id AS charId
+    FROM vip_grants vg
+    JOIN l2game.characters c ON c.charId = vg.target_id
+    JOIN game_accounts ga ON ga.login = c.account_name
+    WHERE vg.scope = 'CHAR'
+      AND vg.end_at <= NOW()
+      AND NOT EXISTS (
+          SELECT 1 FROM vip_grants vg2
+          WHERE vg2.scope = 'GAME'
+            AND vg2.target_id = ga.id
+            AND vg2.end_at > NOW()
+      )
+      AND NOT EXISTS (
+          SELECT 1 FROM vip_grants vg3
+          WHERE vg3.scope = 'WEB'
+            AND vg3.target_id = ga.web_user_id
+            AND vg3.end_at > NOW()
+      )
+");
 $chars = $st->fetchAll(PDO::FETCH_COLUMN);
 
 if (!empty($chars)) {
+    $in = implode(',', array_map('intval', $chars));
     $pdoGame->exec("
         DELETE FROM character_variables
-        WHERE var = 'VIP_CHAR'
-          AND charId IN (" . implode(',', array_map('intval', $chars)) . ")
+        WHERE var IN ('VIP_CHAR', 'VIP_CHAR_END')
+          AND charId IN ($in)
     ");
 }
 
-
-// === GAME VIP (správná logika) ===
+// ================================================================
+// 2) GAME VIP — odeber account_premium
+//    pouze pokud nemá aktivní WEB VIP ani jiný aktivní GAME VIP
+// ================================================================
 $st = $pdo->query("
-    SELECT ga.login, ga.id
+    SELECT ga.login
     FROM game_accounts ga
     WHERE EXISTS (
-        SELECT 1
-        FROM vip_grants vg
+        SELECT 1 FROM vip_grants vg
         WHERE vg.scope = 'GAME'
           AND vg.target_id = ga.id
           AND vg.end_at <= NOW()
     )
     AND NOT EXISTS (
-        SELECT 1
-        FROM vip_grants vg2
+        SELECT 1 FROM vip_grants vg2
         WHERE vg2.scope = 'GAME'
           AND vg2.target_id = ga.id
           AND vg2.end_at > NOW()
     )
     AND NOT EXISTS (
-        SELECT 1
-        FROM vip_grants vg3
+        SELECT 1 FROM vip_grants vg3
         WHERE vg3.scope = 'WEB'
           AND vg3.target_id = ga.web_user_id
           AND vg3.end_at > NOW()
     )
 ");
-
-$rows = $st->fetchAll(PDO::FETCH_ASSOC);
+$rows = $st->fetchAll(PDO::FETCH_COLUMN);
 
 if (!empty($rows)) {
-    $accounts = array_column($rows, 'login');
-    $ids = array_column($rows, 'id');
-
-    $in = implode(',', array_map(fn($a) => $pdo->quote($a), $accounts));
-    $idsIn = implode(',', array_map('intval', $ids));
-
-    // GAME DB
-    $pdoGame->exec("
-        UPDATE account_premium
-        SET enddate = 0
-        WHERE account_name IN ($in)
-    ");
-
-    // WEB DB sync
-    $pdo->exec("
-        UPDATE vip_grants
-        SET end_at = NOW()
-        WHERE scope = 'GAME'
-          AND target_id IN ($idsIn)
-          AND end_at > NOW()
-    ");
+    $in = implode(',', array_map(fn($a) => $pdo->quote($a), $rows));
+    $pdoGame->exec("UPDATE account_premium SET enddate = 0 WHERE account_name IN ($in)");
 }
 
-
-// === WEB VIP ===
+// ================================================================
+// 3) WEB VIP — odeber account_premium
+//    pouze pokud nemá aktivní WEB VIP ani GAME VIP
+// ================================================================
 $st = $pdo->query("
-    SELECT ga.login, ga.web_user_id
+    SELECT ga.login
     FROM game_accounts ga
-    WHERE NOT EXISTS (
-        SELECT 1
-        FROM vip_grants vg
+    WHERE EXISTS (
+        SELECT 1 FROM vip_grants vg
         WHERE vg.scope = 'WEB'
           AND vg.target_id = ga.web_user_id
-          AND vg.end_at > NOW()
+          AND vg.end_at <= NOW()
+    )
+    AND NOT EXISTS (
+        SELECT 1 FROM vip_grants vg2
+        WHERE vg2.scope = 'WEB'
+          AND vg2.target_id = ga.web_user_id
+          AND vg2.end_at > NOW()
+    )
+    AND NOT EXISTS (
+        SELECT 1 FROM vip_grants vg3
+        WHERE vg3.scope = 'GAME'
+          AND vg3.target_id = ga.id
+          AND vg3.end_at > NOW()
     )
 ");
-
-$rows = $st->fetchAll(PDO::FETCH_ASSOC);
+$rows = $st->fetchAll(PDO::FETCH_COLUMN);
 
 if (!empty($rows)) {
-    $accounts = array_unique(array_column($rows, 'login'));
-    $userIds = array_unique(array_column($rows, 'web_user_id'));
-
-    $in = implode(',', array_map(fn($a) => $pdo->quote($a), $accounts));
-    $userIn = implode(',', array_map('intval', $userIds));
-
-    // GAME DB
-    $pdoGame->exec("
-        UPDATE account_premium
-        SET enddate = 0
-        WHERE account_name IN ($in)
-    ");
-
-    // WEB DB sync
-    $pdo->exec("
-        UPDATE vip_grants
-        SET end_at = NOW()
-        WHERE scope = 'WEB'
-          AND target_id IN ($userIn)
-          AND end_at > NOW()
-    ");
+    $in = implode(',', array_map(fn($a) => $pdo->quote($a), $rows));
+    $pdoGame->exec("UPDATE account_premium SET enddate = 0 WHERE account_name IN ($in)");
 }
-// 🔥 CLEANUP expired premium v game DB
-$pdoGame->exec("
-    DELETE FROM account_premium
-    WHERE enddate < UNIX_TIMESTAMP()*1000
+
+// ================================================================
+// 4) SYNC — nastav account_premium pro aktivní VIP (GREATEST priorita)
+// ================================================================
+
+// WEB VIP
+$st = $pdo->query("
+    SELECT ga.login, UNIX_TIMESTAMP(vg.end_at) * 1000 AS endMs
+    FROM game_accounts ga
+    JOIN vip_grants vg ON vg.target_id = ga.web_user_id
+    WHERE vg.scope = 'WEB'
+      AND vg.end_at > NOW()
+    ORDER BY vg.end_at DESC
+");
+foreach ($st->fetchAll(PDO::FETCH_ASSOC) as $row) {
+    $pdoGame->prepare("
+        INSERT INTO account_premium (account_name, enddate)
+        VALUES (?, ?)
+        ON DUPLICATE KEY UPDATE enddate = GREATEST(enddate, VALUES(enddate))
+    ")->execute([$row['login'], $row['endMs']]);
+}
+
+// GAME VIP (jen pokud nemá vyšší WEB VIP)
+$st = $pdo->query("
+    SELECT ga.login, UNIX_TIMESTAMP(vg.end_at) * 1000 AS endMs
+    FROM game_accounts ga
+    JOIN vip_grants vg ON vg.target_id = ga.id
+    WHERE vg.scope = 'GAME'
+      AND vg.end_at > NOW()
+    ORDER BY vg.end_at DESC
+");
+foreach ($st->fetchAll(PDO::FETCH_ASSOC) as $row) {
+    $pdoGame->prepare("
+        INSERT INTO account_premium (account_name, enddate)
+        VALUES (?, ?)
+        ON DUPLICATE KEY UPDATE enddate = GREATEST(enddate, VALUES(enddate))
+    ")->execute([$row['login'], $row['endMs']]);
+}
+
+// ================================================================
+// 5) CLEANUP — smaž staré expirované záznamy z vip_grants
+// ================================================================
+$pdo->exec("
+    DELETE FROM vip_grants
+    WHERE end_at < DATE_SUB(NOW(), INTERVAL 7 DAY)
 ");

@@ -23,42 +23,32 @@ if (!$charId || !in_array($currency, ['VOTE_COIN','DC'])) {
     echo json_encode(['ok'=>false,'error'=>'INVALID_INPUT']);
     exit;
 }
-/* 🔎 Ověření, že postava patří uživateli */
 
+/* 🔎 Ověření, že postava patří uživateli */
 $st = $pdo->prepare("
     SELECT 1
     FROM game_accounts ga
-    JOIN l2game.characters c
-      ON c.account_name = ga.login
+    JOIN l2game.characters c ON c.account_name = ga.login
     WHERE ga.web_user_id = ?
       AND c.charId = ?
     LIMIT 1
 ");
-
 $st->execute([$userId, $charId]);
-
 if (!$st->fetchColumn()) {
-    echo json_encode([
-        'ok'=>false,
-        'error'=>'CHAR_NOT_OWNED'
-    ]);
+    echo json_encode(['ok'=>false,'error'=>'CHAR_NOT_OWNED']);
     exit;
 }
-
 
 $cost = $currency === 'DC' ? 1 : 4;
 
 try {
-
     $pdo->beginTransaction();
 
-    /* 🔐 1️⃣ Zamkneme wallet */
+    /* 🔐 1) Zamkneme wallet */
     $st = $pdo->prepare("
         SELECT balance
         FROM wallet_balances
-        WHERE owner_type='WEB'
-        AND owner_id=?
-        AND currency=?
+        WHERE owner_type='WEB' AND owner_id=? AND currency=?
         FOR UPDATE
     ");
     $st->execute([$userId, $currency]);
@@ -68,23 +58,39 @@ try {
         throw new Exception('NOT_ENOUGH_FUNDS');
     }
 
-    /* 💰 2️⃣ Odečet */
+    /* 💰 2) Odečet */
     $pdo->prepare("
         UPDATE wallet_balances
         SET balance = balance - ?
-        WHERE owner_type='WEB'
-        AND owner_id=?
-        AND currency=?
+        WHERE owner_type='WEB' AND owner_id=? AND currency=?
     ")->execute([$cost, $userId, $currency]);
 
-    /* 🧠 3️⃣ VIP logika (prodloužení místo přepsání) */
+    /* 🧠 3) VIP logika — nepřepisujeme vyšší VIP */
 
+    // Zkontroluj jestli má aktivní GAME nebo WEB VIP
+    $st = $pdo->prepare("
+        SELECT COUNT(*) FROM vip_grants vg
+        JOIN game_accounts ga ON (
+            (vg.scope = 'GAME' AND vg.target_id = ga.id)
+            OR
+            (vg.scope = 'WEB' AND vg.target_id = ga.web_user_id)
+        )
+        JOIN l2game.characters c ON c.account_name = ga.login
+        WHERE c.charId = ?
+          AND vg.end_at > NOW()
+    ");
+    $st->execute([$charId]);
+    $hasHigherVip = (int)$st->fetchColumn() > 0;
+
+    if ($hasHigherVip) {
+        throw new Exception('HIGHER_VIP_ACTIVE');
+    }
+
+    // Zkontroluj existující CHAR VIP
     $st = $pdo->prepare("
         SELECT id, end_at
         FROM vip_grants
-        WHERE scope='CHAR'
-        AND target_id=?
-        AND end_at > NOW()
+        WHERE scope='CHAR' AND target_id=? AND end_at > NOW()
         ORDER BY end_at DESC
         LIMIT 1
         FOR UPDATE
@@ -93,105 +99,69 @@ try {
     $existingVip = $st->fetch(PDO::FETCH_ASSOC);
 
     if ($existingVip) {
-        // prodloužíme
+        // Prodloužení
         $pdo->prepare("
             UPDATE vip_grants
             SET end_at = DATE_ADD(end_at, INTERVAL 1 DAY)
             WHERE id=?
         ")->execute([$existingVip['id']]);
-system_log(
-        $pdo,
-        'ECONOMY',
-        'VIP_24H_EXTEND',
-        $userId,
-        $charId,
-        'SUCCESS',
-        [
-            'currency' => $currency,
-            'cost' => $cost
-        ]
-    );
 
+        system_log($pdo, 'ECONOMY', 'VIP_24H_EXTEND', $userId, $charId, 'SUCCESS', [
+            'currency' => $currency, 'cost' => $cost
+        ]);
     } else {
-
-        // vytvoříme nový VIP
+        // Nový VIP
         $pdo->prepare("
             INSERT INTO vip_grants
             (scope, target_id, level_id, start_at, end_at, source, created_by)
-            VALUES
-            ('CHAR', ?, 1, NOW(), DATE_ADD(NOW(), INTERVAL 1 DAY), 'PURCHASE', ?)
+            VALUES ('CHAR', ?, 1, NOW(), DATE_ADD(NOW(), INTERVAL 1 DAY), 'PURCHASE', ?)
         ")->execute([$charId, $userId]);
-    system_log(
-        $pdo,
-        'ECONOMY',
-        'VIP_24H_ACTIVATE',
-        $userId,
-        $charId,
-        'SUCCESS',
-        [
-            'currency' => $currency,
-            'cost' => $cost
-        ]
-    );
-}
 
-// 🔄 SYNC do L2GAME - nastav VIP_CHAR=true
+        system_log($pdo, 'ECONOMY', 'VIP_24H_ACTIVATE', $userId, $charId, 'SUCCESS', [
+            'currency' => $currency, 'cost' => $cost
+        ]);
+    }
 
-    /* 🧾 4️⃣ Ledger */
+    /* 🧾 4) Ledger */
     $pdo->prepare("
-        INSERT INTO wallet_ledger
-        (owner_type, owner_id, currency, amount, reason)
-        VALUES
-        ('WEB', ?, ?, ?, 'VIP_24H')
+        INSERT INTO wallet_ledger (owner_type, owner_id, currency, amount, reason)
+        VALUES ('WEB', ?, ?, ?, 'VIP_24H')
     ")->execute([$userId, $currency, -$cost]);
-/* 🎮 4️⃣ Sync do L2 – nastavení VIP_CHAR */
 
+    /* 🎮 5) Sync do L2 — VIP_CHAR + VIP_CHAR_END */
+    $st = $pdo->prepare("
+        SELECT UNIX_TIMESTAMP(end_at)
+        FROM vip_grants
+        WHERE scope='CHAR' AND target_id=? AND end_at > NOW()
+        ORDER BY end_at DESC LIMIT 1
+    ");
+    $st->execute([$charId]);
+    $endTs = (int)$st->fetchColumn();
 
-// Načti aktuální end_at po update/insert
-$st = $pdo->prepare("
-    SELECT UNIX_TIMESTAMP(end_at)
-    FROM vip_grants
-    WHERE scope='CHAR' AND target_id=? AND end_at > NOW()
-    ORDER BY end_at DESC LIMIT 1
-");
-$st->execute([$charId]);
-$endTs = (int)$st->fetchColumn();
+    $pdoPremium->prepare("
+        INSERT INTO character_variables (charId, var, val)
+        VALUES (?, 'VIP_CHAR', 'true')
+        ON DUPLICATE KEY UPDATE val = 'true'
+    ")->execute([$charId]);
 
-$pdoPremium->prepare("
-    INSERT INTO character_variables (charId, var, val)
-    VALUES (?, 'VIP_CHAR', 'true')
-    ON DUPLICATE KEY UPDATE val = 'true'
-")->execute([$charId]);
-
-$pdoPremium->prepare("
-    INSERT INTO character_variables (charId, var, val)
-    VALUES (?, 'VIP_CHAR_END', ?)
-    ON DUPLICATE KEY UPDATE val = ?
-")->execute([$charId, $endTs, $endTs]);
+    $pdoPremium->prepare("
+        INSERT INTO character_variables (charId, var, val)
+        VALUES (?, 'VIP_CHAR_END', ?)
+        ON DUPLICATE KEY UPDATE val = ?
+    ")->execute([$charId, $endTs, $endTs]);
 
     $pdo->commit();
 
     echo json_encode(['ok'=>true]);
 
 } catch (Throwable $e) {
-system_log(
-    $pdo,
-    'ECONOMY',
-    'VIP_24H_ACTIVATE',
-    $userId ?? null,
-    $charId ?? null,
-    'FAIL',
-    [
-        'currency' => $currency ?? null,
-        'error' => $e->getMessage()
-    ]
-);
+    system_log($pdo, 'ECONOMY', 'VIP_24H_ACTIVATE', $userId ?? null, $charId ?? null, 'FAIL', [
+        'currency' => $currency ?? null, 'error' => $e->getMessage()
+    ]);
+
     if ($pdo->inTransaction()) {
         $pdo->rollBack();
     }
 
-    echo json_encode([
-        'ok'=>false,
-        'error'=>$e->getMessage()
-    ]);
+    echo json_encode(['ok'=>false,'error'=>$e->getMessage()]);
 }

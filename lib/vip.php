@@ -141,7 +141,7 @@ function vip_sync_account_premium(PDO $pdoWeb, PDO $pdoGame, string $scope, int 
             $pdoGame->prepare("
                 INSERT INTO account_premium (account_name, enddate)
                 VALUES (?, ?)
-                ON DUPLICATE KEY UPDATE enddate = VALUES(enddate)
+                ON DUPLICATE KEY UPDATE enddate = GREATEST(enddate, VALUES(enddate))
             ")->execute([$login, $endMs]);
         }
 
@@ -159,7 +159,7 @@ function vip_sync_account_premium(PDO $pdoWeb, PDO $pdoGame, string $scope, int 
         $pdoGame->prepare("
             INSERT INTO account_premium (account_name, enddate)
             VALUES (?, ?)
-            ON DUPLICATE KEY UPDATE enddate = VALUES(enddate)
+            ON DUPLICATE KEY UPDATE enddate = GREATEST(enddate, VALUES(enddate))
         ")->execute([$login, $endMs]);
 
     } else {
