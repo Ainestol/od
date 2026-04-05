@@ -153,9 +153,10 @@ window.fetch = function (url, options = {}) {
     voteNeedConfirm: isEn ? 'Confirm you voted?' : 'Potvrdit, že jsi hlasoval?',
     voteRewarded: isEn ? 'Vote Coin added!' : 'Vote Coin připsán!',
     votePending: isEn ? 'Not detected yet. Try again later.' : 'Zatím nedetekováno. Zkus to později.',
-    unknownErr: isEn ? 'Unknown error.' : 'Neznámá chyba.'
-    
-  };
+    unknownErr: isEn ? 'Unknown error.' : 'Neznámá chyba.',
+    vipActivated: isEn ? 'VIP activated for 24 hours!' : 'VIP aktivováno na 24 hodin!',
+    convertOk: isEn ? 'Vote Coins exchanged for Dragon Coin!' : 'Vote Coiny vyměněny za Dragon Coin!',
+    };
 
   function qs(sel, root = document) { return root.querySelector(sel); }
   function qsa(sel, root = document) { return Array.from(root.querySelectorAll(sel)); }
@@ -1195,6 +1196,7 @@ async function loadVoteBalance() {
 
 if (data.ok) {
   modal.classList.add('hidden');
+  notify('success', T.vipActivated);
 
   await loadVoteBalance();
   await loadDcBalance();
@@ -1206,10 +1208,10 @@ if (data.ok) {
 }
 
 else {
-  alert(data.error || 'Activation failed.');
+  notify('error', data.error || T.vipErr);
 }
       } catch (err) {
-        alert('Server error.');
+        notify('error', T.serverConnErr);
       }
 
       btn.disabled = false;
@@ -1243,13 +1245,14 @@ else {
         const data = await res.json().catch(() => ({}));
 
         if (data.ok) {
+          notify('success', T.convertOk);
           loadVoteBalance();
           loadDcBalance();
         } else {
-          alert(data.error || 'Conversion failed.');
+          notify('error', isEn ? 'Conversion failed.' : 'Výměna se nezdařila.');
         }
       } catch (err) {
-        alert('Server error.');
+        notify('error', T.serverConnErr);
       }
 
       b.disabled = false;
