@@ -1196,6 +1196,7 @@ async function loadVoteBalance() {
 
 if (data.ok) {
   modal.classList.add('hidden');
+  alert('TEST OK');  // dočasně
   notify('success', T.vipActivated);
 
   await loadVoteBalance();
