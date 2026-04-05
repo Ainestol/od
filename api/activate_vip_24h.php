@@ -131,22 +131,25 @@ try {
         VALUES ('WEB', ?, ?, ?, 'VIP_24H')
     ")->execute([$userId, $currency, -$cost]);
 
-    /* 🎮 5) Sync do L2 — VIP_CHAR + VIP_CHAR_END */
-    $st = $pdo->prepare("
-        SELECT UNIX_TIMESTAMP(end_at)
-        FROM vip_grants
-        WHERE scope='CHAR' AND target_id=? AND end_at > NOW()
-        ORDER BY end_at DESC LIMIT 1
-    ");
-    $st->execute([$charId]);
-    $endTs = (int)$st->fetchColumn();
+/* 🎮 5) Sync do L2 — VIP_CHAR + VIP_CHAR_END */
+$st = $pdo->prepare("
+    SELECT UNIX_TIMESTAMP(end_at)
+    FROM vip_grants
+    WHERE scope='CHAR' AND target_id=? AND end_at > NOW()
+    ORDER BY end_at DESC LIMIT 1
+");
+$st->execute([$charId]);
+$endTs = (int)$st->fetchColumn();
 
-    $pdoPremium->prepare("
-        INSERT INTO character_variables (charId, var, val)
-        VALUES (?, 'VIP_CHAR', 'true')
-        ON DUPLICATE KEY UPDATE val = 'true'
-    ")->execute([$charId]);
+error_log("VIP_CHAR sync start, charId=$charId, endTs=$endTs");
 
+$pdoPremium->prepare("
+    INSERT INTO character_variables (charId, var, val)
+    VALUES (?, 'VIP_CHAR', 'true')
+    ON DUPLICATE KEY UPDATE val = 'true'
+")->execute([$charId]);
+
+error_log("VIP_CHAR written, rows=" . $pdoPremium->query("SELECT ROW_COUNT()")->fetchColumn());
     $pdoPremium->prepare("
         INSERT INTO character_variables (charId, var, val)
         VALUES (?, 'VIP_CHAR_END', ?)
