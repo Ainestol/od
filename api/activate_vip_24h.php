@@ -147,11 +147,27 @@ system_log(
 /* 🎮 4️⃣ Sync do L2 – nastavení VIP_CHAR */
 
 
+// Načti aktuální end_at po update/insert
+$st = $pdo->prepare("
+    SELECT UNIX_TIMESTAMP(end_at)
+    FROM vip_grants
+    WHERE scope='CHAR' AND target_id=? AND end_at > NOW()
+    ORDER BY end_at DESC LIMIT 1
+");
+$st->execute([$charId]);
+$endTs = (int)$st->fetchColumn();
+
 $pdoPremium->prepare("
     INSERT INTO character_variables (charId, var, val)
     VALUES (?, 'VIP_CHAR', 'true')
     ON DUPLICATE KEY UPDATE val = 'true'
 ")->execute([$charId]);
+
+$pdoPremium->prepare("
+    INSERT INTO character_variables (charId, var, val)
+    VALUES (?, 'VIP_CHAR_END', ?)
+    ON DUPLICATE KEY UPDATE val = ?
+")->execute([$charId, $endTs, $endTs]);
 
     $pdo->commit();
 
