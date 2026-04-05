@@ -148,14 +148,14 @@ $pdoPremium->prepare("
     VALUES (?, 'VIP_CHAR', 'true')
     ON DUPLICATE KEY UPDATE val = 'true'
 ")->execute([$charId]);
-
+file_put_contents('/tmp/vip_debug.log', date('c') . " charId=$charId endTs=$endTs\n", FILE_APPEND);
 error_log("VIP_CHAR written, rows=" . $pdoPremium->query("SELECT ROW_COUNT()")->fetchColumn());
     $pdoPremium->prepare("
         INSERT INTO character_variables (charId, var, val)
         VALUES (?, 'VIP_CHAR_END', ?)
         ON DUPLICATE KEY UPDATE val = ?
     ")->execute([$charId, $endTs, $endTs]);
-
+file_put_contents('/tmp/vip_debug.log', date('c') . " VIP_CHAR rows=" . $pdoPremium->query("SELECT ROW_COUNT()")->fetchColumn() . "\n", FILE_APPEND);
     $pdo->commit();
 
     echo json_encode(['ok'=>true]);
