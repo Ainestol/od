@@ -1,4 +1,5 @@
 <?php
+file_put_contents('/tmp/cron_debug.log', date('c') . " CRON START\n", FILE_APPEND);
 require_once __DIR__ . '/../config/db.php';
 $pdoGame = require __DIR__ . '/../config/db_game.php';
 
@@ -42,7 +43,7 @@ if (!empty($chars)) {
           AND charId IN ($in)
     ");
 }
-
+file_put_contents('/tmp/cron_debug.log', date('c') . " CHAR VIP deleted: " . json_encode($chars) . "\n", FILE_APPEND);
 // ================================================================
 // 2) GAME VIP — odeber account_premium
 //    pouze pokud nemá aktivní WEB VIP ani jiný aktivní GAME VIP
