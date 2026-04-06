@@ -147,10 +147,3 @@ foreach ($st->fetchAll(PDO::FETCH_ASSOC) as $row) {
     ")->execute([$row['login'], $row['endMs']]);
 }
 
-// ================================================================
-// 5) CLEANUP — smaž staré expirované záznamy z vip_grants
-// ================================================================
-$pdo->exec("
-    DELETE FROM vip_grants
-    WHERE end_at < DATE_SUB(NOW(), INTERVAL 7 DAY)
-");
