@@ -1,5 +1,4 @@
 <?php
-file_put_contents('/tmp/cron_debug.log', date('c') . " CRON START\n", FILE_APPEND);
 require_once __DIR__ . '/../config/db.php';
 $pdoGame = require __DIR__ . '/../config/db_game.php';
 
@@ -43,7 +42,7 @@ if (!empty($chars)) {
           AND charId IN ($in)
     ");
 }
-file_put_contents('/tmp/cron_debug.log', date('c') . " CHAR VIP deleted: " . json_encode($chars) . "\n", FILE_APPEND);
+
 // ================================================================
 // 2) GAME VIP — odeber account_premium
 //    pouze pokud nemá aktivní WEB VIP ani jiný aktivní GAME VIP
@@ -82,28 +81,32 @@ if (!empty($rows)) {
 //    pouze pokud nemá aktivní WEB VIP ani GAME VIP
 // ================================================================
 $st = $pdo->query("
-    SELECT ga.login
-    FROM game_accounts ga
-    WHERE EXISTS (
-        SELECT 1 FROM vip_grants vg
-        WHERE vg.scope = 'WEB'
-          AND vg.target_id = ga.web_user_id
-          AND vg.end_at <= NOW()
-    )
-    AND NOT EXISTS (
-        SELECT 1 FROM vip_grants vg2
-        WHERE vg2.scope = 'WEB'
-          AND vg2.target_id = ga.web_user_id
-          AND vg2.end_at > NOW()
-    )
-    AND NOT EXISTS (
-        SELECT 1 FROM vip_grants vg3
-        WHERE vg3.scope = 'GAME'
-          AND vg3.target_id = ga.id
-          AND vg3.end_at > NOW()
-    )
+    SELECT vg.target_id AS charId
+    FROM vip_grants vg
+    JOIN l2game.characters c ON c.charId = vg.target_id
+    JOIN game_accounts ga ON ga.login = c.account_name
+    WHERE vg.scope = 'CHAR'
+      AND vg.end_at <= NOW()
+      AND NOT EXISTS (
+          SELECT 1 FROM vip_grants vg_active
+          WHERE vg_active.scope = 'CHAR'
+            AND vg_active.target_id = vg.target_id
+            AND vg_active.end_at > NOW()
+      )
+      AND NOT EXISTS (
+          SELECT 1 FROM vip_grants vg2
+          WHERE vg2.scope = 'GAME'
+            AND vg2.target_id = ga.id
+            AND vg2.end_at > NOW()
+      )
+      AND NOT EXISTS (
+          SELECT 1 FROM vip_grants vg3
+          WHERE vg3.scope = 'WEB'
+            AND vg3.target_id = ga.web_user_id
+            AND vg3.end_at > NOW()
+      )
 ");
-$rows = $st->fetchAll(PDO::FETCH_COLUMN);
+$chars = $st->fetchAll(PDO::FETCH_COLUMN);
 
 if (!empty($rows)) {
     $in = implode(',', array_map(fn($a) => $pdo->quote($a), $rows));
@@ -148,3 +151,6 @@ foreach ($st->fetchAll(PDO::FETCH_ASSOC) as $row) {
     ")->execute([$row['login'], $row['endMs']]);
 }
 
+// ================================================================
+// 5) CLEANUP — smaž staré expirované záznamy z vip_grants
+// ================================================================
