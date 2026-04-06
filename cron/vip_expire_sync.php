@@ -20,6 +20,12 @@ $st = $pdo->query("
     WHERE vg.scope = 'CHAR'
       AND vg.end_at <= NOW()
       AND NOT EXISTS (
+          SELECT 1 FROM vip_grants vg_active
+          WHERE vg_active.scope = 'CHAR'
+            AND vg_active.target_id = vg.target_id
+            AND vg_active.end_at > NOW()
+      )
+      AND NOT EXISTS (
           SELECT 1 FROM vip_grants vg2
           WHERE vg2.scope = 'GAME'
             AND vg2.target_id = ga.id
