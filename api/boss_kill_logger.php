@@ -89,11 +89,10 @@ SELECT
 g.boss_id,
 b.name,
 UNIX_TIMESTAMP() AS kill_time,
-r.respawn,
-r.respawn_random
+b.respawn_delay,
+b.respawn_random
 FROM grandboss_data g
 LEFT JOIN boss_list b ON b.boss_id = g.boss_id
-LEFT JOIN boss_respawn r ON r.boss_id = g.boss_id
 WHERE g.respawn_time > 0
 ";
 
