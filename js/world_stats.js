@@ -354,11 +354,16 @@ if(type === "GRAND"){
     }
 
     // 🟡 WINDOW
-    else if(gStatus === 3){
-        status = T.window;
-        statusClass = "window";
+   else if(gStatus === 3){
+    status = T.window;
+    statusClass = "window";
+    const diff = gRespawn - now;
+    if(diff > 0){
+        info = `${T.spawnWindow}: ${formatCountdown(diff)}`;
+    } else {
         info = T.spawnWindow;
     }
+}
 
     // fallback (když něco chybí)
     else{
