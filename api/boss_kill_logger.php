@@ -88,7 +88,7 @@ $sql = "
 SELECT
 g.boss_id,
 b.name,
-FLOOR(g.respawn_time/1000) AS kill_time,
+UNIX_TIMESTAMP() AS kill_time,
 r.respawn,
 r.respawn_random
 FROM grandboss_data g
