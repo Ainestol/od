@@ -336,36 +336,34 @@ if(type === "GRAND"){
 
     const gStatus = Number(b.grand_status ?? -1);
     const gRespawn = Number(b.grand_respawn_time ?? 0);
+    const killTime = Number(b.kill_time) || 0;
+    const delay = Number(b.respawn_delay) || 0;
+    const random = Number(b.respawn_random) || 0;
 
-    // 🟢 ALIVE
-    if(gStatus === 0 || gRespawn <= now){
+    const windowStart = killTime + delay;
+    const windowEnd = windowStart + random;
+
+    // ALIVE - status 0 or respawn passed
+    if(gStatus === 0 || (gRespawn > 0 && gRespawn <= now)){
         status = T.alive;
         statusClass = "alive";
         info = T.bossAlive;
     }
-
-    // 🔴 DEAD (čekání na respawn)
-    else if(gStatus === 1){
-
-        const diff = gRespawn - now;
+    // DEAD - waiting for window to open
+    else if(killTime > 0 && now < windowStart){
         status = T.dead;
         statusClass = "dead";
+        const diff = windowStart - now;
         info = `${T.spawnWindowIn} ${formatCountdown(diff)}`;
     }
-
-    // 🟡 WINDOW
-   else if(gStatus === 3){
-    status = T.window;
-    statusClass = "window";
-    const diff = gRespawn - now;
-    if(diff > 0){
+    // RESPAWN WINDOW - window is open
+    else if(killTime > 0 && now >= windowStart && now <= windowEnd){
+        status = T.window;
+        statusClass = "window";
+        const diff = windowEnd - now;
         info = `${T.spawnWindow}: ${formatCountdown(diff)}`;
-    } else {
-        info = T.spawnWindow;
     }
-}
-
-    // fallback (když něco chybí)
+    // fallback
     else{
         status = T.alive;
         statusClass = "alive";
