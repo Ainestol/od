@@ -114,8 +114,7 @@ WHERE boss_id = ?
 AND kill_time = ?
 LIMIT 1
 ");
-
-$check->execute([$boss_id,$kill_time]);
+$check->execute([$boss_id]);
 
 if(!$check->fetch()){
 
