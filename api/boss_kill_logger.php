@@ -14,7 +14,7 @@ $sql = "
 SELECT
 r.id AS boss_id,
 b.name,
-FLOOR(r.respawnTime/1000) AS kill_time,
+UNIX_TIMESTAMP() AS kill_time,
 s.respawn_delay,
 s.respawn_random
 FROM npc_respawns r
