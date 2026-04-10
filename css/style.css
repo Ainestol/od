@@ -25,7 +25,7 @@ body {
 
 
 .hero-bg {
-  flex: 0 0 35%;
+  flex: 0 0 40%;
   min-width: 300px;
   height: 100vh;
   background: url("../img/war.webp") center top / cover no-repeat;
@@ -61,7 +61,7 @@ body {
   pointer-events: none;
 }
 .hero-gap {
-  flex: 0 0 60px;
+  flex: 0 0 80px;
 
   background: linear-gradient(
     to right,
