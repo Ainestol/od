@@ -37,7 +37,7 @@ $check = $pdoGame->prepare("
 SELECT id
 FROM boss_kill_log
 WHERE boss_id = ?
-AND kill_time > (UNIX_TIMESTAMP() - 3600)
+AND kill_time > (UNIX_TIMESTAMP() - 259200)
 LIMIT 1
 ");
 $check->execute([$boss_id]);
