@@ -40,11 +40,10 @@ $check = $pdoGame->prepare("
 SELECT id
 FROM boss_kill_log
 WHERE boss_id = ?
-AND kill_time = ?
+AND kill_time > (UNIX_TIMESTAMP() - 3600)
 LIMIT 1
 ");
-
-$check->execute([$boss_id,$kill_time]);
+$check->execute([$boss_id]);
 
 if(!$check->fetch()){
 
@@ -110,7 +109,7 @@ $check = $pdoGame->prepare("
 SELECT id
 FROM boss_kill_log
 WHERE boss_id = ?
-AND kill_time = ?
+AND kill_time > (UNIX_TIMESTAMP() - 3600)
 LIMIT 1
 ");
 $check->execute([$boss_id]);
