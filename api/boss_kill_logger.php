@@ -92,7 +92,8 @@ b.respawn_delay,
 b.respawn_random
 FROM grandboss_data g
 LEFT JOIN boss_list b ON b.boss_id = g.boss_id
-WHERE g.respawn_time > 0
+WHERE g.respawn_time > UNIX_TIMESTAMP()
+AND (g.respawn_time - UNIX_TIMESTAMP()) < (b.respawn_delay + b.respawn_random + 3600)
 ";
 
 $stmt = $pdoGame->query($sql);
