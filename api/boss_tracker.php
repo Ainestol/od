@@ -44,7 +44,7 @@ ON g.boss_id = b.boss_id
 
 WHERE
 b.type='raid'
-OR b.boss_id IN (29001,29006,29014,29068,29020,29028,29045)
+OR b.boss_id IN (29001,29006,29014,29022,29068,29020,29028,29045)
 
 
 ORDER BY b.level ASC
