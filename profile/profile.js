@@ -988,7 +988,7 @@ el.innerHTML = `
 
   async function pollVote(attemptId) {
     const start = Date.now();
-    const maxMs = 90000;
+    const maxMs = 300000;
     const waitMs = 4000;
     let manualConfirm = false;
     let askedConfirm = false;
@@ -1028,8 +1028,26 @@ el.innerHTML = `
       await new Promise(r => setTimeout(r, waitMs));
     }
 
+    const retry = confirm(isEn ? 'Vote not detected yet. Did you vote? Confirm manually?' : 'Hlasování nebylo detekováno. Hlasoval jsi? Potvrdit ručně?');
+if (retry) {
+    const retryRes = await fetch('/api/vote_check.php', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ attempt_id: attemptId, confirm: false })
+    });
+    const retryData = await retryRes.json().catch(() => ({}));
+    if (retryData.status === 'REWARDED' || retryData.status === 'USED') {
+      notify('success', T.voteRewarded);
+      if (typeof window.loadVoteBalance === 'function') window.loadVoteBalance();
+    } else {
+      notify('error', T.votePending);
+    }
+    await loadVoteSites();
+  } else {
     notify('error', T.votePending);
     await loadVoteSites();
+  }
   }
 
   async function startVote(siteId, btnEl) {
