@@ -129,3 +129,8 @@
   }
 
 }
+@media (max-width: 768px) {
+  .side-header img {
+    display: none !important;
+  }
+}
