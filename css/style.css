@@ -2091,10 +2091,10 @@ body {
 }
 .side-header img {
   position: absolute !important;
-  top: 0px; /* nahoru/dolů */
-  left: 50%; /* střed */
+  top: -10px; /* záporné = nahoru */
+  left: 50%;
   transform: translateX(-50%);
-  max-width: 300px !important;
+  max-width: 250px !important;
   z-index: 0;
 }
 .side-logo {
