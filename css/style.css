@@ -215,6 +215,7 @@ nav a:hover {
   text-shadow: 0 0 6px rgba(255,255,255,0.4);
 }
 .side-logo {
+  margin-left: 50px;
   font-family: 'Cinzel', serif;
   font-size: 46px;
   letter-spacing: 7px;        /* víc „epické“ */
@@ -2086,4 +2087,6 @@ body {
 body {
   transition: opacity 0.2s ease;
 }
-
+.side-header img {
+  margin-top: -10px;
+}
