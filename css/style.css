@@ -2087,9 +2087,9 @@ body {
   transition: opacity 0.2s ease;
 }
 .side-header img {
-  margin-top: 150px; /* kladné = dolů, záporné = nahoru */
-  margin-left: -150px; /* záporné = doleva, kladné = doprava */
+  margin-top: 150px !important; /* kladné = dolů, záporné = nahoru */
+  margin-left: -150px !important; /* záporné = doleva, kladné = doprava */
 }
 .side-logo {
-  padding-left: 150px; /* větší = více doprava */
+  padding-left: 150px !important; /* větší = více doprava */
 }
