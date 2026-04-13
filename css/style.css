@@ -2086,10 +2086,18 @@ body {
 body {
   transition: opacity 0.2s ease;
 }
+.side-header {
+  position: relative;
+}
 .side-header img {
-  margin-top: 150px !important; /* kladné = dolů, záporné = nahoru */
-  margin-left: -150px !important; /* záporné = doleva, kladné = doprava */
+  position: absolute !important;
+  top: 0px; /* nahoru/dolů */
+  left: 50%; /* střed */
+  transform: translateX(-50%);
+  max-width: 300px !important;
+  z-index: 0;
 }
 .side-logo {
-  padding-left: 150px !important; /* větší = více doprava */
+  position: relative;
+  z-index: 1;
 }
