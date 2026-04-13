@@ -2086,4 +2086,16 @@ body {
 body {
   transition: opacity 0.2s ease;
 }
-
+.chronicle-badge {
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: #d4af37;
+  opacity: 0.75;
+  text-align: center;
+  margin-top: -8px;
+  text-shadow:
+    0 0 8px rgba(212,175,55,0.6),
+    0 0 20px rgba(212,175,55,0.3);
+}
