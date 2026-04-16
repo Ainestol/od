@@ -108,12 +108,42 @@ try {
   }
 
   // ---- 2) IPCHECK
-  elseif ($method === 'IPCHECK') {
+ elseif ($method === 'IPCHECK') {
 
     $provider  = $a['api_provider'] ?? null;
     $apiKey    = $a['api_key'] ?? null;
-    $ip        = $a['ip'] ?? null;
     $voterRef  = $a['voter_ref'] ?? null;
+    
+    // 🔑 KLÍČOVÁ ZMĚNA: preferuj IPv4, protože vote listy IPv6 nepodporují
+    // (kromě L2Network, která používá voter_ref, ne IP)
+    $ip   = $a['ip'] ?? null;
+    $ipV4 = $a['ip_v4'] ?? null;
+    
+    // Pro IP-based providery použij IPv4 verzi pokud existuje
+    $ipForCheck = $ipV4 ?: $ip;
+    
+    // Pokud hráč nemá IPv4 a provider je IP-based → nelze ověřit
+    $ipBasedProviders = ['HOPZONE', 'RANKZONE', 'HOTSERVERS', 'L2TOP'];
+    if (in_array($provider, $ipBasedProviders, true) && !$ipV4) {
+        // Klient je pure-IPv6 → tenhle provider ho nemůže ověřit
+        $pdo->commit();
+        system_log(
+            $pdo, 'VOTE', 'VOTE_IPV6_UNSUPPORTED',
+            $userId, (int)$a['vote_site_id'], 'INFO',
+            [
+                'attempt_id' => $attemptId,
+                'provider' => $provider,
+                'ip' => $ip,
+                'reason' => 'IPV6_CLIENT_IPV4_PROVIDER_MISMATCH'
+            ]
+        );
+        echo json_encode([
+            'ok' => true, 
+            'status' => 'PENDING',
+            'hint' => 'IPV6_CLIENT'
+        ]);
+        exit;
+    }
 
     if (!$provider || !$apiKey) throw new Exception('IPCHECK_NOT_CONFIGURED');
 
@@ -124,10 +154,10 @@ try {
     $skew = 300; // 5 min tolerance
 
     if ($provider === 'HOPZONE') {
-      if (!$ip) throw new Exception('IPCHECK_NOT_CONFIGURED');
+      if (!$ipForCheck) throw new Exception('IPCHECK_NOT_CONFIGURED');
 
       $url = "https://api.hopzone.net/lineage2/vote?token=" . urlencode($apiKey)
-           . "&ip_address=" . urlencode($ip);
+           . "&ip_address=" . urlencode($ipForCheck);
 
       $j = http_get_json($url, 8);
       if (!$j) {
@@ -152,10 +182,10 @@ try {
     }
 
     elseif ($provider === 'RANKZONE') {
-      if (!$ip) throw new Exception('IPCHECK_NOT_CONFIGURED');
+      if (!$ipForCheck) throw new Exception('IPCHECK_NOT_CONFIGURED');
 
       $url = "https://l2rankzone.com/api/vote-reward?apiKey=" . urlencode($apiKey)
-           . "&ip=" . urlencode($ip);
+           . "&ip=" . urlencode($ipForCheck);
 
       $j = http_get_json($url, 8);
       if (!$j) {
@@ -266,7 +296,7 @@ try {
     }
 
 elseif ($provider === 'HOTSERVERS') {
-  if (!$ip) throw new Exception('IPCHECK_NOT_CONFIGURED');
+  if (!$ipForCheck) throw new Exception('IPCHECK_NOT_CONFIGURED');
 
   // api_key = TOKEN|SERVER_ID
   $parts = explode('|', (string)$apiKey, 2);
@@ -280,7 +310,7 @@ elseif ($provider === 'HOTSERVERS') {
   // ✅ správný endpoint (vrací vote_time + server_time)
   $url = "https://hotservers.org/api/servers/" . rawurlencode($serverId)
        . "/voteCheck?api_token=" . urlencode($token)
-       . "&ip_address=" . urlencode($ip);
+       . "&ip_address=" . urlencode($ipForCheck);
 
   $j = http_get_json($url, 8);
   if (!$j) {
@@ -335,9 +365,9 @@ elseif ($provider === 'HOTSERVERS') {
   }
 }
 elseif ($provider === 'L2TOP') {
-  if (!$ip) throw new Exception('IPCHECK_NOT_CONFIGURED');
+  if (!$ipForCheck) throw new Exception('IPCHECK_NOT_CONFIGURED');
 
-  $url = "https://l2top.org/api/" . rawurlencode($apiKey) . "/ip/" . rawurlencode($ip) . "/";
+  $url = "https://l2top.org/api/" . rawurlencode($apiKey) . "/ip/" . rawurlencode($ipForCheck) . "/";
 
   $j = http_get_json($url, 8);
   if (!$j) {

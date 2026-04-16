@@ -19,7 +19,10 @@ if (!$siteId) {
   exit;
 }
 
-$ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+require_once __DIR__ . '/../lib/ip_helper.php';
+
+$ip   = get_client_ip();
+$ipV4 = get_client_ipv4(); // může být null pro pure-IPv6 klienty
 
 try {
   // 1) načti site (včetně verify_method/api_provider kvůli URL logice)
@@ -63,10 +66,10 @@ try {
   // držíme to stabilní per user, ať je to jednoduché a funguje to.
   $voterRef = 'web_' . $userId;
 
-  $pdo->prepare("
-    INSERT INTO vote_attempts (web_user_id, vote_site_id, ip, nonce, voter_ref, created_at)
-    VALUES (?, ?, ?, ?, ?, NOW())
-  ")->execute([$userId, $siteId, $ip, $nonce, $voterRef]);
+ $pdo->prepare("
+    INSERT INTO vote_attempts (web_user_id, vote_site_id, ip, ip_v4, nonce, voter_ref, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, NOW())
+")->execute([$userId, $siteId, $ip, $ipV4, $nonce, $voterRef]);
 
   $attemptId = (int)$pdo->lastInsertId();
 
