@@ -218,82 +218,58 @@ try {
     }
 
     elseif ($provider === 'L2NETWORK') {
-      // L2Network type=2 = last vote timestamp for "player"
-      if (!$voterRef) throw new Exception('IPCHECK_NOT_CONFIGURED');
+    if (!$voterRef) throw new Exception('IPCHECK_NOT_CONFIGURED');
 
-      $postData = http_build_query([
-        'apiKey' => $apiKey,
-        'type'   => 2,
-        'player' => $voterRef
-      ], '', '&');
+    $ch = curl_init('https://l2network.eu/api.php');
+    curl_setopt_array($ch, [
+        CURLOPT_POST           => true,
+        CURLOPT_POSTFIELDS     => http_build_query([
+            'apiKey' => $apiKey,
+            'type'   => 2,
+            'player' => $voterRef,
+        ]),
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT        => 8,
+        CURLOPT_CONNECTTIMEOUT => 5,
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_SSL_VERIFYHOST => 2,
+        CURLOPT_IPRESOLVE      => CURL_IPRESOLVE_V4,
+        CURLOPT_HTTPHEADER     => ['Content-Type: application/x-www-form-urlencoded'],
+        CURLOPT_USERAGENT      => 'Mozilla/5.0 (compatible; L2OrdoBot/1.0)',
+    ]);
+    $raw = curl_exec($ch);
+    $err = curl_error($ch);
+    curl_close($ch);
 
-      $ctx = stream_context_create([
-        'http' => [
-          'method'  => 'POST',
-          'header'  => "Content-Type: application/x-www-form-urlencoded\r\n",
-          'content' => $postData,
-          'timeout' => 8
-        ],
-        'ssl' => ['verify_peer' => true, 'verify_peer_name' => true]
-      ]);
-
-      $raw = @file_get_contents('https://l2network.eu/api.php', false, $ctx);
-
-      // loguj jen problémové odpovědi (ať to nespamuje disk)
-      if ($raw === false) {
-        log_l2("attempt_id={$attemptId} voterRef={$voterRef} raw=(false)");
-      } else {
-        $t = trim((string)$raw);
-        if ($t === '' || $t === '0') {
-          log_l2("attempt_id={$attemptId} voterRef={$voterRef} raw={$raw}");
-        }
-      }
-
-      if ($raw === false) {
+    if ($raw === false) {
+        log_l2("attempt_id={$attemptId} voterRef={$voterRef} CURL_ERR={$err}");
         $pdo->commit();
-          system_log(
-        $pdo,
-        'VOTE',
-        'VOTE_PENDING',
-        $userId,
-        (int)$a['vote_site_id'],
-        'INFO',
-        [
-            'attempt_id' => $attemptId,
-            'reason' => 'POSTBACK_WAITING_VERIFICATION'
-        ]
-    );
-
         echo json_encode(['ok' => true, 'status' => 'PENDING']);
         exit;
-      }
-
-      $trim = trim((string)$raw);
-      $j = json_decode($raw, true);
-
-      $voteTs = 0;
-
-      // čisté číslo jako text (nejčastější)
-      if ($trim !== '' && ctype_digit($trim)) {
-        $voteTs = (int)$trim;
-      }
-      // JSON číslo
-      elseif (is_int($j) || is_float($j)) {
-        $voteTs = (int)$j;
-      }
-      // JSON objekt
-      elseif (is_array($j)) {
-        foreach (['voteTime','lastVote','last_vote','time','timestamp'] as $k) {
-          if (isset($j[$k]) && is_numeric($j[$k])) { $voteTs = (int)$j[$k]; break; }
-        }
-      }
-
-      if ($voteTs > 0) {
-        if (!$attemptTs || ($voteTs + $skew >= $attemptTs)) {
-          $voted = true;
-        }
-      }
     }
+
+    $trim = trim((string)$raw);
+    if ($trim === '' || $trim === '0') {
+        log_l2("attempt_id={$attemptId} voterRef={$voterRef} raw={$raw}");
+    }
+
+    $j = json_decode($raw, true);
+    $voteTs = 0;
+
+    if ($trim !== '' && ctype_digit($trim)) {
+        $voteTs = (int)$trim;
+    } elseif (is_int($j) || is_float($j)) {
+        $voteTs = (int)$j;
+    } elseif (is_array($j)) {
+        foreach (['voteTime','lastVote','last_vote','time','timestamp'] as $k) {
+            if (isset($j[$k]) && is_numeric($j[$k])) { $voteTs = (int)$j[$k]; break; }
+        }
+    }
+
+    if ($voteTs > 0 && (!$attemptTs || ($voteTs + $skew >= $attemptTs))) {
+        $voted = true;
+    }
+}
 
 elseif ($provider === 'HOTSERVERS') {
   if (!$ipForCheck) throw new Exception('IPCHECK_NOT_CONFIGURED');
