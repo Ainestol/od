@@ -1050,19 +1050,22 @@ if (retry) {
   }
   }
 
-  async function getClientIPv4() {
+ async function getClientIPv4() {
   try {
-    // api.ipify.org má pouze IPv4 na api.ipify.org a pouze IPv6 na api64.ipify.org
-    // Takže tento endpoint VŽDY vrátí IPv4 (pokud ji klient má)
     const ctrl = new AbortController();
     const t = setTimeout(() => ctrl.abort(), 4000);
-    const res = await fetch('https://api.ipify.org?format=json', {
+    
+    // Vlastní IPv4-only endpoint (DNS-only subdoména, obchází Cloudflare)
+    // Prohlížeč se připojí přes IPv4 → REMOTE_ADDR na serveru = reálná IPv4 klienta
+    const res = await fetch('https://ip4.l2ordo.net/api/my_ip.php', {
       signal: ctrl.signal,
-      credentials: 'omit'
+      credentials: 'omit',
+      cache: 'no-store'
     });
     clearTimeout(t);
+    
     const data = await res.json();
-    if (data && /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(data.ip)) {
+    if (data && data.ok && /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(data.ip)) {
       return data.ip;
     }
   } catch (e) {
