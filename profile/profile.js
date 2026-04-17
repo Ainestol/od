@@ -1117,6 +1117,18 @@ async function startVote(siteId, btnEl) {
     if (btnEl) btnEl.disabled = false;
   }
 }
+function initVote() {
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.vote-btn');
+      if (!btn) return;
+
+      const id = parseInt(btn.dataset.id, 10);
+      if (!id) return;
+
+      startVote(id, btn);
+    });
+  }
+
   /* -----------------------------
    * balances
    * ----------------------------- */
