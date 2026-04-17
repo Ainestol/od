@@ -21,8 +21,19 @@ if (!$siteId) {
 
 require_once __DIR__ . '/../lib/ip_helper.php';
 
+require_once __DIR__ . '/../lib/ip_helper.php';
+
+// Přijmi IPv4 od klienta (JS zjistil přes api.ipify.org)
+$clientProvidedIpv4 = null;
+if (isset($data['client_ipv4']) && is_string($data['client_ipv4'])) {
+    $candidate = trim($data['client_ipv4']);
+    if (filter_var($candidate, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+        $clientProvidedIpv4 = $candidate;
+    }
+}
+
 $ip   = get_client_ip();
-$ipV4 = get_client_ipv4(); // může být null pro pure-IPv6 klienty
+$ipV4 = get_client_ipv4($clientProvidedIpv4);  // preferuje client-provided IP
 
 try {
   // 1) načti site (včetně verify_method/api_provider kvůli URL logice)

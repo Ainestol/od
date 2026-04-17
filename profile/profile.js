@@ -1050,59 +1050,73 @@ if (retry) {
   }
   }
 
-  async function startVote(siteId, btnEl) {
-    if (voteBusy) return;
-    voteBusy = true;
+  async function getClientIPv4() {
+  try {
+    // api.ipify.org má pouze IPv4 na api.ipify.org a pouze IPv6 na api64.ipify.org
+    // Takže tento endpoint VŽDY vrátí IPv4 (pokud ji klient má)
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 4000);
+    const res = await fetch('https://api.ipify.org?format=json', {
+      signal: ctrl.signal,
+      credentials: 'omit'
+    });
+    clearTimeout(t);
+    const data = await res.json();
+    if (data && /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(data.ip)) {
+      return data.ip;
+    }
+  } catch (e) {
+    console.warn('IPv4 detection failed:', e);
+  }
+  return null;
+}
 
-    try {
-      if (btnEl) btnEl.disabled = true;
+async function startVote(siteId, btnEl) {
+  if (voteBusy) return;
+  voteBusy = true;
 
-      const res = await fetch('/api/vote_start.php', {
-        method: 'POST',
-        credentials: 'same-origin',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ site_id: siteId })
-      });
+  try {
+    if (btnEl) btnEl.disabled = true;
 
-      const data = await res.json().catch(() => ({}));
+    // 🆕 Získej skutečnou IPv4 klienta (důležité pro IPv6 klienty s dual-stack)
+    const clientIpv4 = await getClientIPv4();
 
-      if (!data.ok) {
-        if (data.error === 'COOLDOWN') {
-          const rem = typeof data.remaining === 'number' ? data.remaining : 0;
-          notify('error', `${T.voteCooldown} ${T.voteCooldownLeft}${rem}s`);
-          await loadVoteSites();
-          return;
-        }
-        notify('error', `${T.voteStartErr} ${data.error || ''}`.trim());
+    const res = await fetch('/api/vote_start.php', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        site_id: siteId,
+        client_ipv4: clientIpv4
+      })
+    });
+
+    const data = await res.json().catch(() => ({}));
+
+    if (!data.ok) {
+      if (data.error === 'COOLDOWN') {
+        const rem = typeof data.remaining === 'number' ? data.remaining : 0;
+        notify('error', `${T.voteCooldown} ${T.voteCooldownLeft}${rem}s`);
+        await loadVoteSites();
         return;
       }
-
-      window.open(data.vote_url, '_blank');
-      notify('success', T.voteOpenHint, 3500);
-
-      await pollVote(data.attempt_id);
-
-    } catch (err) {
-      console.error('Vote start error:', err);
-      notify('error', T.voteStartErr);
-    } finally {
-      voteBusy = false;
-      if (btnEl) btnEl.disabled = false;
+      notify('error', `${T.voteStartErr} ${data.error || ''}`.trim());
+      return;
     }
+
+    window.open(data.vote_url, '_blank');
+    notify('success', T.voteOpenHint, 3500);
+
+    await pollVote(data.attempt_id);
+
+  } catch (err) {
+    console.error('Vote start error:', err);
+    notify('error', T.voteStartErr);
+  } finally {
+    voteBusy = false;
+    if (btnEl) btnEl.disabled = false;
   }
-
-  function initVote() {
-    document.addEventListener('click', (e) => {
-      const btn = e.target.closest('.vote-btn');
-      if (!btn) return;
-
-      const id = parseInt(btn.dataset.id, 10);
-      if (!id) return;
-
-      startVote(id, btn);
-    });
-  }
-
+}
   /* -----------------------------
    * balances
    * ----------------------------- */

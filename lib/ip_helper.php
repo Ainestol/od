@@ -1,12 +1,7 @@
 <?php
 // /var/www/ordodraconis/lib/ip_helper.php
 
-/**
- * Získá klientovu skutečnou IP.
- * Priorita: CF-Connecting-IP > X-Forwarded-For (první) > REMOTE_ADDR
- */
 function get_client_ip(): string {
-    // CloudFlare posílá skutečnou klientovu IP (IPv4 nebo IPv6)
     if (!empty($_SERVER['HTTP_CF_CONNECTING_IP'])) {
         return trim($_SERVER['HTTP_CF_CONNECTING_IP']);
     }
@@ -18,39 +13,56 @@ function get_client_ip(): string {
 }
 
 /**
- * Získá IPv4 verzi klienta.
- * - Pokud klient má IPv4 → vrátí ji
- * - Pokud má jen IPv6 → zkusí CF-Pseudo-IPv4 (musí být zapnuto v CloudFlare)
- * - Jinak vrátí NULL (fallback na voter_ref / MANUAL)
+ * True pokud IP je v Cloudflare Pseudo IPv4 range (240.0.0.0/4).
+ * Tyto IP jsou bezcenné pro externí API kontroly.
  */
-function get_client_ipv4(): ?string {
-    // 1. CloudFlare Pseudo IPv4 (když je zapnuto v CF dashboard)
-    if (!empty($_SERVER['HTTP_CF_PSEUDO_IPV4'])) {
-        $ip = trim($_SERVER['HTTP_CF_PSEUDO_IPV4']);
-        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-            return $ip;
-        }
+function is_pseudo_ipv4(string $ip): bool {
+    if (!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+        return false;
     }
-
-    // 2. Pokud je CF-Connecting-IP přímo IPv4, použij ji
-    $cfIp = $_SERVER['HTTP_CF_CONNECTING_IP'] ?? '';
-    if ($cfIp && filter_var($cfIp, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-        return $cfIp;
-    }
-
-    // 3. Pokud REMOTE_ADDR je IPv4, použij ji
-    $remote = $_SERVER['REMOTE_ADDR'] ?? '';
-    if ($remote && filter_var($remote, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-        return $remote;
-    }
-
-    // 4. Žádná IPv4 není k dispozici
-    return null;
+    // Class E range 240.0.0.0 - 255.255.255.255
+    $long = ip2long($ip);
+    return $long !== false && $long >= ip2long('240.0.0.0');
 }
 
 /**
- * True = IP je IPv6
+ * Získá nejlepší dostupnou REÁLNOU IPv4 klienta.
+ * Preferuje IPv4 kterou poslal klient JS → pak server-side detekce.
+ * Vylučuje Pseudo IPv4 (bezcenné pro vote listy).
+ *
+ * @param ?string $clientProvided IPv4 kterou klient poslal přes JS (může být NULL)
  */
+function get_client_ipv4(?string $clientProvided = null): ?string {
+    // 1. Preferuj IPv4 od klienta (JS fetch na api.ipify.org)
+    //    Tohle je NEJSPOLEHLIVĚJŠÍ zdroj pro dual-stack klienty
+    if ($clientProvided && filter_var($clientProvided, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+        if (!is_pseudo_ipv4($clientProvided)) {
+            return $clientProvided;
+        }
+    }
+
+    // 2. CF-Connecting-IP pokud je to IPv4
+    $cfIp = $_SERVER['HTTP_CF_CONNECTING_IP'] ?? '';
+    if ($cfIp && filter_var($cfIp, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+        if (!is_pseudo_ipv4($cfIp)) {
+            return $cfIp;
+        }
+    }
+
+    // 3. REMOTE_ADDR pokud je to IPv4
+    $remote = $_SERVER['REMOTE_ADDR'] ?? '';
+    if ($remote && filter_var($remote, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+        if (!is_pseudo_ipv4($remote)) {
+            return $remote;
+        }
+    }
+
+    // 4. CF-Pseudo-IPv4 jako poslední možnost, ALE jen pokud je to 
+    //    reálná IP (což Pseudo-IPv4 není, takže tohle nikdy neprojde)
+    //    Ponechávám kód pro jistotu, ale return null.
+    return null;
+}
+
 function is_ipv6(string $ip): bool {
     return filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false;
 }
