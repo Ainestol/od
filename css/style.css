@@ -2086,21 +2086,3 @@ body {
 body {
   transition: opacity 0.2s ease;
 }
-.side-header {
-  display: flex;
-  flex-direction: column; /* 🔥 tohle je klíč */
-}
-.side-logo {
-  font-size: 28px;
-  font-weight: bold;
-  letter-spacing: 3px;
-  color: #f5c76b; /* tvůj gold styl */
-}
-
-.side-subtitle {
-  font-size: 11px;
-  color: #bfa15a;
-  letter-spacing: 2px;
-  margin-top: 2px;
-  text-transform: uppercase;
-}
