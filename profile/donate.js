@@ -30,10 +30,10 @@ const priceText = card?.querySelector('.price')?.textContent?.trim() ?? '';
 
 if (isCz) {
   textEl.textContent =
-    `Vážíme si tvé podpory! Rozhodl ses podpořit server Ordo Draconis dobrovolným příspěvkem ${priceText}. Na oplátku od nás dostaneš ${totalDc} Dragon Coinů jako náš dík.\n\nDragon Coiny nejsou zboží ani služba – jsou to naše poděkování za tvou podporu. Příspěvek je dobrovolný a nenárokový.\n\nPřeješ si pokračovat?`;
+    `Chystáš se zakoupit ${totalDc} Dragon Coinů za ${priceText}.\n\nDragon Coiny jsou virtuální měna určená pro použití ve hře a lze je využít pro různé herní funkce a obsah.\n\nNákup je konečný a nelze jej refundovat.\n\nPřeješ si pokračovat?`;
 } else {
   textEl.textContent =
-    `We appreciate your support! You're about to support the Ordo Draconis server with a voluntary contribution of ${priceText}. As a token of our gratitude, you'll receive ${totalDc} Dragon Coins.\n\nDragon Coins are not a product or service – they are simply our way of saying thank you. This contribution is voluntary and non-refundable.\n\nDo you wish to continue?`;
+    `You are about to purchase ${totalDc} Dragon Coins for ${priceText}.\n\nDragon Coins are a virtual in-game currency that can be used for various features and content.\n\nThis purchase is final and non-refundable.\n\nDo you wish to continue?`;
 }
 
 modal.classList.remove('hidden');

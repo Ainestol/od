@@ -70,7 +70,7 @@ const _origFetch = window.fetch;
 
 window.fetch = function (url, options = {}) {
 
-  // 🔥 1) STRIPE / DONATE – BEZ CSRF
+  // 1) Stripe checkout requests – skip CSRF
   if (options.skipCsrf) {
     return _origFetch(url, options);
   }
