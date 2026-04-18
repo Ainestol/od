@@ -15,12 +15,11 @@ file_put_contents(__DIR__.'/webhook_debug.log', $payload.PHP_EOL, FILE_APPEND);
 
 // 🔒 VERIFY STRIPE SIGNATURE
 try {
-   // $event = \Stripe\Webhook::constructEvent(
-       // $payload,
-       // $sig_header,
-      //  $endpoint_secret
-    //);
-    $event = json_decode($payload);
+   $event = \Stripe\Webhook::constructEvent(
+        $payload,
+        $sig_header,
+        $endpoint_secret
+    );
 
 if (!$event) {
     http_response_code(400);
