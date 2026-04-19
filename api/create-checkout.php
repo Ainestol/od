@@ -1,11 +1,28 @@
 <?php
+// ============================================================
+// 🚫 STRIPE CHECKOUT DEAKTIVOVÁNO (Stripe zavřel účet)
+// ------------------------------------------------------------
+// Endpoint je vypnutý. Původní logika níže zachována
+// pro případné pozdější znovuzapnutí (jiná brána / jiný model).
+// ============================================================
+header('Content-Type: application/json');
+http_response_code(410); // 410 Gone
+echo json_encode([
+    'error'   => 'PAYMENT_DISABLED',
+    'message' => 'Payment system is temporarily disabled.'
+]);
+exit;
+// ============================================================
+// ⬇️ PŮVODNÍ KÓD – NEAKTIVNÍ (ponecháno jako reference)
+// ============================================================
+/*
 ini_set('display_errors', 0);
 error_reporting(0);
 
 header('Content-Type: application/json');
 
 // 🔐 Autoload (Stripe)
-require_once __DIR__ . '/../lib/session.php'; // 🔥 MUSÍ být první
+require_once __DIR__ . '/../lib/session.php';
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -18,16 +35,13 @@ if (!$env || !isset($env['STRIPE_SECRET_KEY'])) {
     exit;
 }
 
-// 🔐 Stripe init
 \Stripe\Stripe::setApiKey($env['STRIPE_SECRET_KEY']);
 
-// 📥 Načtení vstupu
 $input = json_decode(file_get_contents('php://input'), true);
 
 $pack = (int)($input['pack'] ?? 0);
 $currency = strtolower($input['currency'] ?? 'eur');
 
-// 💰 Ceník
 $packs = [
     'eur' => [
         20  => 499,
@@ -44,7 +58,7 @@ $packs = [
         600 => 200000,
     ]
 ];
-// 🎁 Bonusy DC (pack => celkový počet DC včetně bonusu)
+
 $bonuses = [
     20  => 20,
     55  => 60,
@@ -54,7 +68,6 @@ $bonuses = [
 ];
 $total_dc = $bonuses[$pack] ?? $pack;
 
-// ❌ Validace
 if (!isset($packs[$currency]) || !isset($packs[$currency][$pack])) {
     http_response_code(400);
     echo json_encode(['error' => 'Invalid pack or currency']);
@@ -63,13 +76,10 @@ if (!isset($packs[$currency]) || !isset($packs[$currency][$pack])) {
 
 $amount = $packs[$currency][$pack];
 
-// 👤 User ze session
 $user_id = $_SESSION['web_user_id'] ?? 0;
 
-// 🔍 DEBUG (můžeš pak smazat)
 file_put_contents(__DIR__.'/debug_session.log', print_r($_SESSION, true));
 
-// ❌ Bez usera nepouštět platbu
 if ($user_id <= 0) {
     http_response_code(401);
     echo json_encode(['error' => 'User not logged in']);
@@ -94,9 +104,8 @@ try {
         ]],
 
         'success_url' => 'https://l2ordo.net/profile/' . ($currency === 'eur' ? 'index-en.html' : 'index.html') . '?success=1',
-'cancel_url'  => 'https://l2ordo.net/profile/' . ($currency === 'eur' ? 'index-en.html' : 'index.html') . '?canceled=1',
+        'cancel_url'  => 'https://l2ordo.net/profile/' . ($currency === 'eur' ? 'index-en.html' : 'index.html') . '?canceled=1',
 
-        // 🔥 KLÍČOVÉ PRO WEBHOOK
         'metadata' => [
             'dc'       => $total_dc,
             'currency' => $currency,
@@ -113,3 +122,4 @@ try {
     http_response_code(500);
     echo json_encode(['error' => $e->getMessage()]);
 }
+*/

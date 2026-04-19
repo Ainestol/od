@@ -1,4 +1,16 @@
 <?php
+// ============================================================
+// 🚫 STRIPE WEBHOOK DEAKTIVOVÁN (Stripe zavřel účet)
+// ------------------------------------------------------------
+// Endpoint je vypnutý. Původní logika níže zachována
+// pro případné pozdější znovuzapnutí.
+// ============================================================
+http_response_code(410);
+exit('Webhook disabled');
+// ============================================================
+// ⬇️ PŮVODNÍ KÓD – NEAKTIVNÍ (ponecháno jako reference)
+// ============================================================
+/*
 file_put_contents(__DIR__.'/HIT.log', "HIT\n", FILE_APPEND);
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -116,3 +128,4 @@ try {
 http_response_code(200);
 echo 'OK';
 exit;
+*/
