@@ -10,7 +10,7 @@ if (empty($_SESSION['web_user_id'])) {
 
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../lib/logger.php';
-
+require_once __DIR__ . '/../lib/vote_streak.php';
 $userId = (int)$_SESSION['web_user_id'];
 $data = json_decode(file_get_contents('php://input'), true);
 
@@ -429,11 +429,11 @@ elseif ($provider === 'L2TOP') {
     }
   }
 
-  // === odměna (jen jednou) ===
+ // === odměna (jen jednou) === 2 VC
   $pdo->prepare("
     INSERT INTO wallet_balances (owner_type, owner_id, currency, balance)
-    VALUES ('WEB', ?, 'VOTE_COIN', 1)
-    ON DUPLICATE KEY UPDATE balance = balance + 1
+    VALUES ('WEB', ?, 'VOTE_COIN', 2)
+    ON DUPLICATE KEY UPDATE balance = balance + 2
   ")->execute([$userId]);
 
   $pdo->prepare("
@@ -443,10 +443,13 @@ elseif ($provider === 'L2TOP') {
 
   $pdo->prepare("
     INSERT INTO wallet_ledger (owner_type, owner_id, currency, amount, reason, ref_type, ref_id)
-    VALUES ('WEB', ?, 'VOTE_COIN', 1, 'VOTE_REWARD', 'VOTE_ATTEMPT', ?)
+    VALUES ('WEB', ?, 'VOTE_COIN', 2, 'VOTE_REWARD', 'VOTE_ATTEMPT', ?)
   ")->execute([$userId, $attemptId]);
 
   $pdo->prepare("UPDATE vote_attempts SET used_at = NOW() WHERE id = ?")->execute([$attemptId]);
+
+  // === STREAK BONUS check (5 dní × všech 4 sites) ===
+  $streakResult = award_streak_bonus_if_eligible($pdo, $userId);
 
   $pdo->commit();
 
@@ -460,12 +463,17 @@ system_log(
     [
         'attempt_id' => $attemptId,
         'currency' => 'VOTE_COIN',
-        'amount' => 1,
-        'provider' => $a['api_provider'] ?? null
+        'amount' => 2,
+        'provider' => $a['api_provider'] ?? null,
+        'streak'   => $streakResult
     ]
 );
 
-echo json_encode(['ok' => true, 'status' => 'REWARDED']);
+$response = ['ok' => true, 'status' => 'REWARDED'];
+if (!empty($streakResult['awarded'])) {
+    $response['streak_bonus'] = VOTE_STREAK_REWARD;
+}
+echo json_encode($response);
 
 } catch (Throwable $e) {
 
