@@ -1,5 +1,6 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
+require_once __DIR__ . '/../lib/session.php';
 require_once __DIR__ . '/../lib/csrf.php';
 
 echo json_encode([

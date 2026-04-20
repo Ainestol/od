@@ -1,5 +1,14 @@
-document.addEventListener('DOMContentLoaded', () => {
+async function initCsrf() {
+  const res = await fetch('/api/csrf_token.php', { credentials: 'same-origin' });
+  const data = await res.json().catch(() => ({}));
+  if (data.ok && data.token) {
+    window.CSRF_TOKEN = data.token;
+  }
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
   console.log('BUG ADMIN DETAIL JS LOADED');
+  await initCsrf();
 
   /* =========================
      ZÁKLADNÍ PROMĚNNÉ
@@ -116,7 +125,11 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const res = await fetch('/admin/api/save_bug_detail.php', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': window.CSRF_TOKEN || ''
+        },
         body: JSON.stringify({
           id,
           status,
