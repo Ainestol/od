@@ -447,5 +447,5 @@ setInterval(loadWorldStats,60000);
 setInterval(()=>{
 loadBoss("RAID");
 loadBoss("GRAND");
-},1000);
+},20000);
 
