@@ -56,7 +56,7 @@ async function loadWorldStats(){
 
 try{
 
-const res = await fetch('/api/world_stats.php');
+const res = await fetch('/api/world_stats.php', { cache: 'no-store' });
 const data = await res.json();
 
 if(!data.ok) return;
