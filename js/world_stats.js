@@ -312,7 +312,7 @@ if(!json.ok || !json.data) return;
 const box = document.getElementById(type === "RAID" ? "raidBossList" : "grandBossList");
 box.innerHTML = "";
 
-const now = Math.floor(Date.now()/1000);
+const now = Math.floor(Date.now()/20000);
 
 json.data.forEach(b => {
 
