@@ -11,6 +11,12 @@
 </head>
 
 <body class="scroll-right logo-pulse mobile-server">
+  <div id="wipeNotice" class="wipe-notice">
+  ⚔️ WIPE DOKONČEN ⚔️<br>
+  Dnes v 15:00 proběhl wipe serveru.<br>
+  Začni od nuly a ukaž co v tobě je! 🔥
+</div>
+  
   <div class="layout">
 
     <!-- LEVÁ STRANA -->
@@ -213,7 +219,17 @@
 
       updateServerStatus();
       setInterval(updateServerStatus, 10000);
-
+// WIPE NOTICE AUTO HIDE
+if (!localStorage.getItem("wipeSeen")) {
+  setTimeout(() => {
+    const el = document.getElementById('wipeNotice');
+    if (el) el.remove();
+    localStorage.setItem("wipeSeen", "1");
+  }, 300000); // 5 min
+} else {
+  const el = document.getElementById('wipeNotice');
+  if (el) el.remove();
+}
     });
   </script>
 </body>

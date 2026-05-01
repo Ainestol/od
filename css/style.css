@@ -2086,3 +2086,29 @@ body {
 body {
   transition: opacity 0.2s ease;
 }
+.wipe-notice {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  
+  background: linear-gradient(135deg, #c89b3c, #f1c40f);
+  color: #111;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  text-align: center;
+  
+  padding: 15px 25px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.2);
+  
+  box-shadow: 0 0 20px rgba(255, 200, 80, 0.7);
+  z-index: 9999;
+
+  animation: glow 1.5s infinite alternate;
+}
+
+@keyframes glow {
+  from { box-shadow: 0 0 10px rgba(255, 200, 80, 0.5); }
+  to   { box-shadow: 0 0 30px rgba(255, 200, 80, 1); }
+}
