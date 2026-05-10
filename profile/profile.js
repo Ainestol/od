@@ -215,6 +215,14 @@ function notify(type, message, timeout = 3000) {
         return;
       }
 
+      // Welcome message pod nadpisem "Můj profil"
+      const welcomeEl = document.getElementById('profileWelcome');
+      if (welcomeEl && me.email) {
+        welcomeEl.textContent = isEn
+          ? `Welcome back, ${me.email}`
+          : `Vítej zpět, ${me.email}`;
+      }
+
       const container = qs('.auth-container.profile-shell') || qs('.auth-container');
       if (container) {
         const old = container.querySelector('.profile-vip-box');
@@ -259,8 +267,8 @@ function notify(type, message, timeout = 3000) {
 
        if (status) {
   status.textContent = isEnabled
-    ? (isEn ? 'Two-factor authentication is active' : 'Dvoufaktorová ochrana je aktivní')
-    : (isEn ? 'Two-factor authentication is disabled' : 'Dvoufaktorová ochrana je vypnutá');
+    ? (isEn ? '2FA: on' : '2FA: aktivní')
+    : (isEn ? '2FA: off' : '2FA: vypnuto');
 }
 
         if (box) {
@@ -537,7 +545,8 @@ if (btn.dataset.mode === 'disable') {
       const tChangePwd = isEn ? 'Change password' : 'Změnit heslo';
 
       row.innerHTML = `
-        <div class="account-row" data-login="${acc.login}">
+        <div class="account-row" data-login="${acc.login}" title="${isEn ? 'Click to show characters' : 'Klikni pro zobrazení postav'}">
+          <span class="expand-chevron" aria-hidden="true">▸</span>
           <strong>${isEn ? 'Account' : 'Účet'}:</strong> ${acc.login}
 
           <span class="tag">${charsLabel(acc.chars_count)}</span>
@@ -912,10 +921,13 @@ if (btn.dataset.mode === 'disable') {
       // toggle close
       if (!box.classList.contains('hidden')) {
         box.classList.add('hidden');
+        row.classList.remove('expanded');
         box.innerHTML = '';
         return;
       }
 
+      // toggle open
+      row.classList.add('expanded');
       box.classList.remove('hidden');
       box.innerHTML = `<div class="muted">${T.loadingChars}</div>`;
 

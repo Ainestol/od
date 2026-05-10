@@ -317,6 +317,41 @@ body.auth-page.profile-page { overflow: auto; }
   line-height: 1;
   height: auto;
 }
+/* === Klikatelný řádek herního účtu (rozkliknutí pro výpis postav) === */
+.account-row {
+  cursor: pointer;
+  padding: 8px 10px;
+  border-radius: 6px;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.account-row:hover {
+  background: rgba(212, 175, 55, 0.06);
+}
+
+.account-row.expanded {
+  background: rgba(212, 175, 55, 0.08);
+}
+
+/* Šipka která indikuje rozbalitelnost — otáčí se při expanded stavu */
+.account-row .expand-chevron {
+  display: inline-block;
+  width: 14px;
+  margin-right: 8px;
+  color: #d4af37;
+  font-size: 13px;
+  transition: transform 0.25s ease;
+}
+
+.account-row.expanded .expand-chevron {
+  transform: rotate(90deg);
+}
+
+/* Buttony uvnitř řádku zachovávají normální cursor — neměly by dědit pointer */
+.account-row .actions .btn {
+  cursor: pointer;
+}
+
 .char-list {
   margin-left: 30px;
   margin-top: 8px;
@@ -384,6 +419,20 @@ body.auth-page.profile-page { overflow: auto; }
   gap:16px;
   flex-wrap:wrap;
   margin-bottom: 14px;
+}
+
+/* Skupina h1 + welcome message — drží nadpis a uvítání pohromadě */
+.profile-title-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.profile-welcome {
+  font-size: 14px;
+  color: #8f876b;
+  letter-spacing: 0.3px;
 }
 
 .profile-shell .wallet-top{
@@ -638,6 +687,33 @@ body.auth-page.profile-page { overflow: auto; }
   display: flex;
   justify-content: center;
   margin-top: 15px;
+}
+
+/* Inline varianta — 2FA jako mini box vedle "Odhlásit se" v hlavičce */
+.twofa-wrapper.twofa-wrapper--inline {
+  margin-top: 0;
+  justify-content: flex-start;
+}
+
+.twofa-wrapper--inline .twofa-box {
+  padding: 4px 10px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.twofa-wrapper--inline .twofa-btn {
+  font-size: 11px;
+  padding: 3px 10px;
+  margin-bottom: 0;
+  letter-spacing: 0.5px;
+}
+
+.twofa-wrapper--inline .twofa-status {
+  font-size: 11px;
+  white-space: nowrap;
+  letter-spacing: 0.3px;
 }
 
 .twofa-box {

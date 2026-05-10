@@ -24,25 +24,23 @@
 
 
   <a href="/api/logout.php" class="btn">Odhlásit se</a>
-</div>
-<div class="twofa-wrapper">
-  <div class="twofa-box" id="twofaBox">
-    
-    <button id="twofaToggle" class="twofa-btn">
-      Zapnout
-    </button>
 
-    <div id="twofaStatus" class="twofa-status">
-      Dvoufaktorová ochrana je vypnutá
+  <!-- 2FA mini box napravo od „Odhlásit se" -->
+  <div class="twofa-wrapper twofa-wrapper--inline">
+    <div class="twofa-box" id="twofaBox">
+      <button id="twofaToggle" class="twofa-btn">Zapnout</button>
+      <div id="twofaStatus" class="twofa-status">2FA: vypnuto</div>
     </div>
-
   </div>
 </div>
 </header>
 
 <main class="auth-container profile-shell">
    <div class="profile-header">
-    <h1>Můj profil</h1>
+    <div class="profile-title-group">
+      <h1>Můj profil</h1>
+      <div id="profileWelcome" class="profile-welcome"></div>
+    </div>
 
     <div class="wallet-top">
       <div id="voteBalanceTop" class="wallet-pill">
@@ -286,6 +284,15 @@
 
     <section id="support" class="profile-card panel">
   <h2>Hlášení bugů</h2>
+
+  <h3 style="margin-top:0;">Moje hlášení</h3>
+  <div id="myBugs" class="link-list">
+    <div class="muted">Načítám hlášení…</div>
+  </div>
+
+  <hr style="margin:30px 0;">
+
+  <h3>Nahlásit nový bug</h3>
   <p class="muted">Něco nefunguje? Pošli nám detailní popis problému.</p>
 
   <form id="bugForm">
@@ -316,12 +323,6 @@
       Odeslat hlášení
     </button>
   </form>
-  <hr style="margin:30px 0;">
-
-<h3>Moje hlášení</h3>
-<div id="myBugs" class="link-list">
-  <div class="muted">Načítám hlášení…</div>
-</div>
 </section>
 
   </div>
