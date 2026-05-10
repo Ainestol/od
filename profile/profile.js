@@ -483,39 +483,69 @@ if (btn.dataset.mode === 'disable') {
       return;
     }
 
+    // Lokální helpers pro formátování (jeden set pro všechny účty)
+    const formatDate = (ms) => {
+      if (!ms) return '';
+      const d = new Date(Number(ms));
+      if (isEn) {
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+      }
+      return `${d.getDate()}. ${d.getMonth() + 1}. ${d.getFullYear()}`;
+    };
+
+    const charsLabel = (n) => {
+      if (isEn) return `${n} character${n === 1 ? '' : 's'}`;
+      if (n === 1) return `${n} postava`;
+      if (n >= 2 && n <= 4) return `${n} postavy`;
+      return `${n} postav`;
+    };
+
+    const daysLabel = (n) => {
+      if (isEn) return `${n} day${n === 1 ? '' : 's'}`;
+      if (n === 1) return `${n} den`;
+      if (n >= 2 && n <= 4) return `${n} dny`;
+      return `${n} dní`;
+    };
+
     data.accounts.forEach(acc => {
       const row = document.createElement('div');
       row.className = 'mini-row';
 
+      // Sloučený premium tag: status + datum + počet dní v jednom
       const premiumTag = (() => {
-  const tInactive = isEn ? 'Premium: inactive' : 'Premium: neaktivní';
-  const tExpired  = isEn ? 'Premium: expired'  : 'Premium: expirováno';
-  const tDays     = (n) => isEn ? `${n} days` : `${n} ${n === 1 ? 'den' : (n >= 2 && n <= 4 ? 'dny' : 'dní')}`;
+        const tInactive = isEn ? 'Premium: inactive' : 'Premium: neaktivní';
+        const tExpired  = isEn ? 'Premium: expired'  : 'Premium: expirováno';
 
-  if (acc.premium_days_left === null) {
-    return `<span class="tag muted">${tInactive}</span>`;
-  }
-  const left = Number(acc.premium_days_left);
-  if (left < 0) return `<span class="tag danger">${tExpired}</span>`;
-  if (left <= 3) return `<span class="tag warning">Premium: ${tDays(left)}</span>`;
-  return `<span class="tag success">Premium: ${tDays(left)}</span>`;
-})();
+        if (acc.premium_days_left === null) {
+          return `<span class="tag muted">${tInactive}</span>`;
+        }
+        const left = Number(acc.premium_days_left);
+        if (left < 0) return `<span class="tag danger">${tExpired}</span>`;
+
+        const dateStr = formatDate(acc.premium_end_ms);
+        const labelText = isEn
+          ? `Premium until ${dateStr} (${daysLabel(left)})`
+          : `Premium do ${dateStr} (${daysLabel(left)})`;
+
+        const statusClass = left <= 3 ? 'warning' : 'success';
+        return `<span class="tag ${statusClass}">${labelText}</span>`;
+      })();
+
+      const tDelete    = isEn ? 'Delete' : 'Smazat';
+      const tChangePwd = isEn ? 'Change password' : 'Změnit heslo';
 
       row.innerHTML = `
         <div class="account-row" data-login="${acc.login}">
           <strong>${isEn ? 'Account' : 'Účet'}:</strong> ${acc.login}
 
-          <span class="tag">${acc.chars_count} ${isEn ? 'characters' : 'postav'}</span>
+          <span class="tag">${charsLabel(acc.chars_count)}</span>
           ${premiumTag}
-          ${
-            acc.premium_end_at
-              ? `<span class="tag">${acc.premium_end_at}</span>`
-              : `<span class="tag">${acc.created_at}</span>`
-          }
 
           <div class="actions">
-            <button class="btn btn-small btn-danger" data-login="${acc.login}">Delete</button>
-            <button class="btn btn-small" data-reset="${acc.login}">Change password</button>
+            <button class="btn btn-small btn-danger" data-login="${acc.login}">${tDelete}</button>
+            <button class="btn btn-small" data-reset="${acc.login}">${tChangePwd}</button>
           </div>
         </div>
 
