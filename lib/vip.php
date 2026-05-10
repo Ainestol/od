@@ -114,40 +114,65 @@ function vip_grant_extend_or_create(
 }
 
 /**
- * Sync VIP do l2game.account_premium (enddate v milisekundách).
- * - WEB scope: aplikuje na všechny game_accounts pod web_user_id
- * - GAME scope: aplikuje jen na konkrétní game_account (podle id)
+ * Sync premium do l2game.account_premium (enddate v milisekundách).
+ *
+ * Logika: ADDITIVE — vždy se přičítají dny k existující hodnotě.
+ *  - Pokud je premium aktivní (enddate > NOW): enddate += $daysToAdd dní
+ *  - Pokud je expirované nebo nikdy nebylo: enddate = NOW + $daysToAdd dní
+ *
+ * Hráč nikdy nepřijde o čas — co si koupí, to dostane navrch k tomu co měl.
+ *
+ *  - WEB scope:  aplikuje na všechny game_accounts pod web_user_id
+ *  - GAME scope: aplikuje jen na konkrétní game_account (podle id)
  */
-function vip_sync_account_premium(PDO $pdoWeb, PDO $pdoGame, string $scope, int $targetId, int $vipGrantId): void {
+function vip_sync_account_premium(
+    PDO $pdoWeb,
+    PDO $pdoGame,
+    string $scope,
+    int $targetId,
+    int $daysToAdd
+): void {
 
-    $stEnd = $pdoWeb->prepare("SELECT end_at FROM vip_grants WHERE id=? LIMIT 1");
-    $stEnd->execute([$vipGrantId]);
-    $endAt = $stEnd->fetchColumn();
-
-    if (!$endAt) {
-        throw new Exception('VIP_ENDDATE_NOT_FOUND');
+    if ($daysToAdd <= 0) {
+        throw new Exception('INVALID_DAYS');
     }
 
-    $endMs = strtotime($endAt) * 1000;
+    $oneDayMs       = 86400 * 1000;
+    $daysMs         = $daysToAdd * $oneDayMs;
+    $nowMs          = (int)(microtime(true) * 1000);
+    $newEndIfFresh  = $nowMs + $daysMs;
+
+    // SQL fragment — additive ON DUPLICATE KEY (stejný pro WEB i GAME)
+    // ? params: login, newEndIfFresh, nowMs, daysMs, nowMs, daysMs
+    $sql = "
+        INSERT INTO account_premium (account_name, enddate)
+        VALUES (?, ?)
+        ON DUPLICATE KEY UPDATE
+          enddate = IF(enddate > ?, enddate + ?, ? + ?)
+    ";
 
     if ($scope === 'WEB') {
 
-        // targetId je web_user_id
+        // targetId = web_user_id → aplikuj na všechny game účty hráče
         $stAcc = $pdoWeb->prepare("SELECT login FROM game_accounts WHERE web_user_id=?");
         $stAcc->execute([$targetId]);
         $accounts = $stAcc->fetchAll(PDO::FETCH_COLUMN);
 
+        $stIns = $pdoGame->prepare($sql);
         foreach ($accounts as $login) {
-            $pdoGame->prepare("
-                INSERT INTO account_premium (account_name, enddate)
-                VALUES (?, ?)
-                ON DUPLICATE KEY UPDATE enddate = GREATEST(enddate, VALUES(enddate))
-            ")->execute([$login, $endMs]);
+            $stIns->execute([
+                $login,
+                $newEndIfFresh,
+                $nowMs,
+                $daysMs,
+                $nowMs,
+                $daysMs
+            ]);
         }
 
     } elseif ($scope === 'GAME') {
 
-        // targetId je game_accounts.id (ve WEB DB)
+        // targetId = game_accounts.id (ve WEB DB)
         $stAcc = $pdoWeb->prepare("SELECT login FROM game_accounts WHERE id=? LIMIT 1");
         $stAcc->execute([$targetId]);
         $login = $stAcc->fetchColumn();
@@ -156,11 +181,14 @@ function vip_sync_account_premium(PDO $pdoWeb, PDO $pdoGame, string $scope, int 
             throw new Exception('GAME_ACCOUNT_NOT_FOUND');
         }
 
-        $pdoGame->prepare("
-            INSERT INTO account_premium (account_name, enddate)
-            VALUES (?, ?)
-            ON DUPLICATE KEY UPDATE enddate = GREATEST(enddate, VALUES(enddate))
-        ")->execute([$login, $endMs]);
+        $pdoGame->prepare($sql)->execute([
+            $login,
+            $newEndIfFresh,
+            $nowMs,
+            $daysMs,
+            $nowMs,
+            $daysMs
+        ]);
 
     } else {
         throw new Exception('INVALID_SCOPE');

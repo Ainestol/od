@@ -139,7 +139,10 @@ try {
       true
     );
 
-    vip_sync_account_premium($pdo, $pdoGame, $scope, (int)$targetId, (int)$vipGrantId);
+    // Sync do account_premium — pure additive (přičte $days k existující hodnotě).
+    // Pozn.: opraveno ($pdoGame → $gamePdo) — ten typo byl latentní bug,
+    // db_game.php exportuje $gamePdo, ne $pdoGame.
+    vip_sync_account_premium($pdo, $gamePdo, $scope, (int)$targetId, (int)$days);
   }
 
   if ($category === 'MOUNT' || $category === 'COSMETIC') {
