@@ -134,3 +134,58 @@
     display: none !important;
   }
 }
+
+/* =========================
+   MOBILE FIX — vypnout body.scroll-right behavior
+   Na desktopu je layout 100vh s vnitřním scrollem v .right.
+   Na mobilu chceme normální page-scroll (žádný "scroll uvnitř scrollu"),
+   jinak je první scroll matoucí — vrstvy se ruší a drak je sticky.
+========================= */
+@media (max-width: 900px) {
+
+  /* Layout přestane být fixed-height */
+  body.scroll-right .layout {
+    height: auto !important;
+    min-height: auto !important;
+  }
+
+  /* Hero držíme na 300px (mobile.css výše to nastavuje) — přebíjíme 100vh ze scroll-right */
+  body.scroll-right .hero-bg {
+    height: 300px !important;
+  }
+
+  /* Right side normálně teče stránkou, žádný vnitřní scroll */
+  body.scroll-right .right {
+    height: auto !important;
+    overflow: visible !important;
+    overflow-x: visible !important;
+    overflow-y: visible !important;
+    padding-bottom: 24px !important;
+  }
+
+  /* Drak emblém přestane být fixed — bude scrollovat se stránkou */
+  body.scroll-right .right::before {
+    position: absolute !important;
+  }
+
+  /* Lang + server-status: zarovnat doleva, ať labely nezmizí v pravém rohu */
+  .lang {
+    text-align: left !important;
+  }
+
+  /* Status panel — celý zleva, větší rozestupy aby byl čitelný */
+  .server-status {
+    margin-left: 0 !important;
+    margin-top: 14px !important;
+    align-items: flex-start !important;
+  }
+
+  .server-status .status-line {
+    flex-wrap: nowrap !important;
+  }
+
+  /* Player count — pod status řádky, zleva */
+  .server-status .status-players {
+    padding-left: 18px !important;
+  }
+}

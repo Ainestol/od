@@ -1009,24 +1009,32 @@ body.auth-page.profile-page { overflow: auto; }
 
 /* =========================
    TAG VARIANTY (success / warning / danger / muted)
-   Použito v premium tagu účtů a v donations historii.
-   Tlumené odstíny ladící s dark fantasy / zlato-amber stylem webu.
+   3 stupně podle zbývajících dní premium / donation status.
+   Všechny tlumené, ladí s dark fantasy paletou.
 ========================= */
+
+/* SUCCESS — 15+ dní zbývá (pohoda, klidná zelená — sage) */
 .tag.success {
-  border-color: rgba(200, 155, 60, 0.55);
-  color: #c89b3c;
-  background: rgba(200, 155, 60, 0.08);
+  border-color: rgba(127, 176, 105, 0.55);
+  color: #88b070;
+  background: rgba(127, 176, 105, 0.10);
 }
+
+/* WARNING — 5–14 dní (pozor, končí brzy — tlumená oranžovo-žlutá) */
 .tag.warning {
   border-color: rgba(218, 145, 50, 0.55);
   color: #e8a73c;
   background: rgba(218, 145, 50, 0.10);
 }
+
+/* DANGER — <5 dní nebo expirováno (kritické — cihlová červeň) */
 .tag.danger {
   border-color: rgba(170, 60, 50, 0.55);
   color: #c2554a;
   background: rgba(170, 60, 50, 0.10);
 }
+
+/* MUTED — neaktivní stav (šedo-béžová) */
 .tag.muted {
   border-color: rgba(120, 110, 90, 0.4);
   color: #8f876b;

@@ -616,7 +616,14 @@ if (btn.dataset.mode === 'disable') {
           ? `Premium until ${dateStr} (${daysLabel(left)})`
           : `Premium do ${dateStr} (${daysLabel(left)})`;
 
-        const statusClass = left <= 3 ? 'warning' : 'success';
+        // 3 stupně barev podle zbývajících dní:
+        //   15+ dní → success (zelená tlumená — pohoda)
+        //   5–14 dní → warning (žlutá — pozor, končí brzy)
+        //   <5 dní → danger (červená — kriticky)
+        let statusClass = 'success';
+        if (left < 5) statusClass = 'danger';
+        else if (left < 15) statusClass = 'warning';
+
         return `<span class="tag ${statusClass}">${labelText}</span>`;
       })();
 
