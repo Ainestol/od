@@ -140,9 +140,10 @@ try {
     );
 
     // Sync do account_premium — pure additive (přičte $days k existující hodnotě).
-    // Pozn.: opraveno ($pdoGame → $gamePdo) — ten typo byl latentní bug,
-    // db_game.php exportuje $gamePdo, ne $pdoGame.
-    vip_sync_account_premium($pdo, $gamePdo, $scope, (int)$targetId, (int)$days);
+    // Pozn.: $pdoGame se exportuje z config/db_game.php (server používá toto jméno;
+    // můj dřívější pokus přepsat na $gamePdo byl chybný — config soubor je gitignored
+    // a má vlastní konvenci).
+    vip_sync_account_premium($pdo, $pdoGame, $scope, (int)$targetId, (int)$days);
   }
 
   if ($category === 'MOUNT' || $category === 'COSMETIC') {
