@@ -2103,6 +2103,7 @@ padding-left:20px;
   display: block;
 }
 .modal {
+  -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
 }
 .modal {

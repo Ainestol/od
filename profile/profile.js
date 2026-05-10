@@ -250,31 +250,43 @@ function notify(type, message, timeout = 3000) {
         if (btn) btn.style.display = 'inline-flex';
       }
 
-       // 🔐 2FA button state
-      const btn2fa = document.getElementById('twofaToggle');
-      const status = document.getElementById('twofaStatus');
-      const box = document.getElementById('twofaBox');
+       // 🔐 2FA state (toggle button + box uvnitř Bezpečnost tab + indikátor v hlavičce)
+      const btn2fa    = document.getElementById('twofaToggle');
+      const status    = document.getElementById('twofaStatus');
+      const box       = document.getElementById('twofaBox');
+      const indicator = document.getElementById('twofaIndicator');
+
+      const isEnabled = Number(me.twofa_enabled) === 1;
 
       if (btn2fa) {
-        const isEnabled = Number(me.twofa_enabled) === 1;
-
         btn2fa.textContent = isEnabled
-  ? (isEn ? 'Disable' : 'Vypnout')
-  : (isEn ? 'Enable' : 'Zapnout');
+          ? (isEn ? 'Disable' : 'Vypnout')
+          : (isEn ? 'Enable' : 'Zapnout');
         btn2fa.classList.toggle('on', isEnabled);
         btn2fa.classList.toggle('off', !isEnabled);
         btn2fa.dataset.mode = isEnabled ? 'disable' : 'enable';
+      }
 
-       if (status) {
-  status.textContent = isEnabled
-    ? (isEn ? '2FA: on' : '2FA: aktivní')
-    : (isEn ? '2FA: off' : '2FA: vypnuto');
-}
+      if (status) {
+        status.textContent = isEnabled
+          ? (isEn ? '2FA: on' : '2FA: aktivní')
+          : (isEn ? '2FA: off' : '2FA: vypnuto');
+      }
 
-        if (box) {
-          box.classList.remove('active', 'inactive');
-          box.classList.add(isEnabled ? 'active' : 'inactive');
-        }
+      if (box) {
+        box.classList.remove('active', 'inactive');
+        box.classList.add(isEnabled ? 'active' : 'inactive');
+      }
+
+      // Mini indikátor v hlavičce — barva (zelená on / šedá off) + tooltip
+      if (indicator) {
+        indicator.classList.toggle('twofa-indicator--on',  isEnabled);
+        indicator.classList.toggle('twofa-indicator--off', !isEnabled);
+        indicator.title = isEnabled
+          ? (isEn ? '2FA active — click for security settings'
+                  : '2FA aktivní — klikni pro nastavení bezpečnosti')
+          : (isEn ? '2FA disabled — click for security settings'
+                  : '2FA vypnuto — klikni pro nastavení bezpečnosti');
       }
 
     } catch (e) {
@@ -447,9 +459,85 @@ if (btn.dataset.mode === 'disable') {
     const params = new URLSearchParams(window.location.search);
     const tab = params.get('tab');
     if (tab) {
-      const btn = qs(`.profile-shell > .profile-tabs [data-tab="${tab}"]`);
-      if (btn) btn.click();
+      // Backward-compat: staré deeplinky ?tab=vote / shop / donate teď
+      // patří pod Odměny → otevřeme Odměny + odpovídající sub-tab.
+      const rewardsSubMap = { vote: 1, shop: 1, donate: 1 };
+      if (rewardsSubMap[tab]) {
+        const rewardsBtn = qs(`.profile-shell > .profile-tabs [data-tab="rewards"]`);
+        if (rewardsBtn) rewardsBtn.click();
+        const subBtn = qs(`.rewards-tabs [data-rewards-tab="${tab}"]`);
+        if (subBtn) subBtn.click();
+      } else {
+        const btn = qs(`.profile-shell > .profile-tabs [data-tab="${tab}"]`);
+        if (btn) btn.click();
+      }
     }
+  }
+
+  /* -----------------------------
+   * Sub-tabs uvnitř Odměn (Hlasování / Tržiště / Donate)
+   * ----------------------------- */
+  function initRewardsSubTabs() {
+    const subTabs   = document.querySelectorAll('.rewards-tabs .tab');
+    const subPanels = document.querySelectorAll('.rewards-panels .rewards-panel');
+    if (!subTabs.length || !subPanels.length) return;
+
+    const showSub = (key) => {
+      subTabs.forEach(t => t.classList.toggle('active', t.dataset.rewardsTab === key));
+      subPanels.forEach(p => p.classList.toggle('active', p.id === key));
+    };
+
+    subTabs.forEach(t => t.addEventListener('click', () => showSub(t.dataset.rewardsTab)));
+  }
+
+  /* -----------------------------
+   * Wallet shortcuts — klik na VC/DC pill přepne na Odměny + odpovídající sub-tab
+   * VC → Odměny → Hlasování, DC → Odměny → Tržiště
+   * ----------------------------- */
+  function initWalletShortcuts() {
+    document.querySelectorAll('.wallet-pill[data-target-tab]').forEach(pill => {
+      pill.addEventListener('click', () => {
+        const target = pill.dataset.targetTab; // 'vote' nebo 'shop'
+
+        // Krok 1: otevřít Odměny top-level záložku
+        const rewardsBtn = document.querySelector(
+          '.profile-shell > .profile-tabs [data-tab="rewards"]'
+        );
+        if (rewardsBtn) rewardsBtn.click();
+
+        // Krok 2: otevřít cílovou sub-záložku uvnitř Odměn
+        const subBtn = document.querySelector(
+          `.rewards-tabs [data-rewards-tab="${target}"]`
+        );
+        if (subBtn) subBtn.click();
+
+        // Smooth scroll k Odměny sekci
+        const rewardsSection = document.getElementById('rewards');
+        if (rewardsSection) {
+          rewardsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      });
+    });
+  }
+
+  /* -----------------------------
+   * Mini 2FA indikátor v hlavičce — klik vede na záložku Bezpečnost
+   * ----------------------------- */
+  function initSecurityIndicator() {
+    const indicator = document.getElementById('twofaIndicator');
+    if (!indicator) return;
+
+    indicator.addEventListener('click', (e) => {
+      e.preventDefault();
+      const securityBtn = document.querySelector(
+        '.profile-shell > .profile-tabs [data-tab="security"]'
+      );
+      if (securityBtn) {
+        securityBtn.click();
+        const sec = document.getElementById('security');
+        if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    });
   }
 
   /* -----------------------------
@@ -1640,16 +1728,17 @@ function ensureShopInit() {
   }
 
  function initShop() {
-  const shopTabBtn = qs('[data-tab="shop"]');
+  // Po refaktoru je Tržiště sub-záložka uvnitř Odměny → posloucháme
+  // klik na sub-tab `[data-rewards-tab="shop"]` (ne původní `[data-tab="shop"]`).
+  const shopSubBtn = qs('[data-rewards-tab="shop"]');
 
-  // klik na hlavní tab
-  shopTabBtn?.addEventListener('click', ensureShopInit);
+  shopSubBtn?.addEventListener('click', ensureShopInit);
 
-  // pokud je shop už aktivní (např. přes ?tab=shop), nastartuj hned
+  // pokud je shop už aktivní (např. přes deeplink ?tab=shop), nastartuj hned
   const shopPanelActive = document.getElementById('shop')?.classList.contains('active');
-  const shopTabActive = shopTabBtn?.classList.contains('active');
+  const shopSubActive   = shopSubBtn?.classList.contains('active');
 
-  if (shopPanelActive || shopTabActive) {
+  if (shopPanelActive || shopSubActive) {
     ensureShopInit();
   }
 
@@ -1763,6 +1852,9 @@ if (!ok) return;
 
     // 2) tabs
     initTabs();
+    initRewardsSubTabs();
+    initWalletShortcuts();
+    initSecurityIndicator();
 
     // 3) accounts list
     await loadGameAccounts();

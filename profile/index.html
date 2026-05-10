@@ -25,13 +25,12 @@
 
   <a href="/api/logout.php" class="btn">Odhlásit se</a>
 
-  <!-- 2FA mini box napravo od „Odhlásit se" -->
-  <div class="twofa-wrapper twofa-wrapper--inline">
-    <div class="twofa-box" id="twofaBox">
-      <button id="twofaToggle" class="twofa-btn">Zapnout</button>
-      <div id="twofaStatus" class="twofa-status">2FA: vypnuto</div>
-    </div>
-  </div>
+  <!-- 2FA status indikátor — vizuální „lampička", klik vede na záložku Bezpečnost -->
+  <a href="#" id="twofaIndicator" class="twofa-indicator twofa-indicator--off"
+     title="Stav bezpečnosti — klikni pro nastavení">
+    <span class="twofa-dot" aria-hidden="true"></span>
+    <span class="twofa-label">2FA</span>
+  </a>
 </div>
 </header>
 
@@ -43,13 +42,13 @@
     </div>
 
     <div class="wallet-top">
-      <div id="voteBalanceTop" class="wallet-pill">
+      <div id="voteBalanceTop" class="wallet-pill" data-target-tab="vote" title="Klikni pro hlasování pro server">
         <img src="/img/vote-coin.png" alt="" class="coin-icon coin-icon--top">
         <span>VC</span>
         <strong>0</strong>
       </div>
 
-      <div id="dcBalanceTop" class="wallet-pill">
+      <div id="dcBalanceTop" class="wallet-pill" data-target-tab="shop" title="Klikni pro tržiště">
         <img src="/img/dragon-coin.png" alt="" class="coin-icon coin-icon--top">
         <span>DC</span>
         <strong>0</strong>
@@ -59,10 +58,9 @@
 
   <div class="profile-tabs">
     <button type="button" class="tab active" data-tab="accounts">Herní účty</button>
-    <button type="button" class="tab" data-tab="vote">Hlasování pro server</button>
-    <button type="button" class="tab" data-tab="donate">Donate</button>
-    <button type="button" class="tab" data-tab="support">Hlášení bugů</button>
-    <button type="button" class="tab" data-tab="shop">Tržiště</button>
+    <button type="button" class="tab" data-tab="rewards">Odměny</button>
+    <button type="button" class="tab" data-tab="security">Bezpečnost</button>
+    <button type="button" class="tab" data-tab="support">Podpora</button>
   </div>
 
   <div class="profile-panels">
@@ -144,9 +142,21 @@
       <div id="gameAccountsList" class="mini-list"></div>
     </section>
 
-    <section id="vote" class="profile-card panel">
-      <h2>Hlasování pro server</h2>
-      
+    <!-- ODMĚNY (sjednocená záložka pro Hlasování / Tržiště / Donate) -->
+    <section id="rewards" class="profile-card panel">
+      <h2>Odměny</h2>
+      <p class="muted">Hlasuj, vyměňuj coiny nebo podpoř server dobrovolnou dotací.</p>
+
+      <div class="rewards-tabs sub-tabs">
+        <button type="button" class="tab active" data-rewards-tab="vote">Hlasování</button>
+        <button type="button" class="tab" data-rewards-tab="shop">Tržiště</button>
+        <button type="button" class="tab" data-rewards-tab="donate">Donate</button>
+      </div>
+
+      <div class="rewards-panels">
+
+        <!-- Hlasování -->
+        <div id="vote" class="rewards-panel active">
      <p class="muted">
   Klikni na web a odhlasuj. Seznam se načítá automaticky z databáze (všechny aktivní vote weby).
 </p>
@@ -183,10 +193,10 @@
     </div>
   </div>
 </div>
-    </section>
+        </div>
 
-<section id="shop" class="profile-card panel">
-  <h2>Tržiště</h2>
+        <!-- Tržiště -->
+        <div id="shop" class="rewards-panel">
 <p class="muted">Výměna za Dragon Coiny (DC).</p>
 
 <div class="shop-tabs shop-subtabs">
@@ -202,10 +212,10 @@
 <div id="shopMounts" class="link-list" style="display:none;"></div>
 <div id="shopCloaks" class="link-list" style="display:none;"></div>
 <div id="shopCosmetic" class="link-list" style="display:none;"></div>
-</section>
+        </div>
 
-      <section id="donate" class="profile-card panel">
-  <h2>Donate</h2>
+        <!-- Donate -->
+        <div id="donate" class="rewards-panel">
   <p class="muted">
     Platební systém je momentálně pozastaven. Pracujeme na novém modelu podpory serveru.
   </p>
@@ -279,11 +289,40 @@
 
   </div>
   -->
-</section>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- BEZPEČNOST -->
+    <section id="security" class="profile-card panel">
+      <h2>Bezpečnost</h2>
+      <p class="muted">
+        Zabezpeč svůj účet pomocí dvoufaktorové ochrany. Pokud by někdo
+        odhalil tvé heslo, bez druhého kroku se přihlásit nepodaří.
+      </p>
+
+      <div class="security-section">
+        <h3>Dvoufaktorová ochrana (2FA)</h3>
+
+        <div class="twofa-wrapper">
+          <div class="twofa-box" id="twofaBox">
+            <button id="twofaToggle" class="twofa-btn">Zapnout</button>
+            <div id="twofaStatus" class="twofa-status">2FA: vypnuto</div>
+          </div>
+        </div>
+
+        <p class="muted security-hint">
+          Po zapnutí budeš při každém přihlášení žádán o 6místný kód
+          z autentikátoru (Microsoft Authenticator, Google Authenticator, atd.).
+          Bez kódu se k účtu nikdo nedostane, i kdyby znal tvé heslo.
+        </p>
+      </div>
+    </section>
 
 
     <section id="support" class="profile-card panel">
-  <h2>Hlášení bugů</h2>
+  <h2>Podpora</h2>
 
   <h3 style="margin-top:0;">Moje hlášení</h3>
   <div id="myBugs" class="link-list">
