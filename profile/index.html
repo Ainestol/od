@@ -175,26 +175,30 @@
   <button id="convertVcToDc" class="btn btn-primary">
     Převod 4 Vote Coin → 1 Dragon Coin
   </button>
-<button id="openVipModal" class="btn btn-primary">
-  Activace VIP 24h
+<button id="openPremium24Modal" class="btn btn-primary">
+  Aktivace Premium 24h
 </button>
 
-<div id="vipModal" class="modal hidden">
+<div id="premium24Modal" class="modal hidden">
   <div class="modal-box">
-    <h3>Activate VIP 24 Hours</h3>
-    <label>Character</label>
-    <select id="vipCharSelect"></select>
+    <h3>Aktivace Premium 24h</h3>
+    <p class="muted" style="font-size:13px;">
+      Premium pokryje všechny postavy na vybraném herním účtu po dobu 24 hodin.
+      Pokud už máš premium aktivní, jeden den se přičte k existujícímu času.
+    </p>
+    <label>Herní účet</label>
+    <select id="premium24AccSelect"></select>
 
-    <label>Currency</label>
-    <select id="vipCurrency">
-      <option value="VOTE_COIN">4 Vote Coin</option>
-      <option value="DC">1 Dragon Coin</option>
+    <label>Měna</label>
+    <select id="premium24Currency">
+      <option value="VOTE_COIN">8 Vote Coin</option>
+      <option value="DC">2 Dragon Coin</option>
     </select>
 
     <div class="modal-actions">
-      <button id="vipCancel" class="btn">Cancel</button>
-      <button id="vipConfirm" class="btn btn-primary">
-        Activate
+      <button id="premium24Cancel" class="btn">Zrušit</button>
+      <button id="premium24Confirm" class="btn btn-primary">
+        Aktivovat
       </button>
     </div>
   </div>

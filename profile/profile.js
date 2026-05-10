@@ -97,8 +97,8 @@ window.fetch = function (url, options = {}) {
     serverConnErr: isEn ? 'Server connection error.' : 'Chyba spojení se serverem.',
     unableLoad: isEn ? 'Unable to load accounts.' : 'Nepodařilo se načíst účty.',
     noAccounts: isEn ? 'You have no game accounts yet.' : 'Zatím nemáš žádné herní účty.',
-    vipOk: isEn ? 'VIP activated' : 'VIP aktivováno',
-    vipErr: isEn ? 'VIP activation failed' : 'Aktivace VIP se nezdařila',
+    vipOk: isEn ? 'Premium activated' : 'Premium aktivováno',
+    vipErr: isEn ? 'Premium activation failed' : 'Aktivace Premium se nezdařila',
 
     // account actions
     accCreated: isEn ? 'Game account created' : 'Herní účet byl vytvořen',
@@ -154,7 +154,7 @@ window.fetch = function (url, options = {}) {
     voteRewarded: isEn ? 'Vote Coin added!' : 'Vote Coin připsán!',
     votePending: isEn ? 'Not detected yet. Try again later.' : 'Zatím nedetekováno. Zkus to později.',
     unknownErr: isEn ? 'Unknown error.' : 'Neznámá chyba.',
-    vipActivated: isEn ? 'VIP activated for 24 hours!' : 'VIP aktivováno na 24 hodin!',
+    vipActivated: isEn ? 'Premium activated for 24 hours!' : 'Premium aktivováno na 24 hodin!',
     convertOk: isEn ? 'Vote Coins exchanged for Dragon Coin!' : 'Vote Coiny vyměněny za Dragon Coin!',
     };
 
@@ -234,7 +234,7 @@ function notify(type, message, timeout = 3000) {
           vipBox.innerHTML = `
             <img class="vip-icon" src="/img/drak.png" alt="VIP">
             <div>
-              <div class="vip-title">${isEn ? 'WEB VIP active' : 'WEB VIP aktivní'}</div>
+              <div class="vip-title">${isEn ? 'WEB Premium active' : 'WEB Premium aktivní'}</div>
               <div class="vip-meta">
                 ${isEn ? 'Valid until' : 'Platí do'}: ${me.web_vip.end_at}<br>
                 ${isEn ? 'Days left' : 'Zbývá dní'}: ${me.web_vip.days_left}
@@ -1306,10 +1306,11 @@ async function loadVoteBalance() {
   window.loadDcBalance = window.loadDcBalance || loadDcBalance;
 
   /* -----------------------------
-   * VIP 24h activation modal
+   * Premium 24h activation modal
+   * (Per-game-account; nahrazuje původní VIP 24h per-character)
    * ----------------------------- */
-  async function loadAllCharactersForVip() {
-    const select = document.getElementById('vipCharSelect');
+  async function loadGameAccountsForPremium24() {
+    const select = document.getElementById('premium24AccSelect');
     if (!select) return;
 
     select.innerHTML = '';
@@ -1318,32 +1319,32 @@ async function loadVoteBalance() {
     const dataAcc = await resAcc.json().catch(() => ({}));
     if (!dataAcc.ok || !Array.isArray(dataAcc.accounts)) return;
 
-    for (const acc of dataAcc.accounts) {
-      const resChar = await fetch(`/api/list_characters.php?account=${encodeURIComponent(acc.login)}`, {
-        credentials: 'same-origin'
-      });
-      const dataChar = await resChar.json().catch(() => ({}));
-      if (!dataChar.ok || !Array.isArray(dataChar.characters)) continue;
-
-      dataChar.characters.forEach(ch => {
-        const opt = document.createElement('option');
-        opt.value = ch.charId;
-        opt.textContent = `${ch.char_name} (Lv ${ch.level})`;
-        select.appendChild(opt);
-      });
+    if (dataAcc.accounts.length === 0) {
+      const opt = document.createElement('option');
+      opt.value = '';
+      opt.textContent = isEn ? 'No game accounts' : 'Žádné herní účty';
+      select.appendChild(opt);
+      return;
     }
+
+    dataAcc.accounts.forEach(acc => {
+      const opt = document.createElement('option');
+      opt.value = acc.id;
+      opt.textContent = acc.login;
+      select.appendChild(opt);
+    });
   }
 
-  function initVipModal() {
-    const openBtn = document.getElementById('openVipModal');
-    const cancelBtn = document.getElementById('vipCancel');
-    const confirmBtn = document.getElementById('vipConfirm');
-    const modal = document.getElementById('vipModal');
+  function initPremium24Modal() {
+    const openBtn = document.getElementById('openPremium24Modal');
+    const cancelBtn = document.getElementById('premium24Cancel');
+    const confirmBtn = document.getElementById('premium24Confirm');
+    const modal = document.getElementById('premium24Modal');
 
     if (!modal) return;
 
     openBtn?.addEventListener('click', async () => {
-      await loadAllCharactersForVip();
+      await loadGameAccountsForPremium24();
       modal.classList.remove('hidden');
     });
 
@@ -1358,35 +1359,39 @@ async function loadVoteBalance() {
       btn.disabled = true;
       btn.textContent = T.activating;
 
-      const charId = document.getElementById('vipCharSelect')?.value || '';
-      const currency = document.getElementById('vipCurrency')?.value || '';
+      const gameAccountId = document.getElementById('premium24AccSelect')?.value || '';
+      const currency      = document.getElementById('premium24Currency')?.value || '';
 
       try {
-        const res = await fetch('/api/activate_vip_24h.php', {
+        const res = await fetch('/api/activate_premium_24h.php', {
           method: 'POST',
           credentials: 'same-origin',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ char_id: charId, currency })
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': window.CSRF_TOKEN || ''
+          },
+          body: JSON.stringify({
+            game_account_id: gameAccountId,
+            currency
+          })
         });
 
         const data = await res.json().catch(() => ({}));
 
-if (data.ok) {
-  modal.classList.add('hidden');
-  notify('success', T.vipActivated);
+        if (data.ok) {
+          modal.classList.add('hidden');
+          notify('success', T.vipActivated);
 
-  await loadVoteBalance();
-  await loadDcBalance();
-  await loadGameAccounts();
+          await loadVoteBalance();
+          await loadDcBalance();
+          await loadGameAccounts();
 
-  if (typeof window.refreshMeAndUi === 'function') {
-    await window.refreshMeAndUi();
-  }
-}
-
-else {
-  notify('error', data.error || T.vipErr);
-}
+          if (typeof window.refreshMeAndUi === 'function') {
+            await window.refreshMeAndUi();
+          }
+        } else {
+          notify('error', data.error || T.vipErr);
+        }
       } catch (err) {
         notify('error', T.serverConnErr);
       }
@@ -2113,7 +2118,7 @@ if (!ok) return;
     loadDcBalance();
 
     // 8) vip modal + convert
-    initVipModal();
+    initPremium24Modal();
     initConvert();
 
     // 9) bug system
