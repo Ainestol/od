@@ -221,14 +221,90 @@
 
         <!-- Donate -->
         <div id="donate" class="rewards-panel">
-  <p class="muted">
-    The payment system is currently paused. We are working on a new server support model.
-  </p>
+          <p class="muted">
+            The server is free-to-play. If you'd like to support us with a voluntary donation,
+            you can send any amount to the account below — as a <strong>thank-you</strong>
+            we'll credit you Dragon Coins which you can spend in the Marketplace on cosmetics or VIP rewards.
+          </p>
 
-  <div class="muted" style="padding:20px; text-align:center; border:1px dashed #555; border-radius:8px; margin-top:10px;">
-    💤 Dragon Coin purchases are temporarily disabled.<br>
-    Dragon Coins can be earned by voting for the server (Vote Coin → DC conversion).
-  </div>
+          <!-- Player's Web ID + VS for the year -->
+          <div class="donate-id-box" id="donateIdBox">
+            <div>
+              <span class="muted">Your Web ID:</span>
+              <strong id="donateUserId">—</strong>
+            </div>
+            <div>
+              <span class="muted">Variable symbol for 2026:</span>
+              <strong id="donateVs">—</strong>
+              <button type="button" class="btn btn-small donate-copy" data-copy-target="#donateVs">Copy</button>
+            </div>
+          </div>
+
+          <!-- Bank details -->
+          <h3 style="margin-top:20px;">Bank details</h3>
+          <div class="donate-bank">
+            <div><span class="muted">Account number:</span> <strong>3623547014/3030</strong>
+              <button type="button" class="btn btn-small donate-copy" data-copy-text="3623547014/3030">Copy</button>
+            </div>
+            <div><span class="muted">IBAN:</span> <strong>CZ7130300000003623547014</strong>
+              <button type="button" class="btn btn-small donate-copy" data-copy-text="CZ7130300000003623547014">Copy</button>
+            </div>
+            <div><span class="muted">SWIFT/BIC:</span> <strong>AIRACZPP</strong></div>
+            <div><span class="muted">Payment message:</span>
+              <strong>Příspěvek na provoz serveru</strong>
+              <button type="button" class="btn btn-small donate-copy" data-copy-text="Příspěvek na provoz serveru">Copy</button>
+            </div>
+          </div>
+
+          <!-- Conversion info -->
+          <p class="muted" style="margin-top:14px;">
+            <strong>Rate:</strong> 5 CZK = 1 DC&nbsp;&nbsp;•&nbsp;&nbsp;1 EUR = 5 DC<br>
+            <em>Minimum: 25 CZK or 5 EUR. This is not a purchase — DC are granted as a thank-you for supporting the server.</em>
+          </p>
+
+          <hr style="margin:20px 0;">
+
+          <!-- Form: report completed transfer -->
+          <h3>Report a completed transfer</h3>
+          <p class="muted">
+            After sending the transfer, fill in the details below. After manual verification we will credit your DC and send you an email.
+          </p>
+
+          <form id="donateForm" class="donate-form">
+            <div class="form-row">
+              <label for="donateAmount">Amount</label>
+              <input type="number" id="donateAmount" min="1" step="1" required placeholder="e.g. 100">
+            </div>
+
+            <div class="form-row">
+              <label for="donateCurrency">Currency</label>
+              <select id="donateCurrency">
+                <option value="CZK">CZK (Kč)</option>
+                <option value="EUR" selected>EUR (€)</option>
+              </select>
+            </div>
+
+            <div class="form-row">
+              <label for="donatePaidAt">Date paid</label>
+              <input type="date" id="donatePaidAt" required>
+            </div>
+
+            <div class="form-row">
+              <label for="donateNote">Note (optional, max 500 chars)</label>
+              <textarea id="donateNote" maxlength="500" rows="3" placeholder="e.g. for nickname X, sent without VS..."></textarea>
+            </div>
+
+            <div id="donateMsg" class="form-error" style="display:none;"></div>
+
+            <button type="submit" class="btn btn-primary">Submit request</button>
+          </form>
+
+          <hr style="margin:30px 0;">
+
+          <h3>My requests</h3>
+          <div id="myDonations" class="link-list">
+            <div class="muted">Loading history…</div>
+          </div>
 
   <!-- 🚫 ORIGINAL DONATE PACKS – DISABLED (kept for later use)
   <div class="donate-packs">

@@ -1706,6 +1706,243 @@ function ensureShopInit() {
   loadShop();
 }
 
+  /* -----------------------------
+   * DONATE — submit + history list + copy buttons
+   * ----------------------------- */
+  function escapeHtml(s) {
+    if (s == null) return '';
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function calcDonateVs(webId, year) {
+    return String(webId).padStart(4, '0') + String(year);
+  }
+
+  function initDonateCopyButtons() {
+    document.querySelectorAll('.donate-copy').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        let text = btn.dataset.copyText || '';
+        if (!text && btn.dataset.copyTarget) {
+          const target = document.querySelector(btn.dataset.copyTarget);
+          text = target ? target.textContent.trim() : '';
+        }
+        if (!text || text === '—') return;
+
+        try {
+          await navigator.clipboard.writeText(text);
+          const orig = btn.textContent;
+          btn.textContent = isEn ? 'Copied!' : 'Zkopírováno!';
+          setTimeout(() => { btn.textContent = orig; }, 1500);
+        } catch (err) {
+          console.error('Copy failed', err);
+          notify('error', isEn ? 'Copy failed' : 'Kopírování selhalo');
+        }
+      });
+    });
+  }
+
+  async function refreshMyDonations() {
+    const list   = document.getElementById('myDonations');
+    const idEl   = document.getElementById('donateUserId');
+    const vsEl   = document.getElementById('donateVs');
+    if (!list) return;
+
+    list.innerHTML = `<div class="muted">${isEn ? 'Loading…' : 'Načítám…'}</div>`;
+
+    try {
+      const res = await fetch('/api/list_my_donations.php', { credentials: 'same-origin' });
+      const data = await res.json().catch(() => ({}));
+
+      if (!data.ok) {
+        list.innerHTML = `<div class="muted">${isEn ? 'Failed to load.' : 'Nepodařilo se načíst.'}</div>`;
+        return;
+      }
+
+      // Update Web ID + VS pro aktuální rok
+      if (data.web_id) {
+        const year = new Date().getFullYear();
+        if (idEl) idEl.textContent = data.web_id;
+        if (vsEl) vsEl.textContent = calcDonateVs(data.web_id, year);
+      }
+
+      if (!data.donations.length) {
+        list.innerHTML = `<div class="muted">${isEn ? 'No donations yet.' : 'Zatím žádné žádosti.'}</div>`;
+        return;
+      }
+
+      const statusLabels = {
+        pending:  isEn ? 'Pending'  : 'Čeká na schválení',
+        approved: isEn ? 'Approved' : 'Schváleno',
+        rejected: isEn ? 'Rejected' : 'Zamítnuto'
+      };
+      const statusClasses = {
+        pending:  'warning',
+        approved: 'success',
+        rejected: 'danger'
+      };
+
+      list.innerHTML = '';
+      data.donations.forEach(d => {
+        const row = document.createElement('div');
+        row.className = 'mini-row donation-row';
+
+        const dcInfo = (d.status === 'approved' && d.dc_credited > 0)
+          ? `<span class="tag success">+${d.dc_credited} DC</span>`
+          : '';
+
+        const adminNote = d.admin_note
+          ? `<div class="muted" style="margin-top:4px;font-size:12px;"><em>${isEn ? 'Admin' : 'Admin'}:</em> ${escapeHtml(d.admin_note)}</div>`
+          : '';
+
+        const userNote = d.note
+          ? `<div class="muted" style="margin-top:4px;font-size:12px;"><em>${isEn ? 'Your note' : 'Tvoje poznámka'}:</em> ${escapeHtml(d.note)}</div>`
+          : '';
+
+        row.innerHTML = `
+          <div>
+            <strong>${d.amount} ${d.currency}</strong>
+            <span class="muted">·</span>
+            <span class="muted">${isEn ? 'Paid' : 'Platba'}: ${d.paid_at}</span>
+            <span class="tag ${statusClasses[d.status] || ''}">${statusLabels[d.status] || d.status}</span>
+            ${dcInfo}
+          </div>
+          <div class="muted" style="font-size:12px;margin-top:4px;">
+            VS: ${escapeHtml(d.variable_symbol)} · ${isEn ? 'Submitted' : 'Odesláno'}: ${d.created_at}
+          </div>
+          ${userNote}
+          ${adminNote}
+        `;
+        list.appendChild(row);
+      });
+
+    } catch (err) {
+      console.error(err);
+      list.innerHTML = `<div class="muted">${isEn ? 'Connection error.' : 'Chyba spojení.'}</div>`;
+    }
+  }
+
+  function initDonate() {
+    const form = document.getElementById('donateForm');
+    const list = document.getElementById('myDonations');
+    if (!form && !list) return;
+
+    initDonateCopyButtons();
+
+    // Default datum platby = dnes; min = -30 dní; max = dnes
+    const dateInput = document.getElementById('donatePaidAt');
+    if (dateInput) {
+      const today = new Date();
+      const todayStr = today.toISOString().slice(0, 10);
+      dateInput.value = todayStr;
+      dateInput.max   = todayStr;
+      const minDate = new Date(today);
+      minDate.setDate(minDate.getDate() - 30);
+      dateInput.min = minDate.toISOString().slice(0, 10);
+    }
+
+    if (form) {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const msg = document.getElementById('donateMsg');
+        if (msg) { msg.style.display = 'none'; msg.textContent = ''; }
+
+        const amount   = parseInt(document.getElementById('donateAmount').value, 10);
+        const currency = document.getElementById('donateCurrency').value;
+        const paidAt   = document.getElementById('donatePaidAt').value;
+        const note     = document.getElementById('donateNote').value.trim();
+
+        // Client-side quick validation
+        if (!amount || amount <= 0) {
+          msg.textContent = isEn ? 'Enter a valid amount.' : 'Zadej platnou částku.';
+          msg.style.display = 'block';
+          return;
+        }
+        const minAmount = currency === 'CZK' ? 25 : 5;
+        if (amount < minAmount) {
+          msg.textContent = isEn
+            ? `Minimum amount is ${minAmount} ${currency}.`
+            : `Minimální částka je ${minAmount} ${currency}.`;
+          msg.style.display = 'block';
+          return;
+        }
+        if (!paidAt) {
+          msg.textContent = isEn ? 'Select a payment date.' : 'Zadej datum platby.';
+          msg.style.display = 'block';
+          return;
+        }
+
+        try {
+          const res = await fetch('/api/submit_donation.php', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-Token': window.CSRF_TOKEN || ''
+            },
+            body: JSON.stringify({
+              amount, currency,
+              paid_at: paidAt,
+              note,
+              lang: isEn ? 'en' : 'cs'
+            })
+          });
+          const data = await res.json().catch(() => ({}));
+
+          if (!data.ok) {
+            const errMap = {
+              'NOT_LOGGED_IN':    isEn ? 'You are not logged in.' : 'Nejsi přihlášen.',
+              'INVALID_AMOUNT':   isEn ? 'Invalid amount.' : 'Neplatná částka.',
+              'INVALID_CURRENCY': isEn ? 'Invalid currency.' : 'Neplatná měna.',
+              'INVALID_DATE':     isEn ? 'Invalid date.' : 'Neplatné datum.',
+              'DATE_IN_FUTURE':   isEn ? 'Date is in the future.' : 'Datum je v budoucnosti.',
+              'DATE_TOO_OLD':     isEn ? 'Date is more than 30 days ago.' : 'Datum je starší než 30 dní.',
+              'AMOUNT_TOO_LOW':   isEn ? `Minimum is ${data.min} ${data.currency}.` : `Minimum je ${data.min} ${data.currency}.`,
+              'NOTE_TOO_LONG':    isEn ? 'Note is too long.' : 'Poznámka je příliš dlouhá.',
+              'TOO_MANY_PENDING': isEn ? 'You have too many pending requests (max 3).' : 'Máš příliš mnoho čekajících žádostí (max 3).',
+              'COOLDOWN':         isEn ? 'Please wait 24 hours between submissions.' : 'Mezi žádostmi je nutné počkat 24 hodin.',
+              'RATE_LIMITED':     isEn ? 'Too many requests, try later.' : 'Příliš mnoho žádostí, zkus později.',
+              'CSRF_INVALID':     isEn ? 'Session expired, refresh the page.' : 'Session vypršela, obnov stránku.'
+            };
+            const text = errMap[data.error] || (isEn ? 'Request failed.' : 'Žádost selhala.');
+            if (msg) { msg.textContent = text; msg.style.display = 'block'; }
+            return;
+          }
+
+          notify('success', isEn ? 'Request submitted, thank you!' : 'Žádost odeslána, děkujeme!');
+          form.reset();
+          // Reset date back to today (form.reset() ho vyčistí)
+          if (dateInput) {
+            dateInput.value = new Date().toISOString().slice(0, 10);
+          }
+          await refreshMyDonations();
+
+        } catch (err) {
+          console.error(err);
+          if (msg) {
+            msg.textContent = isEn ? 'Connection error.' : 'Chyba spojení.';
+            msg.style.display = 'block';
+          }
+        }
+      });
+    }
+
+    // Initial load
+    refreshMyDonations();
+
+    // Re-load when user clicks Donate sub-tab
+    const donateSubBtn = document.querySelector('[data-rewards-tab="donate"]');
+    if (donateSubBtn) {
+      donateSubBtn.addEventListener('click', refreshMyDonations);
+    }
+  }
+
   function initShopSubTabs() {
     const btns = qsa('#shop [data-shop-tab]');
     if (!btns.length) return;
@@ -1888,6 +2125,8 @@ if (!ok) return;
     initShop();
     // 11) 2FA
     init2FA();
+    // 12) donate
+    initDonate();
   });
 })();
 

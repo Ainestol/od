@@ -920,6 +920,127 @@ body.auth-page.profile-page { overflow: auto; }
 }
 
 /* =========================
+   TAG VARIANTY (success / warning / danger / muted)
+   Použito v premium tagu účtů a v donations historii.
+========================= */
+.tag.success {
+  border-color: rgba(46, 204, 113, 0.45);
+  color: #2ecc71;
+  background: rgba(46, 204, 113, 0.08);
+}
+.tag.warning {
+  border-color: rgba(241, 196, 15, 0.45);
+  color: #f1c40f;
+  background: rgba(241, 196, 15, 0.08);
+}
+.tag.danger {
+  border-color: rgba(231, 76, 60, 0.45);
+  color: #e74c3c;
+  background: rgba(231, 76, 60, 0.08);
+}
+.tag.muted {
+  border-color: rgba(120, 120, 120, 0.4);
+  color: #888;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+/* =========================
+   DONATE PANEL
+========================= */
+.donate-id-box {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 10px;
+  background: rgba(212, 175, 55, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.donate-id-box strong {
+  color: #d4af37;
+  font-family: "Cinzel", serif;
+  letter-spacing: 1px;
+  font-size: 16px;
+}
+
+.donate-bank {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  border: 1px solid #3a3322;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.donate-bank strong {
+  color: #d4af37;
+  letter-spacing: 0.3px;
+  font-family: monospace, "Courier New";
+  font-size: 14px;
+  margin-right: 8px;
+}
+
+.donate-copy {
+  margin-left: 6px;
+  font-size: 11px !important;
+  padding: 2px 8px !important;
+  cursor: pointer;
+}
+
+.donate-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.donate-form .form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.donate-form label {
+  font-size: 13px;
+  color: #bfb8a0;
+}
+
+.donate-form input,
+.donate-form select,
+.donate-form textarea {
+  padding: 8px 10px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid #3a3322;
+  color: #ddd;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.donate-form input:focus,
+.donate-form select:focus,
+.donate-form textarea:focus {
+  outline: none;
+  border-color: #d4af37;
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.2);
+}
+
+.donate-form textarea {
+  resize: vertical;
+  min-height: 70px;
+}
+
+.donation-row {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+/* =========================
    PRICE
 ========================= */
 .donate-card .price {

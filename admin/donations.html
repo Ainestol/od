@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin – Donations</title>
+
+  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="stylesheet" href="/css/mobile.css">
+
+  <style>
+    /* === Donations admin – local styles === */
+    .donations-toolbar {
+      display: flex; flex-wrap: wrap; gap: 10px; align-items: end;
+      margin-bottom: 18px;
+    }
+    .donations-toolbar .field {
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .donations-toolbar label {
+      font-size: 12px; color: #999;
+    }
+    .donations-toolbar input,
+    .donations-toolbar select {
+      padding: 6px 10px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid #3a3322;
+      color: #ddd;
+      border-radius: 4px;
+      font: inherit;
+    }
+    .donations-toolbar .btn {
+      padding: 7px 14px;
+    }
+
+    .donations-summary {
+      display: flex; gap: 16px; flex-wrap: wrap;
+      padding: 12px 16px;
+      margin-bottom: 18px;
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      background: rgba(212, 175, 55, 0.05);
+      border-radius: 8px;
+    }
+    .donations-summary .stat {
+      display: flex; flex-direction: column; align-items: flex-start;
+    }
+    .donations-summary .stat-label {
+      font-size: 12px; color: #999;
+    }
+    .donations-summary .stat-value {
+      color: #d4af37; font-family: "Cinzel", serif; font-size: 20px; letter-spacing: 1px;
+    }
+
+    /* Status badges (mirror existující status-* z bug reports) */
+    .status-badge {
+      padding: 3px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+    }
+    .status-pending {
+      background: rgba(241, 196, 15, 0.15);
+      border: 1px solid rgba(241, 196, 15, 0.4);
+      color: #f1c40f;
+    }
+    .status-approved {
+      background: rgba(46, 204, 113, 0.15);
+      border: 1px solid rgba(46, 204, 113, 0.4);
+      color: #2ecc71;
+    }
+    .status-rejected {
+      background: rgba(231, 76, 60, 0.15);
+      border: 1px solid rgba(231, 76, 60, 0.4);
+      color: #e74c3c;
+    }
+
+    .actions-cell .btn {
+      padding: 4px 10px;
+      font-size: 12px;
+      margin-right: 4px;
+    }
+    .btn-approve { color: #2ecc71; border-color: rgba(46, 204, 113, 0.5); }
+    .btn-approve:hover { background: rgba(46, 204, 113, 0.15); }
+    .btn-reject  { color: #e74c3c; border-color: rgba(231, 76, 60, 0.5); }
+    .btn-reject:hover  { background: rgba(231, 76, 60, 0.15); }
+
+    .admin-table .row-note {
+      font-size: 12px; color: #999; font-style: italic;
+    }
+
+    /* Modal */
+    .donmodal-backdrop {
+      display: none;
+      position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7);
+      z-index: 9000; align-items: center; justify-content: center;
+    }
+    .donmodal-backdrop.active { display: flex; }
+    .donmodal {
+      background: #111;
+      border: 1px solid #d4af37;
+      padding: 22px;
+      border-radius: 8px;
+      max-width: 480px;
+      width: 92%;
+      color: #ddd;
+    }
+    .donmodal h3 { color: #d4af37; margin-top: 0; }
+    .donmodal .meta { font-size: 13px; color: #aaa; margin: 8px 0 14px; }
+    .donmodal textarea {
+      width: 100%;
+      min-height: 90px;
+      background: #0b0b0b;
+      color: #ddd;
+      border: 1px solid #3a3322;
+      border-radius: 4px;
+      padding: 8px;
+      font: inherit;
+      resize: vertical;
+    }
+    .donmodal-actions {
+      display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px;
+    }
+    .donmodal-error {
+      color: #e74c3c; margin-top: 8px; font-size: 13px;
+      display: none;
+    }
+    .donmodal-error.active { display: block; }
+
+    /* Print-friendly view */
+    @media print {
+      .admin-page > #adminHeader,
+      .donations-toolbar,
+      .actions-cell,
+      .print-hide,
+      .admin-card > h2 .filter-controls {
+        display: none !important;
+      }
+      body, .admin-page, .auth-container, .admin-card {
+        background: #fff !important;
+        color: #000 !important;
+        box-shadow: none !important;
+        border: none !important;
+      }
+      .admin-table {
+        color: #000 !important;
+      }
+      .admin-table th, .admin-table td {
+        border-color: #999 !important;
+        color: #000 !important;
+      }
+      .status-badge {
+        color: #000 !important;
+        background: #eee !important;
+        border-color: #999 !important;
+      }
+      .donations-summary {
+        background: #f5f5f5 !important;
+        border-color: #999 !important;
+        color: #000 !important;
+      }
+      .donations-summary .stat-value {
+        color: #000 !important;
+      }
+    }
+  </style>
+</head>
+
+<body class="admin-page">
+
+<div id="adminHeader"></div>
+
+<main class="auth-container">
+
+  <section class="admin-card">
+    <h2>Donations</h2>
+
+    <!-- TOOLBAR -->
+    <div class="donations-toolbar print-hide">
+      <div class="field">
+        <label for="fStatus">Status</label>
+        <select id="fStatus">
+          <option value="pending" selected>Pending</option>
+          <option value="approved">Approved</option>
+          <option value="rejected">Rejected</option>
+          <option value="all">Vše</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="fRange">Rozsah</label>
+        <select id="fRange">
+          <option value="">— auto —</option>
+          <option value="last30">Posledních 30 dní</option>
+          <option value="all">Komplet</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="fFrom">Od (paid_at)</label>
+        <input type="date" id="fFrom">
+      </div>
+
+      <div class="field">
+        <label for="fTo">Do (paid_at)</label>
+        <input type="date" id="fTo">
+      </div>
+
+      <div class="field">
+        <label for="fUserId">User ID</label>
+        <input type="number" id="fUserId" min="1" placeholder="—">
+      </div>
+
+      <button id="btnApply" class="btn">Aplikovat</button>
+      <button id="btnPrint" class="btn">Tisk pro daně</button>
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="donations-summary" id="summaryBox">
+      <div class="stat">
+        <span class="stat-label">Schválené záznamy</span>
+        <span class="stat-value" id="sumCount">—</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Schválené Kč celkem</span>
+        <span class="stat-value" id="sumCzk">—</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">DC připsané celkem</span>
+        <span class="stat-value" id="sumDc">—</span>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <table class="admin-table" id="donationsTable">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Hráč</th>
+          <th>Web ID</th>
+          <th>Částka</th>
+          <th>Datum platby</th>
+          <th>VS</th>
+          <th>Status</th>
+          <th>DC</th>
+          <th>Vytvořeno</th>
+          <th class="actions-cell print-hide">Akce</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <div id="loadingRow" class="muted" style="margin-top:14px;">Načítám…</div>
+    <div id="emptyRow" class="muted" style="margin-top:14px; display:none;">Žádné záznamy.</div>
+  </section>
+
+</main>
+
+<!-- APPROVE MODAL -->
+<div class="donmodal-backdrop" id="approveModal">
+  <div class="donmodal">
+    <h3>Schválit donate</h3>
+    <div class="meta" id="approveMeta">—</div>
+    <div class="donmodal-error" id="approveErr"></div>
+    <div class="donmodal-actions">
+      <button class="btn" id="approveCancel">Zrušit</button>
+      <button class="btn btn-approve" id="approveConfirm">Schválit + připsat DC</button>
+    </div>
+  </div>
+</div>
+
+<!-- REJECT MODAL -->
+<div class="donmodal-backdrop" id="rejectModal">
+  <div class="donmodal">
+    <h3>Zamítnout donate</h3>
+    <div class="meta" id="rejectMeta">—</div>
+    <label for="rejectReason">Důvod (povinný, pošle se hráči emailem):</label>
+    <textarea id="rejectReason" maxlength="500" placeholder="Např. žádný převod nepřišel na účet."></textarea>
+    <div class="donmodal-error" id="rejectErr"></div>
+    <div class="donmodal-actions">
+      <button class="btn" id="rejectCancel">Zrušit</button>
+      <button class="btn btn-reject" id="rejectConfirm">Zamítnout</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  let CSRF = null;
+  let currentDonation = null;
+
+  // === CSRF ===
+  async function loadCsrf() {
+    try {
+      const r = await fetch('/api/csrf_token.php', { credentials: 'same-origin' });
+      const j = await r.json();
+      if (j.ok) CSRF = j.token;
+    } catch (e) { console.error(e); }
+  }
+
+  // === Helpers ===
+  function escapeHtml(s) {
+    if (s == null) return '';
+    return String(s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  function fmtAmount(d) {
+    return `${d.amount} ${d.currency}`;
+  }
+  function expectedDc(d) {
+    if (d.currency === 'CZK') return Math.floor(d.amount / 5);
+    if (d.currency === 'EUR') return d.amount * 5;
+    return 0;
+  }
+
+  // === Load + render ===
+  async function loadDonations() {
+    const status = document.getElementById('fStatus').value;
+    const range  = document.getElementById('fRange').value;
+    const from   = document.getElementById('fFrom').value;
+    const to     = document.getElementById('fTo').value;
+    const userId = document.getElementById('fUserId').value;
+
+    const params = new URLSearchParams();
+    if (status) params.set('status', status);
+    if (range)  params.set('range',  range);
+    if (from)   params.set('from',   from);
+    if (to)     params.set('to',     to);
+    if (userId) params.set('user_id', userId);
+
+    document.getElementById('loadingRow').style.display = 'block';
+    document.getElementById('emptyRow').style.display   = 'none';
+    document.querySelector('#donationsTable tbody').innerHTML = '';
+
+    try {
+      const r = await fetch('/admin/api/list_donations.php?' + params.toString(), {
+        credentials: 'same-origin'
+      });
+      // Pozn: admin endpoint je v /api/admin/, takže URL musí ukazovat tam
+      const j = await r.json().catch(() => ({}));
+
+      if (!j.ok) {
+        document.getElementById('loadingRow').textContent =
+          'Chyba při načítání: ' + (j.error || r.status);
+        return;
+      }
+
+      renderSummary(j.summary);
+      renderTable(j.donations);
+    } catch (e) {
+      console.error(e);
+      document.getElementById('loadingRow').textContent = 'Chyba spojení.';
+    }
+  }
+
+  function renderSummary(s) {
+    document.getElementById('sumCount').textContent = s.approved_count ?? '0';
+    document.getElementById('sumCzk').textContent   = (s.approved_czk   ?? 0) + ' Kč';
+    document.getElementById('sumDc').textContent    = (s.approved_dc    ?? 0) + ' DC';
+  }
+
+  function renderTable(rows) {
+    const tbody = document.querySelector('#donationsTable tbody');
+    tbody.innerHTML = '';
+
+    document.getElementById('loadingRow').style.display = 'none';
+    if (!rows || !rows.length) {
+      document.getElementById('emptyRow').style.display = 'block';
+      return;
+    }
+    document.getElementById('emptyRow').style.display = 'none';
+
+    rows.forEach(d => {
+      const tr = document.createElement('tr');
+      const noteRow = (d.note || d.admin_note)
+        ? `<tr class="row-extra">
+             <td colspan="10" class="row-note" style="padding:4px 12px 12px;">
+               ${d.note ? `<div>📝 Hráč: ${escapeHtml(d.note)}</div>` : ''}
+               ${d.admin_note ? `<div>🛡 Admin: ${escapeHtml(d.admin_note)}</div>` : ''}
+             </td>
+           </tr>`
+        : '';
+
+      tr.innerHTML = `
+        <td>#${d.id}</td>
+        <td>${escapeHtml(d.user_email || '—')}</td>
+        <td>${d.web_user_id}</td>
+        <td><strong>${fmtAmount(d)}</strong></td>
+        <td>${d.paid_at}</td>
+        <td><code>${escapeHtml(d.variable_symbol)}</code></td>
+        <td><span class="status-badge status-${d.status}">${d.status.toUpperCase()}</span></td>
+        <td>${d.dc_credited > 0 ? '+' + d.dc_credited + ' DC' : '—'}</td>
+        <td>${d.created_at}</td>
+        <td class="actions-cell print-hide">
+          ${d.status === 'pending' ? `
+            <button class="btn btn-approve" data-act="approve" data-id="${d.id}">Schválit</button>
+            <button class="btn btn-reject"  data-act="reject"  data-id="${d.id}">Zamítnout</button>
+          ` : '—'}
+        </td>
+      `;
+      tbody.appendChild(tr);
+
+      if (noteRow) {
+        const wrap = document.createElement('tbody');
+        wrap.innerHTML = noteRow;
+        tbody.appendChild(wrap.firstElementChild);
+      }
+    });
+
+    // Bind action buttons
+    tbody.querySelectorAll('button[data-act]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = parseInt(btn.dataset.id, 10);
+        const d  = rows.find(x => x.id === id);
+        if (!d) return;
+        currentDonation = d;
+        if (btn.dataset.act === 'approve') openApprove(d);
+        else openReject(d);
+      });
+    });
+  }
+
+  // === Approve modal ===
+  function openApprove(d) {
+    document.getElementById('approveErr').classList.remove('active');
+    document.getElementById('approveErr').textContent = '';
+    document.getElementById('approveMeta').innerHTML = `
+      <strong>${escapeHtml(d.user_email)}</strong> (Web ID ${d.web_user_id})<br>
+      Částka: <strong>${fmtAmount(d)}</strong> · VS: <code>${escapeHtml(d.variable_symbol)}</code><br>
+      Bude připsáno: <strong>${expectedDc(d)} DC</strong>
+    `;
+    document.getElementById('approveModal').classList.add('active');
+  }
+
+  document.getElementById('approveCancel').addEventListener('click', () => {
+    document.getElementById('approveModal').classList.remove('active');
+  });
+
+  document.getElementById('approveConfirm').addEventListener('click', async () => {
+    if (!currentDonation) return;
+    const errEl = document.getElementById('approveErr');
+    errEl.classList.remove('active');
+
+    try {
+      const r = await fetch('/admin/api/approve_donation.php', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': CSRF || ''
+        },
+        body: JSON.stringify({ donation_id: currentDonation.id })
+      });
+      const j = await r.json().catch(() => ({}));
+
+      if (!j.ok) {
+        errEl.textContent = 'Chyba: ' + (j.error || r.status);
+        errEl.classList.add('active');
+        return;
+      }
+      document.getElementById('approveModal').classList.remove('active');
+      await loadDonations();
+    } catch (e) {
+      console.error(e);
+      errEl.textContent = 'Chyba spojení.';
+      errEl.classList.add('active');
+    }
+  });
+
+  // === Reject modal ===
+  function openReject(d) {
+    document.getElementById('rejectErr').classList.remove('active');
+    document.getElementById('rejectErr').textContent = '';
+    document.getElementById('rejectReason').value = '';
+    document.getElementById('rejectMeta').innerHTML = `
+      <strong>${escapeHtml(d.user_email)}</strong> (Web ID ${d.web_user_id})<br>
+      Částka: <strong>${fmtAmount(d)}</strong> · VS: <code>${escapeHtml(d.variable_symbol)}</code>
+    `;
+    document.getElementById('rejectModal').classList.add('active');
+  }
+
+  document.getElementById('rejectCancel').addEventListener('click', () => {
+    document.getElementById('rejectModal').classList.remove('active');
+  });
+
+  document.getElementById('rejectConfirm').addEventListener('click', async () => {
+    if (!currentDonation) return;
+    const reason = document.getElementById('rejectReason').value.trim();
+    const errEl = document.getElementById('rejectErr');
+    errEl.classList.remove('active');
+
+    if (reason === '') {
+      errEl.textContent = 'Důvod je povinný (pošle se hráči emailem).';
+      errEl.classList.add('active');
+      return;
+    }
+
+    try {
+      const r = await fetch('/admin/api/reject_donation.php', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': CSRF || ''
+        },
+        body: JSON.stringify({
+          donation_id: currentDonation.id,
+          reason
+        })
+      });
+      const j = await r.json().catch(() => ({}));
+
+      if (!j.ok) {
+        errEl.textContent = 'Chyba: ' + (j.error || r.status);
+        errEl.classList.add('active');
+        return;
+      }
+      document.getElementById('rejectModal').classList.remove('active');
+      await loadDonations();
+    } catch (e) {
+      console.error(e);
+      errEl.textContent = 'Chyba spojení.';
+      errEl.classList.add('active');
+    }
+  });
+
+  // === Init ===
+  document.addEventListener('DOMContentLoaded', async () => {
+    await loadCsrf();
+    await loadDonations();
+    document.getElementById('btnApply').addEventListener('click', loadDonations);
+    document.getElementById('btnPrint').addEventListener('click', () => window.print());
+  });
+})();
+</script>
+
+<script>
+fetch('/admin/partials/admin_header.html')
+  .then(r => r.text())
+  .then(html => {
+    document.getElementById('adminHeader').innerHTML = html;
+    const links = document.querySelectorAll('.admin-nav a, .auth a');
+    const currentPath = window.location.pathname;
+    links.forEach(link => {
+      const href = link.getAttribute('href');
+      if (href && currentPath.includes(href.replace(/^\//, ''))) {
+        link.classList.add('active');
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

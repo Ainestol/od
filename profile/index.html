@@ -222,14 +222,90 @@
 
         <!-- Donate -->
         <div id="donate" class="rewards-panel">
-  <p class="muted">
-    Platební systém je momentálně pozastaven. Pracujeme na novém modelu podpory serveru.
-  </p>
+          <p class="muted">
+            Server je free-to-play. Pokud nás chceš podpořit dobrovolným darem,
+            můžeš poslat libovolnou částku na účet níže — jako <strong>poděkování</strong>
+            ti připíšeme Dragon Coiny, za které si můžeš v Tržišti vzít kosmetické věci nebo VIP.
+          </p>
 
-  <div class="muted" style="padding:20px; text-align:center; border:1px dashed #555; border-radius:8px; margin-top:10px;">
-    💤 Nákup Dragon Coinů je dočasně vypnutý.<br>
-    Dragon Coiny lze získat hlasováním pro server (Vote Coin → DC převod).
-  </div>
+          <!-- Hráčovo Web ID + VS pro daný rok -->
+          <div class="donate-id-box" id="donateIdBox">
+            <div>
+              <span class="muted">Tvoje Web ID:</span>
+              <strong id="donateUserId">—</strong>
+            </div>
+            <div>
+              <span class="muted">Variabilní symbol pro rok 2026:</span>
+              <strong id="donateVs">—</strong>
+              <button type="button" class="btn btn-small donate-copy" data-copy-target="#donateVs">Kopírovat</button>
+            </div>
+          </div>
+
+          <!-- Bankovní údaje -->
+          <h3 style="margin-top:20px;">Bankovní údaje</h3>
+          <div class="donate-bank">
+            <div><span class="muted">Číslo účtu:</span> <strong>3623547014/3030</strong>
+              <button type="button" class="btn btn-small donate-copy" data-copy-text="3623547014/3030">Kopírovat</button>
+            </div>
+            <div><span class="muted">IBAN:</span> <strong>CZ7130300000003623547014</strong>
+              <button type="button" class="btn btn-small donate-copy" data-copy-text="CZ7130300000003623547014">Kopírovat</button>
+            </div>
+            <div><span class="muted">SWIFT/BIC:</span> <strong>AIRACZPP</strong></div>
+            <div><span class="muted">Zpráva pro příjemce:</span>
+              <strong>Příspěvek na provoz serveru</strong>
+              <button type="button" class="btn btn-small donate-copy" data-copy-text="Příspěvek na provoz serveru">Kopírovat</button>
+            </div>
+          </div>
+
+          <!-- Conversion info -->
+          <p class="muted" style="margin-top:14px;">
+            <strong>Kurz:</strong> 5 Kč = 1 DC&nbsp;&nbsp;•&nbsp;&nbsp;1 EUR = 5 DC<br>
+            <em>Minimum: 25 Kč nebo 5 EUR. Není to nákup — DC dostáváš jako poděkování za podporu serveru.</em>
+          </p>
+
+          <hr style="margin:20px 0;">
+
+          <!-- Form: ohlásit provedený převod -->
+          <h3>Ohlásit provedený převod</h3>
+          <p class="muted">
+            Po odeslání převodu vyplň níže detaily. Po manuálním ověření ti připíšeme DC a obdržíš email.
+          </p>
+
+          <form id="donateForm" class="donate-form">
+            <div class="form-row">
+              <label for="donateAmount">Částka</label>
+              <input type="number" id="donateAmount" min="1" step="1" required placeholder="např. 100">
+            </div>
+
+            <div class="form-row">
+              <label for="donateCurrency">Měna</label>
+              <select id="donateCurrency">
+                <option value="CZK" selected>CZK (Kč)</option>
+                <option value="EUR">EUR (€)</option>
+              </select>
+            </div>
+
+            <div class="form-row">
+              <label for="donatePaidAt">Datum platby</label>
+              <input type="date" id="donatePaidAt" required>
+            </div>
+
+            <div class="form-row">
+              <label for="donateNote">Poznámka (volitelné, max 500 znaků)</label>
+              <textarea id="donateNote" maxlength="500" rows="3" placeholder="např. za nick X, omylem bez VS..."></textarea>
+            </div>
+
+            <div id="donateMsg" class="form-error" style="display:none;"></div>
+
+            <button type="submit" class="btn btn-primary">Odeslat žádost</button>
+          </form>
+
+          <hr style="margin:30px 0;">
+
+          <h3>Moje žádosti</h3>
+          <div id="myDonations" class="link-list">
+            <div class="muted">Načítám historii…</div>
+          </div>
 
   <!-- 🚫 PŮVODNÍ DONATE PACKS – DEAKTIVOVÁNO (ponecháno pro pozdější použití)
   <div class="donate-packs">
