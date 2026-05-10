@@ -987,50 +987,136 @@ body.auth-page.profile-page { overflow: auto; }
 }
 
 /* =========================
-   DONATE PANEL
+   DONATE PANEL — boxes + grid-aligned rows
 ========================= */
+
+/* Web ID + VS box — zlatě laděný, tlumený glow */
 .donate-id-box {
   margin-top: 14px;
-  padding: 14px 16px;
-  border: 1px solid rgba(212, 175, 55, 0.4);
+  padding: 16px 20px;
+  border: 1px solid rgba(212, 175, 55, 0.45);
   border-radius: 10px;
-  background: rgba(212, 175, 55, 0.06);
+  background:
+    linear-gradient(180deg, rgba(212, 175, 55, 0.08) 0%, rgba(212, 175, 55, 0.03) 100%);
+  box-shadow:
+    inset 0 0 20px rgba(212, 175, 55, 0.05),
+    0 0 14px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+}
+
+/* Bankovní údaje — tmavší, sklepně epický (inverzní k ID boxu) */
+.donate-bank {
+  margin-top: 10px;
+  padding: 16px 20px;
+  border: 1px solid #3a3322;
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(40, 8, 0, 0.18) 0%, rgba(0, 0, 0, 0.45) 100%);
+  box-shadow:
+    inset 0 0 24px rgba(0, 0, 0, 0.6),
+    0 0 12px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+}
+
+/* Decentní zlatý odlesk na horním okraji bank-boxu */
+.donate-bank::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 16px;
+  right: 16px;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(212, 175, 55, 0.5) 50%,
+    transparent 100%);
+}
+
+/* Každý řádek = grid: [label fixed] [value flex] [button auto] */
+.donate-id-box > div,
+.donate-bank > div {
+  display: grid;
+  grid-template-columns: 220px 1fr auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.donate-id-box .muted,
+.donate-bank .muted {
+  font-size: 13px;
+  letter-spacing: 0.3px;
 }
 
 .donate-id-box strong {
   color: #d4af37;
   font-family: "Cinzel", serif;
-  letter-spacing: 1px;
-  font-size: 16px;
-}
-
-.donate-bank {
-  margin-top: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 14px 16px;
-  border: 1px solid #3a3322;
-  border-radius: 8px;
-  background: rgba(0, 0, 0, 0.35);
+  letter-spacing: 1.5px;
+  font-size: 17px;
+  text-shadow: 0 0 6px rgba(212, 175, 55, 0.25);
 }
 
 .donate-bank strong {
   color: #d4af37;
-  letter-spacing: 0.3px;
-  font-family: monospace, "Courier New";
+  letter-spacing: 0.5px;
+  font-family: "Consolas", "Courier New", monospace;
   font-size: 14px;
-  margin-right: 8px;
+  word-break: break-all;
 }
 
+/* Copy button — brand zlatý, hover s glow */
 .donate-copy {
-  margin-left: 6px;
   font-size: 11px !important;
-  padding: 2px 8px !important;
+  padding: 5px 14px !important;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  background: rgba(212, 175, 55, 0.08) !important;
+  border: 1px solid rgba(212, 175, 55, 0.5) !important;
+  color: #d4af37 !important;
+  border-radius: 6px;
   cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  white-space: nowrap;
+  margin: 0 !important;
+}
+
+.donate-copy:hover {
+  background: rgba(212, 175, 55, 0.20) !important;
+  border-color: rgba(212, 175, 55, 0.9) !important;
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+}
+
+.donate-copy:active {
+  transform: translateY(1px);
+}
+
+/* Mobile — grid columns na sloupec, button na druhý řádek */
+@media (max-width: 600px) {
+  .donate-id-box > div,
+  .donate-bank > div {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "label   button"
+      "value   value";
+    row-gap: 4px;
+  }
+  .donate-id-box > div > .muted,
+  .donate-bank > div > .muted {
+    grid-area: label;
+  }
+  .donate-id-box > div > strong,
+  .donate-bank > div > strong {
+    grid-area: value;
+  }
+  .donate-id-box > div > .donate-copy,
+  .donate-bank > div > .donate-copy {
+    grid-area: button;
+    justify-self: end;
+  }
 }
 
 .donate-form {

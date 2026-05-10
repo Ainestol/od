@@ -1414,7 +1414,14 @@ async function loadVoteBalance() {
       const b = e.target;
       if (b.disabled) return;
 
-      if (!confirm(T.convertConfirm)) return;
+      // Místo nativního confirm() použijeme stylovaný showShopConfirm
+      const ok = await showShopConfirm({
+        title: isEn ? 'Convert Vote Coins' : 'Převod Vote Coinů',
+        text:  T.convertConfirm,
+        okLabel: isEn ? 'Convert' : 'Převést',
+        cancelLabel: isEn ? 'Cancel' : 'Zrušit'
+      });
+      if (!ok) return;
 
       b.disabled = true;
       b.textContent = T.processing;
