@@ -546,6 +546,47 @@ body.auth-page.profile-page { overflow: auto; }
 
 /*.shop-img{ filter: drop-shadow(0 0 6px rgba(0,0,0,.85)) contrast(1.1); } */
 
+/* === MOBILE — stack shop card vertikálně, ať se vejde na úzký viewport ===
+   Bez tohohle by se na mobilu .shop-actions vytlačily mimo obrazovku
+   a uživatel by musel scrollovat horizontálně. */
+@media (max-width: 768px) {
+  .shop-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  /* Obrázek na střed, zmenšený, aby nezabral celou stránku */
+  .shop-row .shop-img {
+    width: 100%;
+    max-width: 220px;
+    height: auto;
+    max-height: 220px;
+    margin: 0 auto;
+    flex: 0 0 auto;
+  }
+
+  .shop-row .shop-info {
+    text-align: center;
+  }
+
+  /* Cena, dropdown a Koupit pod sebou nebo na střed v jednom řádku */
+  .shop-row .shop-actions {
+    display: flex !important;
+    flex-wrap: wrap;
+    justify-content: center !important;
+    align-items: center;
+    gap: 8px !important;
+  }
+
+  /* Dropdown (postava/účet) na celou šířku, ať není těsný */
+  .shop-row .shop-actions select {
+    flex: 1 1 100%;
+    min-width: 0;
+    max-width: 260px;
+  }
+}
+
 .shop-confirm{
   border: 1px solid rgba(212,175,55,.35);
   box-shadow: 0 0 18px rgba(0,0,0,.65);
