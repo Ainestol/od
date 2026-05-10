@@ -21,36 +21,39 @@
   Admin panel
 </a>
     <a href="/api/logout.php?lang=en" class="btn">Logout</a>
-  </div>
-<div class="twofa-wrapper">
-  <div class="twofa-box" id="twofaBox">
-    
-    <button id="twofaToggle" class="twofa-btn">
-      Enable
-    </button>
 
-    <div id="twofaStatus" class="twofa-status">
-      Two-factor authentication is disabled
+    <div class="lang">
+      <a href="/profile/index.html">CS</a>
+      |
+      <a href="/profile/index-en.html" class="active">EN</a>
     </div>
 
+    <!-- 2FA status indicator — visual "lamp", click goes to Security tab -->
+    <a href="#" id="twofaIndicator" class="twofa-indicator twofa-indicator--off"
+       title="Security status — click to manage">
+      <span class="twofa-dot" aria-hidden="true"></span>
+      <span class="twofa-label">2FA</span>
+    </a>
   </div>
-</div>
 
 </header>
 
 <main class="auth-container profile-shell">
   
   <div class="profile-header">
-    <h1>My profile</h1>
+    <div class="profile-title-group">
+      <h1>My profile</h1>
+      <div id="profileWelcome" class="profile-welcome"></div>
+    </div>
 
     <div class="wallet-top">
-      <div id="voteBalanceTop" class="wallet-pill">
+      <div id="voteBalanceTop" class="wallet-pill" data-target-tab="vote" title="Click for server vote">
         <img src="/img/vote-coin.png" alt="" class="coin-icon coin-icon--top">
         <span>VC</span>
         <strong>0</strong>
       </div>
 
-      <div id="dcBalanceTop" class="wallet-pill">
+      <div id="dcBalanceTop" class="wallet-pill" data-target-tab="shop" title="Click for marketplace">
         <img src="/img/dragon-coin.png" alt="" class="coin-icon coin-icon--top">
         <span>DC</span>
         <strong>0</strong>
@@ -60,10 +63,9 @@
 
   <div class="profile-tabs">
     <button type="button" class="tab active" data-tab="accounts">Accounts</button>
-    <button type="button" class="tab" data-tab="vote">Server vote</button>
-    <button type="button" class="tab" data-tab="donate">Rewards System</button>
-    <button type="button" class="tab" data-tab="support">Bug report</button>
-    <button type="button" class="tab" data-tab="shop">Market</button>
+    <button type="button" class="tab" data-tab="rewards">Rewards</button>
+    <button type="button" class="tab" data-tab="security">Security</button>
+    <button type="button" class="tab" data-tab="support">Support</button>
   </div>
 
   <div class="profile-panels">
@@ -145,9 +147,21 @@
       <div id="gameAccountsList" class="mini-list"></div>
     </section>
 
-    <section id="vote" class="profile-card panel">
-      <h2>Server vote</h2>
-      
+    <!-- REWARDS (unified tab for Vote / Marketplace / Donate) -->
+    <section id="rewards" class="profile-card panel">
+      <h2>Rewards</h2>
+      <p class="muted">Vote, exchange your coins, or support the server with a voluntary donation.</p>
+
+      <div class="rewards-tabs sub-tabs">
+        <button type="button" class="tab active" data-rewards-tab="vote">Server vote</button>
+        <button type="button" class="tab" data-rewards-tab="shop">Marketplace</button>
+        <button type="button" class="tab" data-rewards-tab="donate">Donate</button>
+      </div>
+
+      <div class="rewards-panels">
+
+        <!-- Server vote -->
+        <div id="vote" class="rewards-panel active">
       <p class="muted">
   Click a site to vote. The list is loaded automatically from our database (all active vote sites).
 </p>
@@ -184,10 +198,10 @@
     </div>
   </div>
 </div>
-    </section>
+        </div>
 
-    <section id="shop" class="profile-card panel">
-  <h2>Marketplace</h2>
+        <!-- Marketplace -->
+        <div id="shop" class="rewards-panel">
   <p class="muted">Exchange for Dragon Coins (DC).</p>
 
   <div class="shop-tabs shop-subtabs">
@@ -203,10 +217,10 @@
   <div id="shopMounts" class="link-list" style="display:none;"></div>
   <div id="shopCloaks" class="link-list" style="display:none;"></div>
   <div id="shopCosmetic" class="link-list" style="display:none;"></div>
-</section>
+        </div>
 
-    <section id="donate" class="profile-card panel">
-  <h2>Donate</h2>
+        <!-- Donate -->
+        <div id="donate" class="rewards-panel">
   <p class="muted">
     The payment system is currently paused. We are working on a new server support model.
   </p>
@@ -280,10 +294,48 @@
 
   </div>
   -->
-</section>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SECURITY -->
+    <section id="security" class="profile-card panel">
+      <h2>Security</h2>
+      <p class="muted">
+        Protect your account with two-factor authentication. Even if someone
+        discovers your password, they cannot log in without the second step.
+      </p>
+
+      <div class="security-section">
+        <h3>Two-factor authentication (2FA)</h3>
+
+        <div class="twofa-wrapper">
+          <div class="twofa-box" id="twofaBox">
+            <button id="twofaToggle" class="twofa-btn">Enable</button>
+            <div id="twofaStatus" class="twofa-status">2FA: off</div>
+          </div>
+        </div>
+
+        <p class="muted security-hint">
+          When enabled, every login will require a 6-digit code from your
+          authenticator app (Microsoft Authenticator, Google Authenticator, etc.).
+          Without the code, no one can access your account — even with your password.
+        </p>
+      </div>
+    </section>
 
    <section id="support" class="profile-card panel">
-  <h2>Bug report</h2>
+  <h2>Support</h2>
+
+  <h3 style="margin-top:0;">My reports</h3>
+  <div id="myBugs" class="link-list">
+    <div class="muted">Loading reports…</div>
+  </div>
+
+  <hr style="margin:30px 0;">
+
+  <h3>Submit a new bug report</h3>
   <p class="muted">Something not working? Let us know.</p>
 
   <form id="bugForm">
@@ -314,15 +366,6 @@
       Submit report
     </button>
   </form>
-
-  <!-- 🔽 PŘESNĚ SEM TO PATŘÍ 🔽 -->
-  <hr style="margin:30px 0;">
-
-  <h3>My reports</h3>
-
-  <div id="myBugs" class="link-list">
-    <div class="muted">Loading reports…</div>
-  </div>
 </section>
 
 
