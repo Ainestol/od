@@ -39,6 +39,14 @@
 
     <form id="registerForm" class="auth-form">
 
+      <!-- Honeypot — anti-bot field hidden from humans via CSS.
+           Bots fill all inputs, so a non-empty value here = reject server-side. -->
+      <div class="honeypot" aria-hidden="true">
+        <label>Website (don't fill this out)
+          <input type="text" name="website" tabindex="-1" autocomplete="off">
+        </label>
+      </div>
+
       <div class="form-group">
         <label for="email">Email address</label>
         <input
@@ -120,6 +128,13 @@
 
   <!-- FOOTER -->
   <footer class="main-footer">
+    <div class="footer-links">
+      <a href="https://discord.gg/tcST38pfqZ" target="_blank" rel="noopener">Discord</a>
+      <span class="dot">·</span>
+      <a href="/pages/rules-en.html">Rules</a>
+      <span class="dot">·</span>
+      <a href="/pages/gdpr-en.html">GDPR</a>
+    </div>
     <p>© Ordo Draconis</p>
   </footer>
 

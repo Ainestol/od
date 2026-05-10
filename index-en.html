@@ -38,11 +38,18 @@
           <a href="index.html">CS</a> |
           <a href="index-en.html" class="active">EN</a>
 
-          <div class="server-status online">
-            <span class="dot"></span>
-            Online
-            <span class="divider">·</span>
-            <span class="players"></span>
+          <div class="server-status">
+            <div class="status-line">
+              <span class="dot dot-ls"></span>
+              <span class="label">Login Server</span>
+            </div>
+            <div class="status-line">
+              <span class="dot dot-gs"></span>
+              <span class="label">Game Server</span>
+            </div>
+            <div class="status-players">
+              <span class="players" data-label="players" data-offline-label="Offline">—</span>
+            </div>
           </div>
         </div>
       </div>
@@ -57,47 +64,137 @@
     </nav>
 
     <div class="content-box">
+
+      <h3>Why Ordo Draconis?</h3>
+      <ul class="why-list">
+        <li>Interlude without customs, retail-like experience</li>
+        <li>QoL features and no pay-to-win</li>
+        <li>Friendly for newcomers, deep for veterans</li>
+      </ul>
+
       <h3>Basic server settings</h3>
 
-      <div class="rates-grid">
+      <div class="rates-grid basic-rates">
 
         <div class="rate-card">
-          <button type="button" class="rate-title">XP RATE</button>
+          <button type="button" class="rate-title">XP / SP RATE</button>
           <div class="rate-detail">
-            XP rate 3×<br>
-            After level 55: 2×<br>
-            After level 74: 1×
+            Lvl 1–55: 3×<br>
+            Lvl 56–74: 2×<br>
+            Lvl 75+: 1×<br>
+            Party: 2.4×
           </div>
         </div>
 
         <div class="rate-card">
-          <button type="button" class="rate-title">SP RATE</button>
+          <button type="button" class="rate-title">DROP</button>
           <div class="rate-detail">
-            SP rate 3×
+            Chance: 4×<br>
+            Amount: 1×
           </div>
         </div>
 
         <div class="rate-card">
-          <button type="button" class="rate-title">DROP RATE</button>
+          <button type="button" class="rate-title">SPOIL</button>
           <div class="rate-detail">
-            Drop rate 4×<br>
-            Raid Bosses: 3×<br>
-            </div>
+            Spoil: 4×
+          </div>
         </div>
 
         <div class="rate-card">
-          <button type="button" class="rate-title">SPOIL RATE</button>
+          <button type="button" class="rate-title">ADENA &amp; SEAL</button>
           <div class="rate-detail">
-            Spoil rate 4×
+            Adena chance: 1.5×<br>
+            Adena amount: 3×<br>
+            Seal Stones amount: 3×
+          </div>
+        </div>
+
+        <div class="rate-card">
+          <button type="button" class="rate-title">QUEST</button>
+          <div class="rate-detail">
+            XP / SP / Adena: 4×<br>
+            Pet XP: 4×
+          </div>
+        </div>
+
+        <div class="rate-card">
+          <button type="button" class="rate-title">RAID BOSS</button>
+          <div class="rate-detail">
+            Drop rate: 3×
+          </div>
+        </div>
+
+      </div>
+
+      <h3>Key systems</h3>
+      <div class="rates-grid systems">
+
+        <div class="rate-card">
+          <button type="button" class="rate-title">SMART BUFFER</button>
+          <div class="rate-detail">
+            Buffer NPC gives you all buffs at once with a 2-hour duration.<br><br>
+            Lvl 1–40: free<br>
+            Lvl 41–69: 1 Event Medal / buff<br>
+            Lvl 70+: 1 Glittering Medal / buff<br><br>
+            Special buffs: 2× price<br>
+            Nobless: 3× price<br><br>
+            Buffs your pet and servitors too.
+          </div>
+        </div>
+
+        <div class="rate-card">
+          <button type="button" class="rate-title">ENCHANT</button>
+          <div class="rate-detail">
+            Safe: +3 weapon / +4 full armor<br>
+            Max: +21<br><br>
+            +1 → +3:&nbsp; 100 %<br>
+            +4 → +14: 95 % → 65 % (−3 % / lvl)<br>
+            +15 → +21: 60 % → 30 % (−5 % / lvl)<br><br>
+            Normal scroll fail: crystals<br>
+            Blessed scroll fail: drops to +0
+          </div>
+        </div>
+
+        <div class="rate-card">
+          <button type="button" class="rate-title">CHAMPIONS</button>
+          <div class="rate-detail">
+            3 % of mobs (lvl 20–89) are champions.<br>
+            Passive (won't attack first), red aura.<br><br>
+            HP 3×, Atk 2×, Speed 2×<br>
+            EXP/SP 3×, drop 3×<br>
+            Adena/Seal amount 4×<br><br>
+            Medal drop (80 % chance):<br>
+            Lvl 20–65: Event Medal<br>
+            Lvl 66–89: Glittering Medal
           </div>
         </div>
 
       </div>
 
       <div class="server-extra">
-        <p>Working pet quests.</p>
-        <p>Castles, geodata, adventurer (RB finder).</p>
-        <p>Drop info.</p>
+        <h4>For newcomers</h4>
+        <p>Free buffer up to level 40</p>
+        <p>Starter quests with shots in every starter zone</p>
+        <p>MissQueen — newbie support NPC</p>
+        <p>Adventurer NPC (RB finder) shows you raid boss locations</p>
+        <p>Free 24h VIP for voting</p>
+      </div>
+
+      <div class="server-extra">
+        <h4>Fair play</h4>
+        <p>Everything free, no pay-to-win</p>
+        <p>Shop only cosmetics (cloaks, mounts, skins) paid via vote coins</p>
+        <p>VC ↔ DC exchange in player profile</p>
+        <p>No custom stats, no sold buffs</p>
+      </div>
+
+      <div class="server-extra">
+        <h4>Features</h4>
+        <p>Auto Loot on, Auto Learn Skills off (retail-feel)</p>
+        <p>Geodata „deMEV", working quests, pet quests + evolution (Wolf → Great Wolf → Fenrir)</p>
+        <p>Top clans, players and RB tracker in the <a href="pages/world-en.html">World</a> tab.</p>
+        <p>Bug report directly from the web, Discord for communication.</p>
       </div>
     </div>
 
@@ -164,52 +261,24 @@
 </div>
 
 <script>
-const rateButtons = document.querySelectorAll('.rate-title');
-
-rateButtons.forEach(button => {
-  button.addEventListener('click', () => {
-    const currentCard = button.closest('.rate-card');
-    const isOpen = currentCard.classList.contains('open');
-
-    document.querySelectorAll('.rate-card').forEach(card => {
-      card.classList.remove('open');
-    });
-
-    if (!isOpen) {
-      currentCard.classList.add('open');
+// Klikatelná je celá karta. Když je karta otevřená a klik míří
+// dovnitř .rate-detail, nezavírám — ať jde označovat text.
+const rateCards = document.querySelectorAll('.rate-card');
+rateCards.forEach(card => {
+  card.addEventListener('click', (e) => {
+    if (card.classList.contains('open') && e.target.closest('.rate-detail')) {
+      return;
     }
+    const isOpen = card.classList.contains('open');
+    rateCards.forEach(c => c.classList.remove('open'));
+    if (!isOpen) card.classList.add('open');
   });
 });
 </script>
 
 <script>
-async function updateServerStatus() {
-  try {
-    const res = await fetch('/api/status.php');
-    const data = await res.json();
+// status panel řeší /js/server-status.js (vloženo níže)
 
-    const dot = document.querySelector('.server-status .dot');
-    const players = document.querySelector('.server-status .players');
-
-    if (!dot || !players) return;
-
-    if (data.online) {
-      dot.style.background = '#2ecc71';
-      players.textContent = data.players + ' Players';
-    } else {
-      dot.style.background = '#e74c3c';
-      players.textContent = 'Offline';
-    }
-  } catch (e) {
-    console.error('Status error', e);
-  }
-}
-
-updateServerStatus();
-setInterval(updateServerStatus, 10000);
-
- updateServerStatus();
-      setInterval(updateServerStatus, 10000);
 // WIPE NOTICE AUTO HIDE
 if (!localStorage.getItem("wipeSeen")) {
   setTimeout(() => {
@@ -223,5 +292,6 @@ if (!localStorage.getItem("wipeSeen")) {
 }
 </script>
 
+<script src="/js/server-status.js" defer></script>
 </body>
 </html>

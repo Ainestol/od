@@ -21,6 +21,21 @@ if (!is_array($input) || empty($input)) {
   exit;
 }
 
+// --- HONEYPOT (anti-bot) ---
+// V HTML formuláři je skryté pole `website` — lidem se nezobrazí, takže
+// zůstane prázdné. Boti vyplňují všechna pole bez výjimky → pokud má hodnotu,
+// jde o bota. Vrátíme falešný úspěch, ať si bot myslí že prošel a odejde,
+// ale do DB nic nezapíšeme a žádný e-mail nepošleme.
+if (!empty(trim((string)($input['website'] ?? '')))) {
+  error_log('[register] honeypot triggered ip=' . ($_SERVER['REMOTE_ADDR'] ?? '?'));
+  echo json_encode([
+    "status" => "ok",
+    "message" => "User registered, verification email sent",
+    "email_sent" => true
+  ]);
+  exit;
+}
+
 $email    = trim((string)($input['email'] ?? ''));
 $password = (string)($input['password'] ?? '');
 $lang     = (($input['lang'] ?? 'cs') === 'en') ? 'en' : 'cs';

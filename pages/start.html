@@ -30,11 +30,18 @@
           <a href="start.html" class="active">CS</a> |
           <a href="start-en.html">EN</a>
 
-          <div class="server-status online">
-            <span class="dot"></span>
-            Online
-            <span class="divider">·</span>
-            <span class="players"></span>
+          <div class="server-status">
+            <div class="status-line">
+              <span class="dot dot-ls"></span>
+              <span class="label">Login Server</span>
+            </div>
+            <div class="status-line">
+              <span class="dot dot-gs"></span>
+              <span class="label">Game Server</span>
+            </div>
+            <div class="status-players">
+              <span class="players" data-label="hráčů" data-offline-label="Offline">—</span>
+            </div>
           </div>
         </div>
       </div>
@@ -159,32 +166,7 @@
   </aside>
 </div>
 
-<script>
-async function updateServerStatus() {
-  try {
-    const res = await fetch('/api/status.php');
-    const data = await res.json();
-
-    const dot = document.querySelector('.server-status .dot');
-    const players = document.querySelector('.server-status .players');
-
-    if (!dot || !players) return;
-
-    if (data.online) {
-      dot.style.background = '#2ecc71';
-      players.textContent = data.players + ' Hráčů';
-    } else {
-      dot.style.background = '#e74c3c';
-      players.textContent = 'Offline';
-    }
-  } catch (e) {
-    console.error('Status error', e);
-  }
-}
-
-updateServerStatus();
-setInterval(updateServerStatus, 10000);
-</script>
+<script src="/js/server-status.js" defer></script>
 
 </body>
 </html>

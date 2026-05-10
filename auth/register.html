@@ -39,6 +39,14 @@
 
         <form id="registerForm" class="auth-form">
 
+            <!-- Honeypot — anti-bot ochrana. Lidem je toto pole skryté přes CSS,
+                 ale boti, kteří plní všechny inputy, ho vyplní a server je odmítne. -->
+            <div class="honeypot" aria-hidden="true">
+                <label>Website (don't fill this out)
+                    <input type="text" name="website" tabindex="-1" autocomplete="off">
+                </label>
+            </div>
+
             <div class="form-group">
                 <label for="email">E-mailová adresa</label>
                 <input
@@ -120,6 +128,13 @@
 
     <!-- FOOTER -->
     <footer class="main-footer">
+        <div class="footer-links">
+            <a href="https://discord.gg/tcST38pfqZ" target="_blank" rel="noopener">Discord</a>
+            <span class="dot">·</span>
+            <a href="/pages/rules.html">Pravidla</a>
+            <span class="dot">·</span>
+            <a href="/pages/gdpr.html">GDPR</a>
+        </div>
         <p>© Ordo Draconis</p>
     </footer>
 
