@@ -1038,17 +1038,16 @@ if (btn.dataset.mode === 'disable') {
           el.className = 'char-row';
 
           const vipData = vipMap[ch.charId];
-          let vipTag = '';
+          let vipTag = '<span class="char-vip-empty"></span>';
           if (vipData && vipData.hasVip) {
-            vipTag = `<span class="tag vip">VIP do ${vipData.endAt}</span>`;
+            const label = isEn ? 'VIP until' : 'VIP do';
+            vipTag = `<span class="tag vip">${label} ${formatDateTime(vipData.endAt)}</span>`;
           }
 
           el.innerHTML = `
-            <span><strong>${ch.char_name}</strong></span>
-            <span>Lv ${ch.level}</span>
-            <span class="${ch.online ? 'online' : 'offline'}">
-              ${ch.online ? 'ONLINE' : 'offline'}
-            </span>
+            <span class="char-name"><strong>${escapeHtml(ch.char_name)}</strong></span>
+            <span class="char-lvl">Lv ${ch.level}</span>
+            <span class="char-state ${ch.online ? 'online' : 'offline'}">${ch.online ? 'ONLINE' : 'offline'}</span>
             ${vipTag}
           `;
           box.appendChild(el);
@@ -1731,6 +1730,25 @@ function ensureShopInit() {
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;');
+  }
+
+  // "2026-07-09 19:17:35" → "19:17 9. 7. 2026"  (CS)
+  // Pro EN: "19:17 Jul 9, 2026"
+  function formatDateTime(s) {
+    if (!s) return '';
+    // Parse SQL DATETIME nebo ISO (toleruje obojí)
+    const d = new Date(String(s).replace(' ', 'T'));
+    if (isNaN(d.getTime())) return s; // pokud nelze parsovat, vrátíme original
+    const hh = String(d.getHours()).padStart(2, '0');
+    const mm = String(d.getMinutes()).padStart(2, '0');
+    const day   = d.getDate();
+    const month = d.getMonth() + 1;
+    const year  = d.getFullYear();
+    if (isEn) {
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      return `${hh}:${mm} ${months[d.getMonth()]} ${day}, ${year}`;
+    }
+    return `${hh}:${mm} ${day}. ${month}. ${year}`;
   }
 
   function calcDonateVs(webId, year) {

@@ -360,18 +360,65 @@ body.auth-page.profile-page { overflow: auto; }
 }
 
 .char-row {
-  display: flex;
+  /* Grid: name | level | status | VIP tag — všechno zarovnané sloupcově */
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) 60px 80px auto;
   gap: 12px;
-  padding: 4px 0;
+  align-items: center;
+  padding: 6px 4px;
   font-size: 14px;
+  border-bottom: 1px solid rgba(58, 51, 34, 0.3);
 }
 
-.char-row .online {
-  color: #4caf50;
+.char-row:last-child {
+  border-bottom: none;
 }
 
-.char-row .offline {
-  color: #888;
+.char-row .char-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.char-row .char-lvl {
+  color: #bfb8a0;
+  letter-spacing: 0.3px;
+}
+
+.char-row .char-state {
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.char-row .char-state.online {
+  color: #c89b3c;
+  text-shadow: 0 0 4px rgba(200, 155, 60, 0.4);
+}
+
+.char-row .char-state.offline {
+  color: #6f6a58;
+}
+
+/* prázdný placeholder když postava nemá VIP — grid si zachová sloupec */
+.char-row .char-vip-empty {
+  display: block;
+}
+
+/* Mobile — stack vertikálně, čitelnější na úzké šířce */
+@media (max-width: 600px) {
+  .char-row {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "name   state"
+      "level  vip";
+    row-gap: 4px;
+  }
+  .char-row .char-name  { grid-area: name; }
+  .char-row .char-lvl   { grid-area: level; }
+  .char-row .char-state { grid-area: state; justify-self: end; }
+  .char-row .tag.vip,
+  .char-row .char-vip-empty { grid-area: vip; justify-self: end; }
 }
 .tag.vip {
   background: #d4af37;
