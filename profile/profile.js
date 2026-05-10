@@ -579,18 +579,9 @@ if (btn.dataset.mode === 'disable') {
       return;
     }
 
-    // Lokální helpers pro formátování (jeden set pro všechny účty)
-    const formatDate = (ms) => {
-      if (!ms) return '';
-      const d = new Date(Number(ms));
-      if (isEn) {
-        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
-      }
-      return `${d.getDate()}. ${d.getMonth() + 1}. ${d.getFullYear()}`;
-    };
-
+    // Lokální helpers pro formátování (gramatika).
+    // formatDateTime() je globální helper definovaný výše (sjednocený formát
+    // datumu+času pro celý profil).
     const charsLabel = (n) => {
       if (isEn) return `${n} character${n === 1 ? '' : 's'}`;
       if (n === 1) return `${n} postava`;
@@ -620,7 +611,7 @@ if (btn.dataset.mode === 'disable') {
         const left = Number(acc.premium_days_left);
         if (left < 0) return `<span class="tag danger">${tExpired}</span>`;
 
-        const dateStr = formatDate(acc.premium_end_ms);
+        const dateStr = formatDateTime(acc.premium_end_ms);
         const labelText = isEn
           ? `Premium until ${dateStr} (${daysLabel(left)})`
           : `Premium do ${dateStr} (${daysLabel(left)})`;
@@ -1040,7 +1031,7 @@ if (btn.dataset.mode === 'disable') {
           const vipData = vipMap[ch.charId];
           let vipTag = '<span class="char-vip-empty"></span>';
           if (vipData && vipData.hasVip) {
-            const label = isEn ? 'VIP until' : 'VIP do';
+            const label = isEn ? 'Premium until' : 'Premium do';
             vipTag = `<span class="tag vip">${label} ${formatDateTime(vipData.endAt)}</span>`;
           }
 
@@ -1732,23 +1723,37 @@ function ensureShopInit() {
       .replace(/'/g, '&#39;');
   }
 
-  // "2026-07-09 19:17:35" → "19:17 9. 7. 2026"  (CS)
-  // Pro EN: "19:17 Jul 9, 2026"
-  function formatDateTime(s) {
-    if (!s) return '';
-    // Parse SQL DATETIME nebo ISO (toleruje obojí)
-    const d = new Date(String(s).replace(' ', 'T'));
-    if (isNaN(d.getTime())) return s; // pokud nelze parsovat, vrátíme original
-    const hh = String(d.getHours()).padStart(2, '0');
-    const mm = String(d.getMinutes()).padStart(2, '0');
+  // Univerzální formátování datumu+času. Akceptuje:
+  //   - SQL datetime string: "2026-07-09 19:17:35"
+  //   - ISO string: "2026-07-09T19:17:35"
+  //   - milisekundy (Number nebo string s číslicemi): 1783800000000
+  //
+  // Výstup:
+  //   CS: "9. 7. 2026 19:17 hod"
+  //   EN: "Jul 9, 2026 19:17"
+  function formatDateTime(input) {
+    if (input === null || input === undefined || input === '') return '';
+    let d;
+    // Detekce: pokud je číslo nebo string složený jen z číslic → milisekundy
+    if (typeof input === 'number' || /^\d+$/.test(String(input))) {
+      d = new Date(Number(input));
+    } else {
+      // SQL/ISO string
+      d = new Date(String(input).replace(' ', 'T'));
+    }
+    if (isNaN(d.getTime())) return String(input);
+
+    const hh    = String(d.getHours()).padStart(2, '0');
+    const mm    = String(d.getMinutes()).padStart(2, '0');
     const day   = d.getDate();
     const month = d.getMonth() + 1;
     const year  = d.getFullYear();
+
     if (isEn) {
       const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-      return `${hh}:${mm} ${months[d.getMonth()]} ${day}, ${year}`;
+      return `${months[d.getMonth()]} ${day}, ${year} ${hh}:${mm}`;
     }
-    return `${hh}:${mm} ${day}. ${month}. ${year}`;
+    return `${day}. ${month}. ${year} ${hh}:${mm} hod`;
   }
 
   function calcDonateVs(webId, year) {
