@@ -76,24 +76,17 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
 </div>
 </div>
   <div class="admin-grid">
-  
-  </div>
+
     <div class="admin-card">
-      <h3>Bug reports</h3>
-      <p>Přehled hlášených chyb od hráčů.</p>
-      <a href="/admin/bug_reports.html" class="btn btn-primary">Otevřít</a>
+      <h3>Uživatelé</h3>
+      <p>Přehled WEB → GAME → CHAR</p>
+      <a href="/admin/users.html" class="btn btn-primary">Otevřít</a>
     </div>
 
     <div class="admin-card">
-      <h3>VIP & Wallet</h3>
+      <h3>VIP &amp; Wallet</h3>
       <p>Správa VIP, DC a uživatelských výhod</p>
       <a href="/admin/vip.html" class="btn btn-primary">Otevřít</a>
-    </div>
-
-    <div class="admin-card">
-      <h3>Online players</h3>
-      <p>Aktuálně přihlášení hráči</p>
-      <a href="/admin/online_players.html" class="btn btn-primary">Otevřít</a>
     </div>
 
     <div class="admin-card">
@@ -103,15 +96,29 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     </div>
 
     <div class="admin-card">
-      <h3>Uživatelé</h3>
-      <p>Přehled WEB → GAME → CHAR</p>
-      <a href="/admin/users.html" class="btn btn-primary">Otevřít</a>
+      <h3>Donations</h3>
+      <p>Schvalování darů od hráčů</p>
+      <a href="/admin/donations.html" class="btn btn-primary">Otevřít</a>
     </div>
- <div class="admin-card">
+
+    <div class="admin-card">
+      <h3>Bug reports</h3>
+      <p>Přehled hlášených chyb od hráčů</p>
+      <a href="/admin/bug_reports.html" class="btn btn-primary">Otevřít</a>
+    </div>
+
+    <div class="admin-card">
+      <h3>Online players</h3>
+      <p>Aktuálně přihlášení hráči</p>
+      <a href="/admin/online_players.html" class="btn btn-primary">Otevřít</a>
+    </div>
+
+    <div class="admin-card">
       <h3>Přehled všech akcí</h3>
       <p>Logy, výpisy</p>
       <a href="/admin/logs.html" class="btn btn-primary">Otevřít</a>
     </div>
+
   </div>
 
 </main>

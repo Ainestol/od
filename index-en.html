@@ -11,12 +11,6 @@
 
 <body class="scroll-right logo-pulse">
 
-<div id="wipeNotice" class="wipe-notice">
-  ⚔️ SERVER WIPE COMPLETE ⚔️<br>
-  Today 01.05.2026 at 15:00 the server has been wiped.<br>
-  Start fresh and prove your strength! 🔥
-</div>
-
 <div class="layout">
 
   <!-- LEFT SIDE -->
@@ -278,18 +272,6 @@ rateCards.forEach(card => {
 
 <script>
 // status panel řeší /js/server-status.js (vloženo níže)
-
-// WIPE NOTICE AUTO HIDE
-if (!localStorage.getItem("wipeSeen")) {
-  setTimeout(() => {
-    const el = document.getElementById('wipeNotice');
-    if (el) el.remove();
-    localStorage.setItem("wipeSeen", "1");
-  }, 300000); // 5 min
-} else {
-  const el = document.getElementById('wipeNotice');
-  if (el) el.remove();
-}
 </script>
 
 <script src="/js/server-status.js" defer></script>
