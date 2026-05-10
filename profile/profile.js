@@ -1315,7 +1315,9 @@ async function loadVoteBalance() {
 
     select.innerHTML = '';
 
-    const resAcc = await fetch('/api/list_game_accounts.php', { credentials: 'same-origin' });
+    // list_game_accounts_min.php vrací {id, login} — to je co potřebujeme
+    // (full list_game_accounts.php nevrací id v current schema)
+    const resAcc = await fetch('/api/list_game_accounts_min.php', { credentials: 'same-origin' });
     const dataAcc = await resAcc.json().catch(() => ({}));
     if (!dataAcc.ok || !Array.isArray(dataAcc.accounts)) return;
 
@@ -1363,13 +1365,13 @@ async function loadVoteBalance() {
       const currency      = document.getElementById('premium24Currency')?.value || '';
 
       try {
+        // POZN: nepředáváme X-CSRF-Token explicitně — monkey-patched fetch
+        // (řádek 84) ho automaticky přidá jako 'X-CSRF-TOKEN'. Explicit header
+        // by case-kolidoval a CSRF check by selhal.
         const res = await fetch('/api/activate_premium_24h.php', {
           method: 'POST',
           credentials: 'same-origin',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-Token': window.CSRF_TOKEN || ''
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             game_account_id: gameAccountId,
             currency
@@ -1884,13 +1886,11 @@ function ensureShopInit() {
         }
 
         try {
+          // CSRF token přidává monkey-patched fetch (řádek 84) automaticky
           const res = await fetch('/api/submit_donation.php', {
             method: 'POST',
             credentials: 'same-origin',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-CSRF-Token': window.CSRF_TOKEN || ''
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               amount, currency,
               paid_at: paidAt,
