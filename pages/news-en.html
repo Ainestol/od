@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>News | Ordo Draconis</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/mobile.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="scroll-right logo-pulse mobile-server">
+<div class="layout">
+
+  <div class="hero-bg hero-world"></div>
+  <div class="hero-gap"></div>
+
+  <aside class="right">
+
+    <div class="side-header">
+      <div class="side-logo">Ordo Draconis - L2 Interlude </div>
+      <div class="top-actions">
+        <div class="auth">
+          <a href="/auth/register-en.html" class="btn">Registration</a>
+          <a href="/auth/login-en.html" class="btn">Login</a>
+        </div>
+
+        <div class="lang">
+          <a href="news.html">CS</a> |
+          <a href="news-en.html" class="active">EN</a>
+
+          <div class="server-status">
+            <div class="status-line">
+              <span class="dot dot-ls"></span>
+              <span class="label">Login Server</span>
+            </div>
+            <div class="status-line">
+              <span class="dot dot-gs"></span>
+              <span class="label">Game Server</span>
+            </div>
+            <div class="status-players">
+              <span class="players" data-label="players" data-offline-label="Offline">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="side-nav">
+      <a href="../index-en.html">Home</a>
+      <a href="server-en.html">About server</a>
+      <a href="start-en.html">How to start</a>
+      <a href="world-en.html">World</a>
+      <a href="donate-en.html">Rewards System</a>
+      <a href="news-en.html" class="active">News</a>
+    </nav>
+
+    <div class="content-box">
+      <h3>📜 Server News</h3>
+      <p class="muted">
+        Changes, fixes, news and events. Newest on top.
+      </p>
+
+      <div class="changelog-page-tabs" id="filterTabs">
+        <button type="button" class="tab active" data-cat="all">All</button>
+        <button type="button" class="tab" data-cat="feature">🆕 News</button>
+        <button type="button" class="tab" data-cat="fix">🔧 Fixes</button>
+        <button type="button" class="tab" data-cat="change">⚔ Changes</button>
+        <button type="button" class="tab" data-cat="important">⚠ Important</button>
+        <button type="button" class="tab" data-cat="event">🎉 Events</button>
+      </div>
+
+      <div id="changelogList" class="changelog-items">
+        <div class="muted">Loading…</div>
+      </div>
+    </div>
+
+    <div class="page-footer">
+      <div class="footer-links">
+        <a href="https://discord.gg/tcST38pfqZ" target="_blank" rel="noopener">Discord</a>
+        <span class="dot">·</span>
+        <a href="rules-en.html">Rules</a>
+        <span class="dot">·</span>
+        <a href="gdpr-en.html">GDPR</a>
+      </div>
+    </div>
+
+  </aside>
+</div>
+
+<script>
+(function(){
+  const CAT = {
+    feature:   { icon: '🆕', label: 'New',       cls: 'success' },
+    fix:       { icon: '🔧', label: 'Fix',       cls: 'gold' },
+    change:    { icon: '⚔',  label: 'Change',    cls: 'warning' },
+    important: { icon: '⚠',  label: 'Important', cls: 'danger' },
+    event:     { icon: '🎉', label: 'Event',     cls: 'event' }
+  };
+  let all = [];
+  let activeCat = 'all';
+
+  function fmt(s){
+    const d = new Date(String(s).replace(' ','T'));
+    if (isNaN(d.getTime())) return s;
+    const m = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return `${m[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+  }
+  function esc(s){
+    if (s==null) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+  function render(){
+    const box = document.getElementById('changelogList');
+    const items = (activeCat === 'all') ? all : all.filter(e => e.category === activeCat);
+    if (!items.length){
+      box.innerHTML = '<div class="muted">No entries in this category.</div>';
+      return;
+    }
+    box.innerHTML = items.map(e => {
+      const m = CAT[e.category] || CAT.change;
+      const fb = e.lang_fallback ? ' <span class="changelog-fallback" title="CZ original">[CZ]</span>' : '';
+      return `
+        <article class="changelog-item changelog-cat-${m.cls}">
+          <div class="changelog-item-head">
+            <span class="changelog-cat">${m.icon} ${m.label}</span>
+            <span class="changelog-date">${fmt(e.created_at)}</span>
+          </div>
+          <h4 class="changelog-title">${esc(e.title)}${fb}</h4>
+          <div class="changelog-body">${esc(e.body).replace(/\n/g,'<br>')}</div>
+        </article>
+      `;
+    }).join('');
+  }
+
+  async function load(){
+    try {
+      const r = await fetch('/api/list_changelog.php?limit=200&lang=en', { cache: 'no-store' });
+      const d = await r.json();
+      if (!d.ok){ document.getElementById('changelogList').innerHTML = '<div class="muted">Failed to load.</div>'; return; }
+      all = d.entries || [];
+      render();
+    } catch(e){ console.error(e); document.getElementById('changelogList').innerHTML = '<div class="muted">Connection error.</div>'; }
+  }
+
+  document.getElementById('filterTabs').addEventListener('click', e => {
+    const btn = e.target.closest('.tab');
+    if (!btn) return;
+    document.querySelectorAll('#filterTabs .tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeCat = btn.dataset.cat;
+    render();
+  });
+
+  load();
+})();
+</script>
+<script src="/js/server-status.js" defer></script>
+</body>
+</html>

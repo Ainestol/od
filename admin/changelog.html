@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin – Aktuality</title>
+  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/mobile.css">
+
+  <style>
+    .changelog-admin-toolbar {
+      display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px;
+    }
+    .changelog-admin-toolbar .btn { padding: 8px 14px; }
+
+    .cl-entry {
+      border: 1px solid #2a2418;
+      border-left: 3px solid #c89b3c;
+      padding: 14px 18px;
+      background: rgba(0,0,0,0.35);
+      border-radius: 4px;
+      margin-bottom: 12px;
+    }
+    .cl-entry-head {
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 10px; margin-bottom: 6px;
+    }
+    .cl-cat-success { border-left-color: rgba(136, 176, 112, 0.7); }
+    .cl-cat-gold    { border-left-color: rgba(212, 175, 55, 0.7); }
+    .cl-cat-warning { border-left-color: rgba(232, 167, 60, 0.7); }
+    .cl-cat-danger  { border-left-color: rgba(194, 85, 74, 0.7); }
+    .cl-cat-event   { border-left-color: rgba(255, 215, 100, 0.9); }
+    .cl-meta { color: #8f876b; font-size: 12px; }
+    .cl-title { color: #e8dfc4; margin: 4px 0 6px; font-size: 16px; }
+    .cl-body  { color: #bfb8a0; font-size: 13px; line-height: 1.55; white-space: pre-wrap; }
+    .cl-actions .btn { padding: 4px 10px; font-size: 12px; margin-left: 4px; }
+    .cl-draft-badge {
+      background: rgba(120,110,90,0.3); color: #8f876b;
+      padding: 2px 8px; border-radius: 4px; font-size: 11px;
+      margin-left: 6px;
+    }
+
+    /* Modal */
+    .clmodal-backdrop {
+      display: none;
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+      z-index: 9000; align-items: center; justify-content: center;
+    }
+    .clmodal-backdrop.active { display: flex; }
+    .clmodal {
+      background: #111; border: 1px solid #d4af37;
+      padding: 22px; border-radius: 8px;
+      max-width: 700px; width: 92%;
+      max-height: 90vh; overflow-y: auto;
+      color: #ddd;
+    }
+    .clmodal h3 { color: #d4af37; margin-top: 0; }
+    .clmodal label {
+      display: block; font-size: 13px; color: #bfb8a0; margin: 12px 0 4px;
+    }
+    .clmodal input,
+    .clmodal select,
+    .clmodal textarea {
+      width: 100%;
+      padding: 8px 10px;
+      background: #0b0b0b;
+      color: #ddd;
+      border: 1px solid #3a3322;
+      border-radius: 4px;
+      font: inherit;
+      box-sizing: border-box;
+    }
+    .clmodal textarea { min-height: 90px; resize: vertical; }
+    .clmodal-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .clmodal-actions {
+      display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px;
+    }
+    .clmodal-error {
+      color: #c2554a; margin-top: 8px; font-size: 13px; display: none;
+    }
+    .clmodal-error.active { display: block; }
+    .clmodal .hint { color: #6f6a58; font-size: 11px; font-style: italic; }
+  </style>
+</head>
+<body class="admin-page">
+
+<div id="adminHeader"></div>
+
+<main class="auth-container">
+
+  <section class="admin-card">
+    <h2>📜 Aktuality (Changelog)</h2>
+
+    <div class="changelog-admin-toolbar">
+      <button id="btnNew" class="btn btn-primary">+ Přidat záznam</button>
+      <button id="btnReload" class="btn">Obnovit</button>
+      <select id="filterCat" class="btn">
+        <option value="all">Všechny kategorie</option>
+        <option value="feature">🆕 Novinka</option>
+        <option value="fix">🔧 Oprava</option>
+        <option value="change">⚔ Změna</option>
+        <option value="important">⚠ Důležité</option>
+        <option value="event">🎉 Událost</option>
+      </select>
+    </div>
+
+    <div id="clList">
+      <div class="muted">Načítám…</div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Create/Edit Modal -->
+<div class="clmodal-backdrop" id="clModal">
+  <div class="clmodal">
+    <h3 id="clModalTitle">Nový záznam</h3>
+
+    <input type="hidden" id="clId" value="">
+
+    <div class="clmodal-row2">
+      <div>
+        <label for="clCategory">Kategorie</label>
+        <select id="clCategory">
+          <option value="feature">🆕 Novinka</option>
+          <option value="fix">🔧 Oprava</option>
+          <option value="change" selected>⚔ Změna</option>
+          <option value="important">⚠ Důležité</option>
+          <option value="event">🎉 Událost</option>
+        </select>
+      </div>
+      <div>
+        <label for="clPublished">Stav</label>
+        <select id="clPublished">
+          <option value="1" selected>Publikovat</option>
+          <option value="0">Koncept</option>
+        </select>
+      </div>
+    </div>
+
+    <label for="clTitleCs">Titulek CS <span class="hint">(povinný)</span></label>
+    <input id="clTitleCs" type="text" maxlength="200" placeholder="Krátký výstižný titulek…">
+
+    <label for="clBodyCs">Popis CS <span class="hint">(povinný, podporuje řádkování)</span></label>
+    <textarea id="clBodyCs" maxlength="5000" placeholder="Detailní popis změny…"></textarea>
+
+    <label for="clTitleEn">Titulek EN <span class="hint">(volitelný — pokud prázdný, EN stránka zobrazí CS s [CZ] flagem)</span></label>
+    <input id="clTitleEn" type="text" maxlength="200" placeholder="English title (optional)">
+
+    <label for="clBodyEn">Popis EN <span class="hint">(volitelný)</span></label>
+    <textarea id="clBodyEn" maxlength="5000" placeholder="English description (optional)"></textarea>
+
+    <div class="clmodal-error" id="clError"></div>
+
+    <div class="clmodal-actions">
+      <button class="btn" id="clCancel">Zrušit</button>
+      <button class="btn btn-primary" id="clSave">Uložit</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  let CSRF = null;
+  let entries = [];
+  let filterCat = 'all';
+
+  const CAT = {
+    feature:   { icon: '🆕', label: 'Novinka',  cls: 'success' },
+    fix:       { icon: '🔧', label: 'Oprava',   cls: 'gold' },
+    change:    { icon: '⚔',  label: 'Změna',    cls: 'warning' },
+    important: { icon: '⚠',  label: 'Důležité', cls: 'danger' },
+    event:     { icon: '🎉', label: 'Událost',  cls: 'event' }
+  };
+
+  function esc(s){
+    if (s==null) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+  function fmt(s){
+    const d = new Date(String(s).replace(' ','T'));
+    if (isNaN(d.getTime())) return s;
+    return `${d.getDate()}. ${d.getMonth()+1}. ${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+  }
+
+  async function loadCsrf(){
+    try { const r = await fetch('/api/csrf_token.php', { credentials: 'same-origin' });
+      const j = await r.json(); if (j.ok) CSRF = j.token;
+    } catch(e){ console.error(e); }
+  }
+
+  async function loadList(){
+    document.getElementById('clList').innerHTML = '<div class="muted">Načítám…</div>';
+    try {
+      const r = await fetch('/admin/api/list_changelog_admin.php', { credentials: 'same-origin' });
+      const j = await r.json();
+      if (!j.ok){
+        document.getElementById('clList').innerHTML = '<div class="muted">Chyba: ' + (j.error||r.status) + '</div>';
+        return;
+      }
+      entries = j.entries || [];
+      render();
+    } catch(e){
+      console.error(e);
+      document.getElementById('clList').innerHTML = '<div class="muted">Chyba spojení.</div>';
+    }
+  }
+
+  function render(){
+    const list = (filterCat === 'all') ? entries : entries.filter(e => e.category === filterCat);
+    const box = document.getElementById('clList');
+    if (!list.length){
+      box.innerHTML = '<div class="muted">Žádné záznamy.</div>';
+      return;
+    }
+    box.innerHTML = list.map(e => {
+      const m = CAT[e.category] || CAT.change;
+      const draft = e.is_published === 0 ? '<span class="cl-draft-badge">KONCEPT</span>' : '';
+      const enFlag = (e.title_en || e.body_en) ? '' : ' <span class="cl-draft-badge" title="Bez EN překladu">CS only</span>';
+      return `
+        <article class="cl-entry cl-cat-${m.cls}">
+          <div class="cl-entry-head">
+            <div>
+              <span class="cl-meta">${m.icon} ${m.label} · ${fmt(e.created_at)}</span>
+              ${draft}${enFlag}
+            </div>
+            <div class="cl-actions">
+              <button class="btn" data-act="edit" data-id="${e.id}">Upravit</button>
+              <button class="btn" data-act="delete" data-id="${e.id}">Smazat</button>
+            </div>
+          </div>
+          <h3 class="cl-title">${esc(e.title_cs)}</h3>
+          <div class="cl-body">${esc(e.body_cs)}</div>
+        </article>
+      `;
+    }).join('');
+  }
+
+  function openModal(entry){
+    document.getElementById('clError').classList.remove('active');
+    document.getElementById('clError').textContent = '';
+    if (entry){
+      document.getElementById('clModalTitle').textContent = 'Upravit záznam #' + entry.id;
+      document.getElementById('clId').value = entry.id;
+      document.getElementById('clCategory').value = entry.category;
+      document.getElementById('clPublished').value = String(entry.is_published);
+      document.getElementById('clTitleCs').value = entry.title_cs || '';
+      document.getElementById('clBodyCs').value  = entry.body_cs  || '';
+      document.getElementById('clTitleEn').value = entry.title_en || '';
+      document.getElementById('clBodyEn').value  = entry.body_en  || '';
+    } else {
+      document.getElementById('clModalTitle').textContent = 'Nový záznam';
+      document.getElementById('clId').value = '';
+      document.getElementById('clCategory').value = 'change';
+      document.getElementById('clPublished').value = '1';
+      document.getElementById('clTitleCs').value = '';
+      document.getElementById('clBodyCs').value  = '';
+      document.getElementById('clTitleEn').value = '';
+      document.getElementById('clBodyEn').value  = '';
+    }
+    document.getElementById('clModal').classList.add('active');
+  }
+
+  function closeModal(){
+    document.getElementById('clModal').classList.remove('active');
+  }
+
+  async function save(){
+    const errEl = document.getElementById('clError');
+    errEl.classList.remove('active');
+
+    const payload = {
+      id:           parseInt(document.getElementById('clId').value, 10) || 0,
+      category:     document.getElementById('clCategory').value,
+      is_published: parseInt(document.getElementById('clPublished').value, 10),
+      title_cs:     document.getElementById('clTitleCs').value.trim(),
+      body_cs:      document.getElementById('clBodyCs').value.trim(),
+      title_en:     document.getElementById('clTitleEn').value.trim(),
+      body_en:      document.getElementById('clBodyEn').value.trim()
+    };
+
+    if (!payload.title_cs || !payload.body_cs){
+      errEl.textContent = 'CS titulek a popis jsou povinné.';
+      errEl.classList.add('active');
+      return;
+    }
+
+    try {
+      const r = await fetch('/admin/api/save_changelog.php', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': CSRF || '' },
+        body: JSON.stringify(payload)
+      });
+      const j = await r.json();
+      if (!j.ok){
+        errEl.textContent = 'Chyba: ' + (j.error || r.status);
+        errEl.classList.add('active');
+        return;
+      }
+      closeModal();
+      await loadList();
+    } catch(e){
+      console.error(e);
+      errEl.textContent = 'Chyba spojení.';
+      errEl.classList.add('active');
+    }
+  }
+
+  async function del(id){
+    if (!confirm('Opravdu smazat tento záznam? (Akce je nevratná.)')) return;
+    try {
+      const r = await fetch('/admin/api/delete_changelog.php', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': CSRF || '' },
+        body: JSON.stringify({ id })
+      });
+      const j = await r.json();
+      if (!j.ok){
+        alert('Chyba: ' + (j.error || r.status));
+        return;
+      }
+      await loadList();
+    } catch(e){
+      console.error(e);
+      alert('Chyba spojení.');
+    }
+  }
+
+  // Init
+  document.addEventListener('DOMContentLoaded', async () => {
+    await loadCsrf();
+    await loadList();
+
+    document.getElementById('btnNew').addEventListener('click', () => openModal(null));
+    document.getElementById('btnReload').addEventListener('click', loadList);
+    document.getElementById('filterCat').addEventListener('change', e => {
+      filterCat = e.target.value;
+      render();
+    });
+    document.getElementById('clCancel').addEventListener('click', closeModal);
+    document.getElementById('clSave').addEventListener('click', save);
+
+    document.getElementById('clList').addEventListener('click', e => {
+      const btn = e.target.closest('button[data-act]');
+      if (!btn) return;
+      const id = parseInt(btn.dataset.id, 10);
+      const entry = entries.find(x => x.id === id);
+      if (!entry) return;
+      if (btn.dataset.act === 'edit') openModal(entry);
+      else if (btn.dataset.act === 'delete') del(id);
+    });
+  });
+})();
+</script>
+
+<script>
+fetch('/admin/partials/admin_header.html')
+  .then(r => r.text())
+  .then(html => {
+    document.getElementById('adminHeader').innerHTML = html;
+    const links = document.querySelectorAll('.auth a');
+    const currentPath = window.location.pathname;
+    links.forEach(link => {
+      const href = link.getAttribute('href');
+      if (href && currentPath.includes(href.replace(/^\//,''))) link.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>

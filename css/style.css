@@ -2178,6 +2178,191 @@ body {
 }
 
 /* =========================
+   CHANGELOG / AKTUALITY WIDGET
+   ========================= */
+.changelog-widget {
+  margin-top: 30px;
+  margin-bottom: 30px;
+  padding: 22px;
+  border: 1px solid #3a3322;
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(20, 12, 0, 0.25) 0%, rgba(0, 0, 0, 0.45) 100%);
+  position: relative;
+}
+
+.changelog-widget::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 18px;
+  right: 18px;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%, rgba(212, 175, 55, 0.6) 50%, transparent 100%);
+}
+
+.changelog-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.changelog-header h3 {
+  color: #d4af37;
+  font-family: "Cinzel", serif;
+  letter-spacing: 2px;
+  font-size: 18px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  text-shadow: 0 0 6px rgba(212, 175, 55, 0.3);
+}
+
+.changelog-more-link {
+  color: #c89b3c;
+  text-decoration: none;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  transition: color 0.2s ease;
+}
+
+.changelog-more-link:hover {
+  color: #ffd36a;
+  text-decoration: underline;
+}
+
+.changelog-items {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.changelog-item {
+  border: 1px solid #2a2418;
+  border-left: 3px solid #c89b3c;
+  padding: 12px 16px;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 4px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.changelog-item:hover {
+  border-color: #3a3322;
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.08);
+}
+
+/* Per-kategorie barvy levého proužku (tlumené, jako tag varianty) */
+.changelog-cat-success { border-left-color: rgba(136, 176, 112, 0.7); }
+.changelog-cat-gold    { border-left-color: rgba(212, 175, 55, 0.7); }
+.changelog-cat-warning { border-left-color: rgba(232, 167, 60, 0.7); }
+.changelog-cat-danger  { border-left-color: rgba(194, 85, 74, 0.7); }
+.changelog-cat-event   {
+  border-left-color: rgba(255, 215, 100, 0.9);
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.12);
+}
+
+.changelog-item-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.changelog-cat {
+  color: #d4af37;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.changelog-date {
+  color: #8f876b;
+  font-style: italic;
+}
+
+.changelog-title {
+  color: #e8dfc4;
+  margin: 4px 0 6px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.changelog-body {
+  color: #bfb8a0;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.changelog-fallback {
+  color: #6f6a58;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  vertical-align: middle;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .changelog-widget {
+    padding: 16px;
+  }
+  .changelog-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .changelog-item-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+}
+
+/* =========================
+   FULL CHANGELOG PAGE (pages/news.html)
+   ========================= */
+.changelog-page-tabs {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 18px 0 22px;
+}
+
+.changelog-page-tabs .tab {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  background: rgba(0, 0, 0, 0.25);
+  color: rgba(255, 255, 255, 0.85);
+  padding: 6px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  font-family: inherit;
+  font-size: 13px;
+  transition: transform 0.08s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+.changelog-page-tabs .tab:hover {
+  background: rgba(0, 0, 0, 0.18);
+  border-color: rgba(212, 175, 55, 0.55);
+}
+
+.changelog-page-tabs .tab.active {
+  background: rgba(212, 175, 55, 0.14);
+  border-color: rgba(212, 175, 55, 0.85);
+  color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.15);
+}
+
+/* =========================
    HOMEPAGE — SYSTEMS GRID + EXTRA HEADERS
    ========================= */
 

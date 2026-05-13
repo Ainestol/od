@@ -102,6 +102,12 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     </div>
 
     <div class="admin-card">
+      <h3>Aktuality</h3>
+      <p>Změny, opravy, novinky a události na webu</p>
+      <a href="/admin/changelog.html" class="btn btn-primary">Otevřít</a>
+    </div>
+
+    <div class="admin-card">
       <h3>Bug reports</h3>
       <p>Přehled hlášených chyb od hráčů</p>
       <a href="/admin/bug_reports.html" class="btn btn-primary">Otevřít</a>

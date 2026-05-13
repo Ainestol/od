@@ -4,3 +4,6 @@ config/db_game_write.php
 config/mail.php
 cookies.txt
 server_changes.patch
+
+# Interní dokumentace — nesdílet veřejně přes git
+*.md

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aktuality | Ordo Draconis</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/mobile.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="scroll-right logo-pulse mobile-server">
+<div class="layout">
+
+  <div class="hero-bg hero-world"></div>
+  <div class="hero-gap"></div>
+
+  <aside class="right">
+
+    <div class="side-header">
+      <div class="side-logo">Ordo Draconis - L2 Interlude </div>
+      <div class="top-actions">
+        <div class="auth">
+          <a href="/auth/register.html" class="btn">Registrace</a>
+          <a href="/auth/login.html" class="btn">Přihlášení</a>
+        </div>
+
+        <div class="lang">
+          <a href="news.html" class="active">CS</a> |
+          <a href="news-en.html">EN</a>
+
+          <div class="server-status">
+            <div class="status-line">
+              <span class="dot dot-ls"></span>
+              <span class="label">Login Server</span>
+            </div>
+            <div class="status-line">
+              <span class="dot dot-gs"></span>
+              <span class="label">Game Server</span>
+            </div>
+            <div class="status-players">
+              <span class="players" data-label="hráčů" data-offline-label="Offline">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="side-nav">
+      <a href="../index.html">Domů</a>
+      <a href="server.html">O serveru</a>
+      <a href="start.html">Začít hrát</a>
+      <a href="world.html">Svět</a>
+      <a href="donate.html">Systém odměn</a>
+      <a href="news.html" class="active">Aktuality</a>
+    </nav>
+
+    <div class="content-box">
+      <h3>📜 Aktuality serveru</h3>
+      <p class="muted">
+        Změny, opravy, novinky a události. Nejnovější nahoře.
+      </p>
+
+      <div class="changelog-page-tabs" id="filterTabs">
+        <button type="button" class="tab active" data-cat="all">Vše</button>
+        <button type="button" class="tab" data-cat="feature">🆕 Novinky</button>
+        <button type="button" class="tab" data-cat="fix">🔧 Opravy</button>
+        <button type="button" class="tab" data-cat="change">⚔ Změny</button>
+        <button type="button" class="tab" data-cat="important">⚠ Důležité</button>
+        <button type="button" class="tab" data-cat="event">🎉 Události</button>
+      </div>
+
+      <div id="changelogList" class="changelog-items">
+        <div class="muted">Načítám…</div>
+      </div>
+    </div>
+
+    <div class="page-footer">
+      <div class="footer-links">
+        <a href="https://discord.gg/tcST38pfqZ" target="_blank" rel="noopener">Discord</a>
+        <span class="dot">·</span>
+        <a href="rules.html">Pravidla</a>
+        <span class="dot">·</span>
+        <a href="gdpr.html">GDPR</a>
+      </div>
+    </div>
+
+  </aside>
+</div>
+
+<script>
+(function(){
+  const CAT = {
+    feature:   { icon: '🆕', label: 'Novinka',  cls: 'success' },
+    fix:       { icon: '🔧', label: 'Oprava',   cls: 'gold' },
+    change:    { icon: '⚔',  label: 'Změna',    cls: 'warning' },
+    important: { icon: '⚠',  label: 'Důležité', cls: 'danger' },
+    event:     { icon: '🎉', label: 'Událost',  cls: 'event' }
+  };
+  let all = [];
+  let activeCat = 'all';
+
+  function fmt(s){
+    const d = new Date(String(s).replace(' ','T'));
+    if (isNaN(d.getTime())) return s;
+    return `${d.getDate()}. ${d.getMonth()+1}. ${d.getFullYear()}`;
+  }
+  function esc(s){
+    if (s==null) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+  function render(){
+    const box = document.getElementById('changelogList');
+    const items = (activeCat === 'all') ? all : all.filter(e => e.category === activeCat);
+    if (!items.length){
+      box.innerHTML = '<div class="muted">Žádné záznamy v této kategorii.</div>';
+      return;
+    }
+    box.innerHTML = items.map(e => {
+      const m = CAT[e.category] || CAT.change;
+      const fb = e.lang_fallback ? ' <span class="changelog-fallback" title="CZ original">[CZ]</span>' : '';
+      return `
+        <article class="changelog-item changelog-cat-${m.cls}">
+          <div class="changelog-item-head">
+            <span class="changelog-cat">${m.icon} ${m.label}</span>
+            <span class="changelog-date">${fmt(e.created_at)}</span>
+          </div>
+          <h4 class="changelog-title">${esc(e.title)}${fb}</h4>
+          <div class="changelog-body">${esc(e.body).replace(/\n/g,'<br>')}</div>
+        </article>
+      `;
+    }).join('');
+  }
+
+  async function load(){
+    try {
+      const r = await fetch('/api/list_changelog.php?limit=200&lang=cs', { cache: 'no-store' });
+      const d = await r.json();
+      if (!d.ok){ document.getElementById('changelogList').innerHTML = '<div class="muted">Chyba při načítání.</div>'; return; }
+      all = d.entries || [];
+      render();
+    } catch(e){ console.error(e); document.getElementById('changelogList').innerHTML = '<div class="muted">Chyba spojení.</div>'; }
+  }
+
+  document.getElementById('filterTabs').addEventListener('click', e => {
+    const btn = e.target.closest('.tab');
+    if (!btn) return;
+    document.querySelectorAll('#filterTabs .tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeCat = btn.dataset.cat;
+    render();
+  });
+
+  load();
+})();
+</script>
+<script src="/js/server-status.js" defer></script>
+</body>
+</html>
