@@ -20,9 +20,28 @@
     <section class="admin-card">
         <h2>Web účty</h2>
 
+        <div class="users-toolbar">
+            <div class="users-search">
+                <input id="usersSearch" type="search"
+                       placeholder="Hledat e-mail / web ID / game login / postavu / charId…"
+                       autocomplete="off">
+                <button id="usersSearchClear" type="button" title="Vymazat">×</button>
+            </div>
+            <div class="users-filters" id="usersFilters">
+                <button class="chip" data-filter="verified">Ověření</button>
+                <button class="chip" data-filter="unverified">Neověření</button>
+                <button class="chip" data-filter="admin">Admin</button>
+                <button class="chip" data-filter="twofa">2FA</button>
+                <button class="chip" data-filter="has_premium">Premium aktivní</button>
+                <button class="chip" data-filter="no_game_account">Bez game účtu</button>
+                <button class="chip" data-filter="multi_account">Multi-účet (2+)</button>
+            </div>
+            <div class="users-stats" id="usersStats"></div>
+        </div>
+
         <div id="webUsersTree" class="admin-tree">
-    <!-- plní users_admin.js -->
-</div>
+            <!-- plní users_admin.js -->
+        </div>
 
     </section>
 
