@@ -5,15 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin – VIP správa</title>
 
-    <!-- tvé existující CSS -->
-    
     <link rel="stylesheet" href="/css/admin.css">
     <link rel="stylesheet" href="/css/mobile.css">
 
-     <!-- JS -->
     <script src="/api/js/api.js" defer></script>
     <script src="/admin/js/vip_admin.js" defer></script>
-
 </head>
 <body class="admin-page">
 
@@ -21,71 +17,118 @@
 
 <main class="auth-container">
 
-    <!-- RUČNÍ PŘIDÁNÍ VIP -->
-    <section class="admin-card">
-        <h2>Přidat VIP</h2>
-
-        <label>Scope</label>
-        <select id="vipScope">
-            <option value="WEB">WEB</option>
-            <option value="GAME">GAME</option>
-            <option value="CHAR">CHAR</option>
-        </select>
-
-        <label>Target ID</label>
-        <input type="number" id="vipTargetId">
-
-        <label>Level</label>
-        <input type="number" id="vipLevelId" value="2">
-
-        <label>Dní</label>
-        <input type="number" id="vipDays" value="30">
-
-        <button id="vipAddBtn" class="btn btn-primary">Přidat VIP</button>
-
-        <div id="vipAddResult"></div>
+    <!-- Stats bar -->
+    <section class="admin-card vip-stats-card">
+        <h2>VIP přehled</h2>
+        <div class="vip-stats">
+            <span class="vip-stat">Aktivní<b id="statActive">–</b></span>
+            <span class="vip-stat scope-web">WEB<b id="statWeb">–</b></span>
+            <span class="vip-stat scope-game">GAME<b id="statGame">–</b></span>
+            <span class="vip-stat scope-char">CHAR<b id="statChar">–</b></span>
+            <span class="vip-stat vip-stat-soon">Brzy končí (&lt; 5 d)<b id="statSoon">–</b></span>
+        </div>
     </section>
 
-    <div style="margin:20px 0;">
-        <label>
-            <input type="checkbox" id="showExpiredVip">
-            Zobrazit i expirované VIP
-        </label>
-    </div>
-
-    <!-- PŘEHLED VIP -->
+    <!-- Add / extend form -->
     <section class="admin-card">
-        <h2>Aktivní VIP</h2>
+        <h2>Přidat / prodloužit Premium</h2>
 
-        <button id="vipReloadBtn" class="btn">Načíst VIP</button>
+        <div class="vip-form">
 
-        <table class="admin-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Scope</th>
-                    <th>Target</th>
-                    <th>Level</th>
-                    <th>Platí do</th>
-                    <th>Akce</th>
-                </tr>
-            </thead>
-            <tbody id="vipTable"></tbody>
-        </table>
+            <div class="vip-field">
+                <label>Scope</label>
+                <div class="seg-control" id="scopeSeg">
+                    <button type="button" data-scope="WEB"  class="active">WEB · web account</button>
+                    <button type="button" data-scope="GAME">GAME · game účet</button>
+                    <button type="button" data-scope="CHAR">CHAR · postava</button>
+                </div>
+            </div>
+
+            <div class="vip-field">
+                <label id="targetLabel">Pro koho (e-mail)</label>
+                <div class="vip-picker">
+                    <input id="vipTargetSearch" type="text" autocomplete="off"
+                           placeholder="Začni psát e-mail nebo web ID…">
+                    <div class="vip-autocomplete" id="vipAutocomplete"></div>
+                </div>
+                <div class="vip-target-chip hidden" id="vipTargetChip">
+                    <span class="chip-label"></span>
+                    <button class="chip-clear" type="button" title="Zrušit výběr">✕</button>
+                </div>
+            </div>
+
+            <div class="vip-field">
+                <label>Level</label>
+                <div class="seg-control" id="levelSeg"></div>
+                <div class="vip-level-hint muted" id="levelHint"></div>
+            </div>
+
+            <div class="vip-field">
+                <label>Trvání</label>
+                <div class="day-presets" id="daysPresets">
+                    <button type="button" data-days="1">1 den</button>
+                    <button type="button" data-days="7">7 dní</button>
+                    <button type="button" data-days="30" class="active">30 dní</button>
+                    <button type="button" data-days="90">90 dní</button>
+                    <button type="button" data-days="custom">Vlastní…</button>
+                </div>
+                <input id="vipDaysCustom" type="number" min="1" max="3650"
+                       class="hidden" placeholder="Počet dní">
+            </div>
+
+            <div class="vip-preview hidden" id="vipPreview"></div>
+
+            <div class="vip-form-actions">
+                <button id="vipAddBtn" class="btn btn-primary" disabled>Přidat Premium</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Active grants -->
+    <section class="admin-card">
+        <div class="vip-list-toolbar">
+            <h2>VIP granty</h2>
+            <div class="vip-list-filters" id="vipListFilters">
+                <button class="chip active" data-scope-filter="all">Vše</button>
+                <button class="chip" data-scope-filter="WEB">WEB</button>
+                <button class="chip" data-scope-filter="GAME">GAME</button>
+                <button class="chip" data-scope-filter="CHAR">CHAR</button>
+                <button class="chip" data-scope-filter="soon">Brzy končí</button>
+            </div>
+            <label class="vip-toggle">
+                <input type="checkbox" id="showExpiredVip"> Zobrazit expirované
+            </label>
+        </div>
+
+        <div class="vip-grant-list" id="vipGrantList">
+            <div class="muted">Načítám…</div>
+        </div>
     </section>
 
 </main>
+
+<!-- Confirm modal -->
+<div class="vip-modal-backdrop hidden" id="vipModalBackdrop">
+    <div class="vip-modal" role="dialog" aria-modal="true">
+        <h3 id="vipModalTitle">Potvrdit akci</h3>
+        <div id="vipModalBody" class="vip-modal-body"></div>
+        <div class="vip-modal-actions">
+            <button class="btn" id="vipModalCancel" type="button">Zrušit</button>
+            <button class="btn btn-danger" id="vipModalConfirm" type="button">Odebrat</button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="vip-toast" id="vipToast"></div>
 
 <script>
 fetch('/admin/partials/admin_header.html')
   .then(r => r.text())
   .then(html => {
     document.getElementById('adminHeader').innerHTML = html;
-
-    // 🔥 zvýraznění aktivní stránky
     const links = document.querySelectorAll('.admin-nav a');
     const currentPath = window.location.pathname;
-
     links.forEach(link => {
       if (currentPath.includes(link.getAttribute('href'))) {
         link.classList.add('active');
@@ -94,7 +137,5 @@ fetch('/admin/partials/admin_header.html')
   });
 </script>
 
-
 </body>
-
 </html>
