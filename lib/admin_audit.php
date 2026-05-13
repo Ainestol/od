@@ -7,7 +7,7 @@ function admin_audit(PDO $pdo, string $action, ?int $targetUserId = null, array 
     }
 
     $stmt = $pdo->prepare("
-        INSERT INTO audit_log
+        INSERT INTO general_audit_log
         (actor_user_id, action, target_user_id, meta, created_at)
         VALUES (?, ?, ?, ?, NOW())
     ");
