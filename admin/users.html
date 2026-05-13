@@ -36,6 +36,20 @@
                 <button class="chip" data-filter="no_game_account">Bez game účtu</button>
                 <button class="chip" data-filter="multi_account">Multi-účet (2+)</button>
             </div>
+            <div class="users-sort">
+                <span class="sort-label">Seřadit:</span>
+                <select id="usersSort">
+                    <option value="id">ID</option>
+                    <option value="email">E-mail (A→Z)</option>
+                    <option value="created_at">Registrace</option>
+                    <option value="last_access_ms">Poslední aktivita</option>
+                    <option value="game_account_count">Počet game účtů</option>
+                    <option value="character_count">Počet postav</option>
+                    <option value="vc_balance">Vote Coins</option>
+                    <option value="dc_balance">Dragon Coins</option>
+                </select>
+                <button id="usersSortDir" type="button" title="Změnit směr třídění">↓ od největšího</button>
+            </div>
             <div class="users-stats" id="usersStats"></div>
         </div>
 

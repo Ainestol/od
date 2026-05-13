@@ -8,6 +8,11 @@
  *   filter  — CSV of filter keys (combined with AND):
  *               verified | unverified | admin | twofa
  *               has_premium | no_game_account | multi_account
+ *   sort    — sort key (whitelist):
+ *               id | email | created_at | last_access_ms
+ *               game_account_count | character_count
+ *               vc_balance | dc_balance
+ *   dir     — asc | desc (default desc)
  *
  * Response (extends previous shape — additive, backward compatible):
  *   {
@@ -36,6 +41,15 @@ try {
         explode(',', (string)($_GET['filter'] ?? ''))
     )));
     $qint    = ($q !== '' && ctype_digit($q)) ? (int)$q : 0;
+
+    $sortWhitelist = [
+        'id', 'email', 'created_at',
+        'game_account_count', 'character_count',
+        'vc_balance', 'dc_balance',
+        'last_access_ms',
+    ];
+    $sort = in_array(($_GET['sort'] ?? ''), $sortWhitelist, true) ? $_GET['sort'] : 'id';
+    $dir  = (($_GET['dir'] ?? '') === 'asc') ? 'asc' : 'desc';
 
     // ─────────────────────────────────────────────────────────
     // STEP A — pre-collect matching account_names from game DB
@@ -241,12 +255,32 @@ try {
         unset($u);
     }
 
+    // ─────────────────────────────────────────────────────────
+    // STEP D — sort in PHP (cross-DB aggregates already present)
+    // ─────────────────────────────────────────────────────────
+    if (!empty($users)) {
+        usort($users, function ($a, $b) use ($sort, $dir) {
+            $av = $a[$sort] ?? 0;
+            $bv = $b[$sort] ?? 0;
+            if (is_bool($av)) $av = $av ? 1 : 0;
+            if (is_bool($bv)) $bv = $bv ? 1 : 0;
+            if (is_string($av) || is_string($bv)) {
+                $cmp = strnatcasecmp((string)$av, (string)$bv);
+            } else {
+                $cmp = $av <=> $bv;
+            }
+            return $dir === 'asc' ? $cmp : -$cmp;
+        });
+    }
+
     echo json_encode([
         'ok'      => true,
         'data'    => $users,
         'total'   => count($users),
         'q'       => $q,
         'filters' => $filters,
+        'sort'    => $sort,
+        'dir'     => $dir,
     ]);
 
 } catch (Throwable $e) {

@@ -6,11 +6,41 @@
   'use strict';
 
   // ----- state ---------------------------------------------------------
+  const SORT_LABELS_ASC = {
+    id:                  '↑ od nejstaršího',
+    email:               '↑ A → Z',
+    created_at:          '↑ od nejstarších registrací',
+    last_access_ms:      '↑ od nejdéle nehrajících',
+    game_account_count:  '↑ od nejméně účtů',
+    character_count:     '↑ od nejméně postav',
+    vc_balance:          '↑ od nejmenšího VC',
+    dc_balance:          '↑ od nejmenšího DC',
+  };
+  const SORT_LABELS_DESC = {
+    id:                  '↓ od nejnovějšího',
+    email:               '↓ Z → A',
+    created_at:          '↓ od nejnovějších registrací',
+    last_access_ms:      '↓ od nejnedávněji hrajících',
+    game_account_count:  '↓ od nejvíce účtů',
+    character_count:     '↓ od nejvíce postav',
+    vc_balance:          '↓ od největšího VC',
+    dc_balance:          '↓ od největšího DC',
+  };
+
+  // load persisted sort preference (per-admin browser)
+  let persistedSort = 'id', persistedDir = 'desc';
+  try {
+    persistedSort = localStorage.getItem('adminUsers.sort') || 'id';
+    persistedDir  = localStorage.getItem('adminUsers.dir')  || 'desc';
+  } catch (_) {}
+
   const state = {
     q: '',
     filters: new Set(),       // active filter keys
+    sort: persistedSort,
+    dir:  persistedDir,
     debounceTimer: null,
-    inflight: null,           // current fetch promise (for cancel-newest semantics)
+    inflight: null,           // for cancel-newest semantics
   };
 
   // ----- helpers -------------------------------------------------------
@@ -57,8 +87,17 @@
     const p = new URLSearchParams();
     if (state.q) p.set('q', state.q);
     if (state.filters.size) p.set('filter', [...state.filters].join(','));
+    if (state.sort) p.set('sort', state.sort);
+    if (state.dir)  p.set('dir',  state.dir);
     const s = p.toString();
     return s ? '?' + s : '';
+  }
+
+  function updateSortDirBtn() {
+    const btn = document.getElementById('usersSortDir');
+    if (!btn) return;
+    const map = state.dir === 'asc' ? SORT_LABELS_ASC : SORT_LABELS_DESC;
+    btn.textContent = map[state.sort] || (state.dir === 'asc' ? '↑ vzestupně' : '↓ sestupně');
   }
 
   // ----- rendering -----------------------------------------------------
@@ -85,7 +124,7 @@
         <span class="tree-title">${esc(u.email)}</span>
         <span class="tree-id">#${u.id}</span>
         ${badges.join(' ')}
-        <button class="btn btn-small" data-act="vip-web" data-id="${u.id}">VIP</button>
+        <button class="btn btn-small vip-btn" data-act="vip-web" data-id="${u.id}" title="Spravovat VIP / Premium pro celý web účet (všechny game účty)">VIP webu</button>
       </div>
       <div class="tree-meta">${meta.join(' · ')}</div>
       <div class="tree-children hidden"></div>
@@ -107,7 +146,7 @@
         <span class="tree-title">${esc(g.login)}</span>
         <span class="tree-id">#${g.id}</span>
         <span class="tree-meta-inline">${meta.join(' · ')}</span>
-        <button class="btn btn-small" data-act="vip-game" data-id="${g.id}">VIP</button>
+        <button class="btn btn-small vip-btn" data-act="vip-game" data-id="${g.id}" title="Spravovat VIP / Premium jen pro tento game účet">VIP účtu</button>
       </div>
       <div class="tree-children hidden"></div>
     `;
@@ -124,7 +163,7 @@
       <span class="tree-title">${esc(c.char_name)}</span>
       <span class="tree-id">#${c.charId}</span>
       <span class="tree-meta-inline">${meta.join(' · ')}</span>
-      <button class="btn btn-small" data-act="vip-char" data-id="${c.charId}">VIP</button>
+      <button class="btn btn-small vip-btn" data-act="vip-char" data-id="${c.charId}" title="Spravovat VIP / Premium jen pro tuto postavu">VIP postavy</button>
     `;
   }
 
@@ -266,29 +305,53 @@
       }
       loadUsers();
     });
+
+    // sort select + direction
+    const sortSelect = document.getElementById('usersSort');
+    const sortDirBtn = document.getElementById('usersSortDir');
+
+    if (sortSelect) {
+      sortSelect.value = state.sort;
+      sortSelect.addEventListener('change', () => {
+        state.sort = sortSelect.value;
+        try { localStorage.setItem('adminUsers.sort', state.sort); } catch (_) {}
+        updateSortDirBtn();
+        loadUsers();
+      });
+    }
+
+    if (sortDirBtn) {
+      sortDirBtn.addEventListener('click', () => {
+        state.dir = (state.dir === 'desc') ? 'asc' : 'desc';
+        try { localStorage.setItem('adminUsers.dir', state.dir); } catch (_) {}
+        updateSortDirBtn();
+        loadUsers();
+      });
+    }
+
+    updateSortDirBtn();
   }
 
   function bindTreeDelegation() {
     const tree = document.getElementById('webUsersTree');
 
     tree.addEventListener('click', e => {
-      // toggle web → game
       const toggleBtn = e.target.closest('.toggle-btn');
       if (toggleBtn) {
-        const webBox = toggleBtn.closest('.tree-web');
-        if (webBox) {
-          const childrenBox = webBox.querySelector(':scope > .tree-children');
-          if (childrenBox) {
-            toggleGameAccounts(webBox.dataset.userId, toggleBtn, childrenBox);
-            return;
-          }
-        }
-        // toggle game → characters
+        // INNERMOST FIRST — game toggle is inside a web box; checking web first would shadow it
         const gameBox = toggleBtn.closest('.tree-game');
         if (gameBox) {
           const childrenBox = gameBox.querySelector(':scope > .tree-children');
           if (childrenBox) {
             toggleCharacters(gameBox.dataset.accountId, toggleBtn, childrenBox);
+            return;
+          }
+        }
+        const webBox = toggleBtn.closest('.tree-web');
+        if (webBox) {
+          const childrenBox = webBox.querySelector(':scope > .tree-children');
+          if (childrenBox) {
+            toggleGameAccounts(webBox.dataset.userId, toggleBtn, childrenBox);
             return;
           }
         }
