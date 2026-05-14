@@ -94,36 +94,26 @@
     });
   }
 
+  // Cached overview data (so toggle re-renders without re-fetch)
+  let _overviewCache = null;
+
   // ----- OVERVIEW ---------------------------------------------------
   async function loadOverview() {
     try {
       const res = await apiFetch('/admin/api/ac_overview.php');
+      _overviewCache = res;
       const p = res.players || {};
       const e = res.events  || {};
-      document.getElementById('statBanRec').textContent = p.ban_recommended ?? 0;
-      document.getElementById('statHighRisk').textContent = p.high_risk     ?? 0;
-      document.getElementById('statWatch').textContent    = p.manual_watch  ?? 0;
-      document.getElementById('statScored').textContent   = p.total_with_score ?? 0;
-      document.getElementById('statEvNew').textContent    = e.new_total ?? 0;
-      document.getElementById('statEv24h').textContent    = e.last_24h ?? 0;
-      document.getElementById('statEv1h').textContent     = e.last_1h ?? 0;
+      document.getElementById('statBanRec').textContent  = p.ban_recommended ?? 0;
+      document.getElementById('statHighRisk').textContent= p.high_risk     ?? 0;
+      document.getElementById('statWatch').textContent   = p.manual_watch  ?? 0;
+      document.getElementById('statScored').textContent  = p.total_with_score ?? 0;
+      document.getElementById('statEvNew').textContent   = e.new_total ?? 0;
+      document.getElementById('statEv24h').textContent   = e.last_24h ?? 0;
+      document.getElementById('statEv1h').textContent    = e.last_1h ?? 0;
+      document.getElementById('statAdmin7d').textContent = e.admin_audit_7d ?? 0;
 
-      // Breakdowns
-      const byType = e.by_type || {};
-      document.getElementById('breakdownType').innerHTML =
-        Object.keys(byType).length
-          ? Object.entries(byType)
-              .map(([k, v]) => `<span class="bd-pill bd-${k.toLowerCase()}"><b>${v}</b> ${esc(k)}</span>`).join('')
-          : '<span class="muted">Žádné události za 7 dní.</span>';
-
-      const bySev = e.by_severity || {};
-      document.getElementById('breakdownSeverity').innerHTML =
-        Object.keys(bySev).length
-          ? ['CRITICAL','HIGH','MEDIUM','LOW']
-              .filter(s => bySev[s])
-              .map(s => `<span class="bd-pill ${severityClass(s)}"><b>${bySev[s]}</b> ${esc(s)}</span>`)
-              .join('')
-          : '<span class="muted">–</span>';
+      renderBreakdowns();
 
       // Top players table
       const tbody = document.querySelector('#topPlayersTable tbody');
@@ -157,13 +147,56 @@
       const btn = e.target.closest('button[data-act="view-events"]');
       if (!btn) return;
       const charId = parseInt(btn.dataset.cid, 10);
-      // Switch to events tab, pre-filter by this char
       state.events.charId = charId;
-      // Just open events tab — UX simplified, no auto filter for now
       document.querySelector('.sec-subtab[data-sub="events"]').click();
-      // Also trigger search field reset and set?  Simpler: filter via API param
       loadEvents({ char_id: charId });
     });
+
+    // Toggle: NEW only vs include IGNORED noise
+    const tg = document.getElementById('bdShowAll');
+    if (tg) {
+      tg.addEventListener('change', () => renderBreakdowns());
+    }
+
+    // Admin audit card click → events tab filtered to ADMIN_PRIVILEGE_EVENT
+    const adminCard = document.getElementById('statAdminCard');
+    if (adminCard) {
+      adminCard.addEventListener('click', () => {
+        state.events.eventType = 'ADMIN_PRIVILEGE_EVENT';
+        // Clear review status default (we want to see audit, not 'NEW')
+        state.events.reviewStatuses = new Set();
+        document.querySelector('.sec-subtab[data-sub="events"]').click();
+        // Apply selects visually
+        const sel = document.getElementById('eventsType');
+        if (sel) sel.value = 'ADMIN_PRIVILEGE_EVENT';
+        document.querySelectorAll('#eventsReviewFilters .chip').forEach(c => c.classList.remove('active'));
+        loadEvents();
+      });
+    }
+  }
+
+  // Render the breakdown pills from cached overview data, respecting toggle
+  function renderBreakdowns() {
+    if (!_overviewCache) return;
+    const e = _overviewCache.events || {};
+    const showAll = !!document.getElementById('bdShowAll')?.checked;
+
+    const byType = showAll ? (e.by_type_all || {}) : (e.by_type_new || {});
+    const bySev  = showAll ? (e.by_severity_all || {}) : (e.by_severity_new || {});
+
+    document.getElementById('breakdownType').innerHTML =
+      Object.keys(byType).length
+        ? Object.entries(byType)
+            .map(([k, v]) => `<span class="bd-pill"><b>${v}</b> ${esc(k)}</span>`).join('')
+        : `<span class="muted">${showAll ? 'Žádné události za 7 dní.' : 'Žádná aktivní podezření (NEW).'}</span>`;
+
+    document.getElementById('breakdownSeverity').innerHTML =
+      Object.keys(bySev).length
+        ? ['CRITICAL','HIGH','MEDIUM','LOW']
+            .filter(s => bySev[s])
+            .map(s => `<span class="bd-pill ${severityClass(s)}"><b>${bySev[s]}</b> ${esc(s)}</span>`)
+            .join('')
+        : '<span class="muted">–</span>';
   }
 
   // ----- PLAYERS ----------------------------------------------------

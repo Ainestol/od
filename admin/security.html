@@ -65,9 +65,20 @@
         <span class="sec-stat-num"  id="statEv1h">–</span>
         <span class="sec-stat-label">poslední hodina</span>
       </div>
+      <div class="sec-stat-card sec-stat-mini sec-stat-audit"
+           id="statAdminCard" style="cursor:pointer"
+           title="Klikni pro filtr Události → ADMIN_PRIVILEGE_EVENT">
+        <span class="sec-stat-num"  id="statAdmin7d">–</span>
+        <span class="sec-stat-label">admin akcí (7d, audit)</span>
+      </div>
     </div>
 
-    <h3 class="sec-section-h">Rozdělení událostí (posledních 7 dní)</h3>
+    <div class="sec-breakdown-header">
+      <h3 class="sec-section-h">Rozdělení podezřelých událostí (posledních 7 dní)</h3>
+      <label class="vip-toggle">
+        <input type="checkbox" id="bdShowAll"> Včetně IGNORED (šum z konfigurace)
+      </label>
+    </div>
     <div class="sec-breakdown" id="breakdownType"></div>
 
     <h3 class="sec-section-h">Podle severity</h3>
@@ -157,10 +168,16 @@
 
       <select id="eventsType" class="sec-select">
         <option value="">Všechny typy</option>
-        <option value="TELEPORT">TELEPORT</option>
-        <option value="SPEED">SPEED</option>
-        <option value="RANGE">RANGE</option>
-        <option value="ECONOMY">ECONOMY</option>
+        <optgroup label="Aktivní podezření">
+          <option value="SUSPICIOUS_ECONOMY_GAIN">SUSPICIOUS_ECONOMY_GAIN</option>
+          <option value="SKILL_OUT_OF_RANGE">SKILL_OUT_OF_RANGE</option>
+          <option value="SPEED_ANOMALY">SPEED_ANOMALY</option>
+          <option value="ILLEGAL_TELEPORT">ILLEGAL_TELEPORT</option>
+          <option value="IMPOSSIBLE_ACTION_RATE">IMPOSSIBLE_ACTION_RATE</option>
+        </optgroup>
+        <optgroup label="Audit">
+          <option value="ADMIN_PRIVILEGE_EVENT">ADMIN_PRIVILEGE_EVENT</option>
+        </optgroup>
       </select>
 
       <select id="eventsSeverity" class="sec-select">

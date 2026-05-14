@@ -1396,6 +1396,18 @@ text-decoration:underline;
 .sec-stat-card.sec-stat-danger .sec-stat-num { color: #c2554a; }
 .sec-stat-card.sec-stat-warn   { border-color: rgba(232,167,60,0.45); background: rgba(232,167,60,0.05); }
 .sec-stat-card.sec-stat-warn   .sec-stat-num { color: #e8a73c; }
+.sec-stat-card.sec-stat-audit  { border-color: rgba(108,160,200,0.4); background: rgba(108,160,200,0.04); }
+.sec-stat-card.sec-stat-audit  .sec-stat-num { color: #6ca0c8; }
+.sec-stat-card.sec-stat-audit:hover { border-color: rgba(108,160,200,0.7); }
+
+.sec-breakdown-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.sec-breakdown-header .sec-section-h { margin-bottom: 0; padding-top: 0; border-top: none; }
 .sec-stat-num { color: #ffd36a; font-size: 30px; font-weight: 700; line-height: 1; }
 .sec-stat-label { color: #8f876b; font-size: 12px; margin-top: 4px; }
 

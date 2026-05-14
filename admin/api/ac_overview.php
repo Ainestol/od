@@ -74,35 +74,77 @@ try {
         FROM ac_suspicious_events
     ")->fetch(PDO::FETCH_ASSOC) ?: [];
 
-    $byTypeStmt = $pdoGame->query("
+    // Breakdown by event_type — split into ACTIVE (NEW) and ALL (last 7 days)
+    // Exclude ADMIN_PRIVILEGE_EVENT from both (it's audit, not suspicion — separate stat below)
+    $byTypeAllStmt = $pdoGame->query("
         SELECT event_type, COUNT(*) AS cnt
         FROM ac_suspicious_events
         WHERE event_time >= NOW() - INTERVAL 7 DAY
+          AND event_type != 'ADMIN_PRIVILEGE_EVENT'
         GROUP BY event_type
         ORDER BY cnt DESC
     ");
-    $byType = [];
-    foreach ($byTypeStmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
-        $byType[$r['event_type']] = (int)$r['cnt'];
+    $byTypeAll = [];
+    foreach ($byTypeAllStmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
+        $byTypeAll[$r['event_type']] = (int)$r['cnt'];
     }
 
-    $bySevStmt = $pdoGame->query("
+    $byTypeNewStmt = $pdoGame->query("
+        SELECT event_type, COUNT(*) AS cnt
+        FROM ac_suspicious_events
+        WHERE event_time >= NOW() - INTERVAL 7 DAY
+          AND event_type != 'ADMIN_PRIVILEGE_EVENT'
+          AND review_status = 'NEW'
+        GROUP BY event_type
+        ORDER BY cnt DESC
+    ");
+    $byTypeNew = [];
+    foreach ($byTypeNewStmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
+        $byTypeNew[$r['event_type']] = (int)$r['cnt'];
+    }
+
+    $bySevAllStmt = $pdoGame->query("
         SELECT severity, COUNT(*) AS cnt
         FROM ac_suspicious_events
         WHERE event_time >= NOW() - INTERVAL 7 DAY
+          AND event_type != 'ADMIN_PRIVILEGE_EVENT'
         GROUP BY severity
     ");
-    $bySev = [];
-    foreach ($bySevStmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
-        $bySev[$r['severity']] = (int)$r['cnt'];
+    $bySevAll = [];
+    foreach ($bySevAllStmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
+        $bySevAll[$r['severity']] = (int)$r['cnt'];
     }
 
+    $bySevNewStmt = $pdoGame->query("
+        SELECT severity, COUNT(*) AS cnt
+        FROM ac_suspicious_events
+        WHERE event_time >= NOW() - INTERVAL 7 DAY
+          AND event_type != 'ADMIN_PRIVILEGE_EVENT'
+          AND review_status = 'NEW'
+        GROUP BY severity
+    ");
+    $bySevNew = [];
+    foreach ($bySevNewStmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
+        $bySevNew[$r['severity']] = (int)$r['cnt'];
+    }
+
+    // Admin audit count (separate — not suspicion)
+    $adminAuditStmt = $pdoGame->query("
+        SELECT COUNT(*) FROM ac_suspicious_events
+        WHERE event_type = 'ADMIN_PRIVILEGE_EVENT'
+          AND event_time >= NOW() - INTERVAL 7 DAY
+    ");
+    $adminAudit7d = (int)$adminAuditStmt->fetchColumn();
+
     $events = [
-        'new_total'   => (int)($evAgg['new_total'] ?? 0),
-        'last_24h'    => (int)($evAgg['last_24h']  ?? 0),
-        'last_1h'     => (int)($evAgg['last_1h']   ?? 0),
-        'by_type'     => $byType,
-        'by_severity' => $bySev,
+        'new_total'          => (int)($evAgg['new_total'] ?? 0),
+        'last_24h'           => (int)($evAgg['last_24h']  ?? 0),
+        'last_1h'            => (int)($evAgg['last_1h']   ?? 0),
+        'admin_audit_7d'     => $adminAudit7d,
+        'by_type_all'        => $byTypeAll,
+        'by_type_new'        => $byTypeNew,
+        'by_severity_all'    => $bySevAll,
+        'by_severity_new'    => $bySevNew,
     ];
 
     // ─── Resolve web user emails for top players ──────────────
