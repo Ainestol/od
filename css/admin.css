@@ -494,6 +494,26 @@ text-decoration:underline;
   font-weight: 600;
 }
 
+/* Online chip — green accent (so admin recognizes "live state" filter at a glance) */
+.users-filters .chip-online { display: inline-flex; align-items: center; gap: 6px; }
+.users-filters .chip-online .chip-dot {
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #88b070;
+  box-shadow: 0 0 6px rgba(136,176,112,0.6);
+}
+.users-filters .chip-online:hover {
+  border-color: #88b070;
+  color: #a8c98b;
+}
+.users-filters .chip-online.active {
+  background: #88b070;
+  color: #0c1a08;
+  border-color: #88b070;
+}
+.users-filters .chip-online.active .chip-dot { background: #0c1a08; box-shadow: none; }
+
 .users-stats {
   font-size: 12px;
   color: #8f876b;

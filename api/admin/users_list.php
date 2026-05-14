@@ -8,6 +8,7 @@
  *   filter  — CSV of filter keys (combined with AND):
  *               verified | unverified | admin | twofa
  *               has_premium | no_game_account | multi_account
+ *               online   (derived — applied after game DB enrichment)
  *   sort    — sort key (whitelist):
  *               id | email | created_at | last_access_ms
  *               game_account_count | character_count
@@ -253,6 +254,16 @@ try {
             $u['last_access_ms']     = (int)$agg['last_access'];
         }
         unset($u);
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // POST-ENRICHMENT FILTER — derived fields (any_online comes from game DB)
+    // ─────────────────────────────────────────────────────────
+    if (in_array('online', $filters, true)) {
+        $users = array_values(array_filter(
+            $users,
+            fn($u) => !empty($u['any_online'])
+        ));
     }
 
     // ─────────────────────────────────────────────────────────

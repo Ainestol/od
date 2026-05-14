@@ -140,7 +140,31 @@
       state.levelId = parseInt(btn.dataset.levelId, 10);
       applyLevelUI();
       updateLevelHint();
+      autoSyncDaysForLevel();
       updatePreview();
+    });
+  }
+
+  /**
+   * Smart default — VIP I + GAME ≈ "Premium 24h" → days = 1.
+   * Moving away from that combo restores default 30.
+   * If admin used "Vlastní…" with a custom number, we don't override.
+   */
+  function autoSyncDaysForLevel() {
+    if (state.customDays) return; // respect explicit custom input
+    if (state.scope === 'GAME' && state.levelId === 1) {
+      setDays(1);
+    } else if (state.days === 1) {
+      setDays(30);
+    }
+  }
+
+  function setDays(d) {
+    state.days = d;
+    state.customDays = false;
+    document.getElementById('vipDaysCustom').classList.add('hidden');
+    document.querySelectorAll('#daysPresets button').forEach(b => {
+      b.classList.toggle('active', b.dataset.days === String(d));
     });
   }
 
@@ -162,6 +186,7 @@
       state.levelId = pickDefaultLevelForScope(state.scope);
       applyLevelUI();
       updateLevelHint();
+      autoSyncDaysForLevel();
       updatePreview();
     });
   }
