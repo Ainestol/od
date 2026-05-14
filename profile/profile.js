@@ -1809,10 +1809,14 @@ function ensureShopInit() {
       }
 
       // Update Web ID + VS pro aktuální rok
+      // Backend nyní vrací next_vs (userId + rok + pořadí). Fallback na klientský výpočet
+      // pokud by endpoint někdy next_vs nevracel.
       if (data.web_id) {
-        const year = new Date().getFullYear();
+        const year = data.year || new Date().getFullYear();
         if (idEl) idEl.textContent = data.web_id;
-        if (vsEl) vsEl.textContent = calcDonateVs(data.web_id, year);
+        const yearEl = document.getElementById('donateYear');
+        if (yearEl) yearEl.textContent = year;
+        if (vsEl) vsEl.textContent = data.next_vs || calcDonateVs(data.web_id, year);
       }
 
       if (!data.donations.length) {

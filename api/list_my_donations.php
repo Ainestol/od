@@ -50,10 +50,25 @@ try {
     }
     unset($r);
 
+    // Compute the NEXT expected variable symbol for current year
+    // Format: userId + currentYear + nextSeq (kde nextSeq = počet existujících platby v daném roce + 1)
+    $currentYear = (int)date('Y');
+    $seqStmt = $pdo->prepare("
+        SELECT COUNT(*) FROM donations
+        WHERE web_user_id = ?
+          AND YEAR(paid_at) = ?
+    ");
+    $seqStmt->execute([$userId, $currentYear]);
+    $nextSeq = (int)$seqStmt->fetchColumn() + 1;
+    $nextVs  = $userId . $currentYear . $nextSeq;
+
     echo json_encode([
         'ok'        => true,
         'donations' => $rows,
-        'web_id'    => $userId
+        'web_id'    => $userId,
+        'next_vs'   => $nextVs,
+        'next_seq'  => $nextSeq,
+        'year'      => $currentYear,
     ]);
 
 } catch (Throwable $e) {
