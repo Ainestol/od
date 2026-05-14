@@ -61,11 +61,12 @@ elseif (!empty($_SESSION['lang'])) {
 $_SESSION['lang'] = $lang;
 
 echo json_encode([
-  "ok"      => true,
-  "logged_in" => true,
-  "email"   => $_SESSION['web_email'],
-  "lang" => $lang,
-  "role"    => $_SESSION['role'] ?? 'user', // 🔥 čárka
-  "web_vip" => $webVip,
+  "ok"            => true,
+  "logged_in"     => true,
+  "id"            => (int)$_SESSION['web_user_id'],
+  "email"         => $_SESSION['web_email'],
+  "lang"          => $lang,
+  "role"          => $_SESSION['role'] ?? 'user',
+  "web_vip"       => $webVip,
   "twofa_enabled" => $twofaEnabled
 ]);

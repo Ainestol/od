@@ -2,9 +2,12 @@
 /**
  * Admin: schválí donate žádost, připíše DC do wallet, pošle email hráči.
  *
- * POST JSON: { donation_id: int }
- *
- * Conversion rate: CZK 5:1 DC, EUR 1:5 DC.
+ * POST JSON: {
+ *   donation_id: int,
+ *   dc_credited?: int    // optional override; if not provided, auto-calc:
+ *                        //   CZK / 5  (e.g., 150 CZK → 30 DC)
+ *                        //   EUR * 5  (e.g., 5 EUR → 25 DC)
+ * }
  */
 
 header('Content-Type: application/json; charset=utf-8');
@@ -31,6 +34,23 @@ try {
         http_response_code(400);
         echo json_encode(['ok' => false, 'error' => 'INVALID_ID']);
         exit;
+    }
+
+    // Optional admin override of DC amount. -1 / null / missing → auto-calc below.
+    $customDc = null;
+    if (array_key_exists('dc_credited', $input) && $input['dc_credited'] !== null && $input['dc_credited'] !== '') {
+        $customDc = (int)$input['dc_credited'];
+        if ($customDc < 0) {
+            http_response_code(400);
+            echo json_encode(['ok' => false, 'error' => 'INVALID_DC_AMOUNT']);
+            exit;
+        }
+        // Safety upper bound — admin nemůže omylem připsat 10000 DC za 150 Kč
+        if ($customDc > 100000) {
+            http_response_code(400);
+            echo json_encode(['ok' => false, 'error' => 'DC_AMOUNT_TOO_HIGH']);
+            exit;
+        }
     }
 
     $adminId = (int)$_SESSION['web_user_id'];
@@ -69,16 +89,20 @@ try {
 
         $amount   = (int)$donation['amount'];
         $currency = $donation['currency'];
+
+        // Auto-calculated default (admin může přepsat přes $customDc)
         if ($currency === 'CZK') {
-            $dcAmount = intdiv($amount, 5);
+            $autoDc = intdiv($amount, 5);
         } elseif ($currency === 'EUR') {
-            $dcAmount = $amount * 5;
+            $autoDc = $amount * 5;
         } else {
             $pdo->rollBack();
             http_response_code(400);
             echo json_encode(['ok' => false, 'error' => 'UNKNOWN_CURRENCY']);
             exit;
         }
+
+        $dcAmount = ($customDc !== null) ? $customDc : $autoDc;
 
         if ($dcAmount <= 0) {
             $pdo->rollBack();
@@ -116,10 +140,12 @@ try {
         );
 
         admin_audit($pdo, 'donation_approve', $userId, [
-            'donation_id' => $donationId,
-            'amount'      => $amount,
-            'currency'    => $currency,
-            'dc_credited' => $dcAmount
+            'donation_id'    => $donationId,
+            'amount'         => $amount,
+            'currency'       => $currency,
+            'dc_credited'    => $dcAmount,
+            'dc_auto'        => $autoDc,
+            'dc_overridden'  => ($customDc !== null && $customDc !== $autoDc),
         ]);
 
         $pdo->commit();

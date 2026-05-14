@@ -215,12 +215,13 @@ function notify(type, message, timeout = 3000) {
         return;
       }
 
-      // Welcome message pod nadpisem "Můj profil"
+      // Welcome message pod nadpisem "Můj profil" (s web ID jako "#N")
       const welcomeEl = document.getElementById('profileWelcome');
       if (welcomeEl && me.email) {
-        welcomeEl.textContent = isEn
-          ? `Welcome back, ${me.email}`
-          : `Vítej zpět, ${me.email}`;
+        const idSuffix = me.id ? ` <span class="welcome-id" title="${isEn ? 'Your Web ID' : 'Tvoje Web ID'}">#${me.id}</span>` : '';
+        welcomeEl.innerHTML = (isEn
+          ? `Welcome back, ${escapeHtml(me.email)}`
+          : `Vítej zpět, ${escapeHtml(me.email)}`) + idSuffix;
       }
 
       const container = qs('.auth-container.profile-shell') || qs('.auth-container');

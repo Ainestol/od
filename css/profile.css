@@ -481,6 +481,18 @@ body.auth-page.profile-page { overflow: auto; }
   color: #8f876b;
   letter-spacing: 0.3px;
 }
+.profile-welcome .welcome-id {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(212,175,55,0.12);
+  color: #d4af37;
+  border: 1px solid rgba(212,175,55,0.3);
+  border-radius: 999px;
+  letter-spacing: 0;
+}
 
 .profile-shell .wallet-top{
   display:flex;

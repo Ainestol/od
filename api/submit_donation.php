@@ -232,10 +232,5 @@ try {
 } catch (Throwable $e) {
     error_log('[submit_donation] ' . $e->getMessage());
     http_response_code(500);
-    echo json_encode([
-        'ok'    => false,
-        'error' => 'SERVER_ERROR',
-        'debug' => $e->getMessage(),       // TEMP — diagnose 500, remove after fix
-        'where' => $e->getFile() . ':' . $e->getLine(),
-    ]);
+    echo json_encode(['ok' => false, 'error' => 'SERVER_ERROR']);
 }

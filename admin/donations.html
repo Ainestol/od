@@ -261,6 +261,19 @@
   <div class="donmodal">
     <h3>Schválit donate</h3>
     <div class="meta" id="approveMeta">—</div>
+
+    <label for="approveDc" style="display:block; margin:10px 0 4px; font-size:13px;">
+      Připsat <strong>DC</strong> hráči
+      <span class="muted" id="approveAutoHint" style="font-style:italic;"></span>
+    </label>
+    <div style="display:flex; gap:8px; align-items:center;">
+      <input type="number" id="approveDc" min="0" max="100000" step="1"
+             style="flex:1; padding:8px 10px; background:#0b0b0b; color:#e5c46a;
+                    border:1px solid #3a3322; border-radius:4px; font:inherit;">
+      <button type="button" id="approveDcReset" class="btn btn-small"
+              title="Vrátit na automaticky vypočítanou hodnotu">⟲ Auto</button>
+    </div>
+
     <div class="donmodal-error" id="approveErr"></div>
     <div class="donmodal-actions">
       <button class="btn" id="approveCancel">Zrušit</button>
@@ -427,22 +440,53 @@
   function openApprove(d) {
     document.getElementById('approveErr').classList.remove('active');
     document.getElementById('approveErr').textContent = '';
+
+    const autoDc = expectedDc(d);
+    const rateLabel = d.currency === 'CZK'
+      ? `(${d.amount} Kč ÷ 5 = ${autoDc} DC)`
+      : `(${d.amount} EUR × 5 = ${autoDc} DC)`;
+
     document.getElementById('approveMeta').innerHTML = `
       <strong>${escapeHtml(d.user_email)}</strong> (Web ID ${d.web_user_id})<br>
-      Částka: <strong>${fmtAmount(d)}</strong> · VS: <code>${escapeHtml(d.variable_symbol)}</code><br>
-      Bude připsáno: <strong>${expectedDc(d)} DC</strong>
+      Částka: <strong>${fmtAmount(d)}</strong> · VS: <code>${escapeHtml(d.variable_symbol)}</code>
     `;
+    document.getElementById('approveDc').value = autoDc;
+    document.getElementById('approveDc').dataset.auto = autoDc;
+    document.getElementById('approveAutoHint').textContent = ' — auto ' + rateLabel;
+
     document.getElementById('approveModal').classList.add('active');
+    setTimeout(() => document.getElementById('approveDc').focus(), 50);
   }
 
   document.getElementById('approveCancel').addEventListener('click', () => {
     document.getElementById('approveModal').classList.remove('active');
   });
 
+  document.getElementById('approveDcReset').addEventListener('click', () => {
+    const inp = document.getElementById('approveDc');
+    inp.value = inp.dataset.auto || 0;
+    inp.focus();
+  });
+
   document.getElementById('approveConfirm').addEventListener('click', async () => {
     if (!currentDonation) return;
     const errEl = document.getElementById('approveErr');
     errEl.classList.remove('active');
+
+    const dcInput = document.getElementById('approveDc');
+    const dcValue = parseInt(dcInput.value, 10);
+    if (isNaN(dcValue) || dcValue < 0) {
+      errEl.textContent = 'DC musí být nezáporné číslo.';
+      errEl.classList.add('active');
+      return;
+    }
+
+    // Konfirm na velký override
+    const autoDc = parseInt(dcInput.dataset.auto, 10);
+    if (Math.abs(dcValue - autoDc) >= 20 && !confirm(
+          `Opravdu připsat ${dcValue} DC místo automatických ${autoDc} DC?`)) {
+      return;
+    }
 
     try {
       const r = await fetch('/admin/api/approve_donation.php', {
@@ -452,7 +496,10 @@
           'Content-Type': 'application/json',
           'X-CSRF-Token': CSRF || ''
         },
-        body: JSON.stringify({ donation_id: currentDonation.id })
+        body: JSON.stringify({
+          donation_id: currentDonation.id,
+          dc_credited: dcValue
+        })
       });
       const j = await r.json().catch(() => ({}));
 
