@@ -1131,3 +1131,209 @@ text-decoration:underline;
 }
 .vip-toast.show { transform: translateX(0); }
 .vip-toast.err { color: #c2554a; border-color: #c2554a; }
+
+/* =====================================
+   ECONOMY PANEL
+   ===================================== */
+
+.econ-stats { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 6px; }
+.econ-stat-card {
+  display: flex; flex-direction: column; gap: 4px;
+  padding: 14px 18px;
+  background: linear-gradient(180deg, rgba(212,175,55,0.08), rgba(212,175,55,0.02));
+  border: 1px solid rgba(212,175,55,0.2);
+  border-radius: 6px;
+  min-width: 200px;
+}
+.econ-stat-label { color: #8f876b; font-size: 12px; }
+.econ-stat-num { color: #ffd36a; font-size: 32px; font-weight: 700; line-height: 1; }
+.econ-stat-num.econ-stat-dc { color: #6ca0c8; }
+.econ-stat-sub { color: #6f6a58; font-size: 11px; margin-top: 2px; }
+
+.econ-picker { position: relative; max-width: 560px; }
+.econ-picker.hidden { display: none; }
+.econ-picker input {
+  width: 100%;
+  padding: 9px 12px;
+  background: #0b0b0b;
+  color: #e5c46a;
+  border: 1px solid #3a3322;
+  border-radius: 6px;
+  font: inherit;
+  outline: none;
+}
+.econ-picker input:focus { border-color: #d4af37; }
+.econ-picker input::placeholder { color: #6f6a58; }
+
+#econDetail { margin-top: 18px; }
+.econ-section-h {
+  color: #d4af37;
+  font-size: 16px;
+  margin: 18px 0 10px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(212,175,55,0.12);
+}
+
+.econ-wallet { display: flex; gap: 12px; margin: 8px 0; flex-wrap: wrap; }
+.econ-wallet-pill {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 12px 18px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid #3a3322;
+  border-radius: 6px;
+  min-width: 160px;
+}
+.econ-wallet-pill .pill-label { color: #8f876b; font-size: 12px; }
+.econ-wallet-pill strong { font-size: 24px; font-weight: 700; margin-top: 2px; }
+.econ-pill-vc strong { color: #ffd36a; }
+.econ-pill-dc strong { color: #6ca0c8; }
+.econ-pill-vc { border-left: 3px solid #ffd36a; }
+.econ-pill-dc { border-left: 3px solid #6ca0c8; }
+
+.econ-form { display: flex; flex-direction: column; gap: 16px; max-width: 700px; }
+.econ-quick.day-presets button[data-amt^="-"] {
+  color: #c2554a;
+}
+.econ-quick.day-presets button[data-amt^="-"]:hover {
+  border-color: #c2554a;
+  color: #d97369;
+}
+#econAmount, #econNote {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: #0b0b0b;
+  color: #e5c46a;
+  border: 1px solid #3a3322;
+  border-radius: 6px;
+  font: inherit;
+  outline: none;
+  max-width: 360px;
+}
+#econNote { max-width: 540px; }
+#econAmount:focus, #econNote:focus { border-color: #d4af37; }
+
+.econ-ledger-filters { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+.econ-ledger-filters .chip {
+  background: rgba(255,255,255,0.03);
+  color: #bfb8a0;
+  border: 1px solid #3a3322;
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.econ-ledger-filters .chip:hover { border-color: #d4af37; color: #ffd36a; }
+.econ-ledger-filters .chip.active {
+  background: #d4af37; color: #1a1408; border-color: #d4af37; font-weight: 600;
+}
+
+.econ-ledger-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.econ-ledger-table th {
+  text-align: left;
+  padding: 8px 10px;
+  color: #8f876b;
+  border-bottom: 1px solid rgba(212,175,55,0.2);
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+}
+.econ-ledger-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  color: #bfb8a0;
+}
+.econ-ledger-table tr:hover td { background: rgba(255,255,255,0.02); }
+.cur-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+.cur-badge.vc { background: rgba(212,175,55,0.15); color: #ffd36a; border: 1px solid rgba(212,175,55,0.4); }
+.cur-badge.dc { background: rgba(108,160,200,0.15); color: #6ca0c8; border: 1px solid rgba(108,160,200,0.4); }
+.amt-pos { color: #88b070; font-weight: 600; }
+.amt-neg { color: #c2554a; font-weight: 600; }
+.amt-zero { color: #8f876b; }
+.ta-right { text-align: right; }
+.ta-mono  { font-family: "SF Mono", Consolas, monospace; font-size: 12px; }
+.ta-center { text-align: center; }
+.muted-text { color: #6f6a58; font-size: 11px; }
+
+/* =====================================
+   ONLINE PLAYERS
+   ===================================== */
+
+.online-stats { display: flex; gap: 14px; flex-wrap: wrap; margin: 6px 0 12px; }
+.online-stat-card {
+  display: flex; flex-direction: column; align-items: flex-start;
+  padding: 12px 18px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(212,175,55,0.15);
+  border-radius: 6px;
+  min-width: 140px;
+}
+.online-stat-num { font-size: 28px; font-weight: 700; color: #ffd36a; line-height: 1; }
+.online-stat-label { color: #8f876b; font-size: 12px; margin-top: 4px; }
+.online-stat-num.online-stat-gm    { color: #88b070; }
+.online-stat-num.online-stat-trade { color: #6ca0c8; }
+
+.online-level-bars { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0 12px; }
+.online-level-pill {
+  font-size: 12px;
+  padding: 4px 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid #3a3322;
+  border-radius: 999px;
+  color: #bfb8a0;
+}
+.online-level-pill b { color: #ffd36a; margin-right: 6px; }
+
+.online-refresh-bar {
+  display: flex; align-items: center; gap: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  margin-top: 4px;
+  font-size: 12px;
+}
+
+.online-table th.sort-asc::after { content: ' ▲'; color: #d4af37; font-size: 9px; }
+.online-table th.sort-desc::after { content: ' ▼'; color: #d4af37; font-size: 9px; }
+
+.gm-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 8px;
+  background: #3ddc97;
+  color: #0f5132;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 3px;
+  vertical-align: 2px;
+}
+
+.time-ok   { color: #88b070; }
+.time-mid  { color: #e8a73c; }
+.time-warn { color: #c2554a; font-weight: 600; }
+
+/* Offline trade table */
+.offline-trade-table { width: 100%; }
+.trade-type-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.trade-type-badge.type-1 { background: rgba(212,175,55,0.15);  color: #ffd36a; border: 1px solid rgba(212,175,55,0.4); }
+.trade-type-badge.type-3 { background: rgba(108,160,200,0.15); color: #6ca0c8; border: 1px solid rgba(108,160,200,0.4); }
+.trade-type-badge.type-8 { background: rgba(136,176,112,0.15); color: #88b070; border: 1px solid rgba(136,176,112,0.4); }
+.trade-title { color: #e5c46a; font-style: italic; }

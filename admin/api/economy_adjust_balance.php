@@ -15,12 +15,22 @@ $adminId = (int)($_SESSION['web_user_id'] ?? 0);
 
 $data = json_decode(file_get_contents('php://input'), true);
 
-$userId  = (int)($data['user_id'] ?? 0);
+$userId   = (int)($data['user_id'] ?? 0);
 $currency = $data['currency'] ?? '';
 $amount   = (int)($data['amount'] ?? 0);
+$note     = trim((string)($data['note'] ?? ''));
+
+if (mb_strlen($note) > 255) {
+    $note = mb_substr($note, 0, 255);
+}
 
 if (!$userId || !$currency || !$amount) {
-    echo json_encode(['ok'=>false]);
+    echo json_encode(['ok'=>false, 'error'=>'MISSING_FIELDS']);
+    exit;
+}
+
+if (!in_array($currency, ['VOTE_COIN','DC'], true)) {
+    echo json_encode(['ok'=>false, 'error'=>'INVALID_CURRENCY']);
     exit;
 }
 
@@ -37,10 +47,10 @@ try {
 
     $st = $pdo->prepare("
         INSERT INTO wallet_ledger
-        (owner_type, owner_id, currency, amount, reason)
-        VALUES ('WEB', ?, ?, ?, 'ADMIN_ADJUST')
+        (owner_type, owner_id, currency, amount, reason, note)
+        VALUES ('WEB', ?, ?, ?, 'ADMIN_ADJUST', ?)
     ");
-    $st->execute([$userId, $currency, $amount]);
+    $st->execute([$userId, $currency, $amount, $note !== '' ? $note : null]);
 
    $pdo->commit();
 
@@ -62,7 +72,8 @@ system_log(
     'SUCCESS',
     [
         'currency' => $currency,
-        'amount' => $amount
+        'amount'   => $amount,
+        'note'     => $note !== '' ? $note : null,
     ]
 );
 

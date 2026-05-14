@@ -6,164 +6,104 @@
   <title>Admin – Online hráči</title>
   <link rel="stylesheet" href="/css/admin.css">
   <link rel="stylesheet" href="/css/mobile.css">
-</head>
 
+  <script src="/api/js/api.js" defer></script>
+</head>
 <body class="admin-page">
 
 <div id="adminHeader"></div>
 
 <main class="auth-container">
 
+  <!-- Stats bar -->
   <section class="admin-card">
-
-    <h2>Online hráči</h2>
-
-    <div style="margin-bottom:15px;">
-      Aktuálně online:
-      <strong id="onlineCount" class="online-badge">0</strong>
+    <h2>Online přehled</h2>
+    <div class="online-stats">
+      <div class="online-stat-card">
+        <span class="online-stat-num" id="onlTotal">0</span>
+        <span class="online-stat-label">online postav</span>
+      </div>
+      <div class="online-stat-card">
+        <span class="online-stat-num" id="onlUniqUsers">0</span>
+        <span class="online-stat-label">různých hráčů</span>
+      </div>
+      <div class="online-stat-card">
+        <span class="online-stat-num online-stat-gm" id="onlGm">0</span>
+        <span class="online-stat-label">GM online</span>
+      </div>
+      <div class="online-stat-card">
+        <span class="online-stat-num online-stat-trade" id="onlTrade">0</span>
+        <span class="online-stat-label">offline obchodů</span>
+      </div>
     </div>
+    <div class="online-level-bars">
+      <span class="online-level-pill"><b id="onlLv1">0</b> Lv 1–39</span>
+      <span class="online-level-pill"><b id="onlLv2">0</b> Lv 40–59</span>
+      <span class="online-level-pill"><b id="onlLv3">0</b> Lv 60–79</span>
+      <span class="online-level-pill"><b id="onlLv4">0</b> Lv 80+</span>
+    </div>
+    <div class="online-refresh-bar">
+      <span class="muted" id="refreshStatus">Načítám…</span>
+      <button id="refreshPause" class="btn-small" type="button">Pauza</button>
+      <button id="refreshNow" class="btn-small" type="button">Obnovit teď</button>
+    </div>
+  </section>
 
-    <table class="admin-table" id="onlineTable">
+  <!-- Online -->
+  <section class="admin-card">
+    <h2>Aktuálně online</h2>
+    <table class="admin-table online-table" id="onlineTable">
       <thead>
         <tr>
-          <th data-key="char_name" data-type="text">POSTAVA</th>
-          <th data-key="level" data-type="number">LEVEL</th>
-          <th data-key="account_name" data-type="text">ÚČET</th>
+          <th data-key="char_name"  data-type="text">POSTAVA</th>
+          <th data-key="level"      data-type="number">LEVEL</th>
+          <th data-key="classid"    data-type="number">CLASS</th>
+          <th data-key="account_name" data-type="text">GAME ÚČET</th>
+          <th data-key="web_email"  data-type="text">WEB HRÁČ</th>
           <th data-key="onlineTime" data-type="number">ODEHRÁNO</th>
         </tr>
       </thead>
       <tbody></tbody>
     </table>
+  </section>
 
+  <!-- Offline trade -->
+  <section class="admin-card">
+    <h2>Offline obchody <span class="muted" style="font-size:13px;">(private store / private buy)</span></h2>
+    <table class="admin-table offline-trade-table" id="offlineTable">
+      <thead>
+        <tr>
+          <th>POSTAVA</th>
+          <th>LEVEL</th>
+          <th>CLASS</th>
+          <th>TYP</th>
+          <th>NÁZEV OBCHODU</th>
+          <th>GAME ÚČET</th>
+          <th>WEB HRÁČ</th>
+          <th>OD KDY</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
   </section>
 
 </main>
 
-<script>
-let allPlayers = [];
-let currentSort = { key: null, dir: 1 };
-
-/* ===== LOAD DATA ===== */
-async function loadOnlinePlayers() {
-  try {
-     const res = await fetch('/admin/api/list_online_players.php?t=' + Date.now(), {
-      cache: 'no-store'
-    });
-
-    const data = await res.json();
-
-    if (!data.ok) return;
-
-    allPlayers = data.players;
-
-    document.getElementById('onlineCount').textContent = allPlayers.length;
-    renderTable(allPlayers);
-
-  } catch (e) {
-    console.error("Chyba při načítání online hráčů:", e);
-  }
-}
-
-/* ===== RENDER TABLE ===== */
-function renderTable(players) {
-  const tbody = document.querySelector('#onlineTable tbody');
-  tbody.innerHTML = '';
-
-  players.forEach(p => {
-
-    const tr = document.createElement('tr');
-
-    if (p.is_gm == 1) {
-      tr.style.background = "rgba(61,220,151,0.08)";
-    }
-
-    tr.innerHTML = `
-      <td>
-        ${p.char_name}
-        ${p.is_gm == 1 ? '<span style="margin-left:6px;padding:2px 8px;font-size:11px;font-weight:bold;border-radius:6px;background:#3ddc97;color:#0f5132;">GM</span>' : ''}
-      </td>
-      <td>${p.level}</td>
-      <td>${p.account_name}</td>
-      <td>${formatTime(p.onlineTime)}</td>
-    `;
-
-    tbody.appendChild(tr);
-  });
-}
-
-/* ===== SORTING ===== */
-function sortBy(key, type) {
-
-  let dir = 1;
-
-  if (currentSort.key === key) {
-    dir = -currentSort.dir;
-  }
-
-  currentSort = { key, dir };
-
-  const sorted = [...allPlayers].sort((a, b) => {
-
-    let v1 = a[key];
-    let v2 = b[key];
-
-    if (type === 'text') {
-      return v1.localeCompare(v2) * dir;
-    }
-
-    return (v1 - v2) * dir;
-  });
-
-  renderTable(sorted);
-}
-
-/* ===== TIME FORMAT ===== */
-function formatTime(sec) {
-  if (!sec) return "0h 0m";
-
-  const h = Math.floor(sec / 3600);
-  const m = Math.floor((sec % 3600) / 60);
-
-  return `${h}h ${m}m`;
-}
-
-/* ===== HEADER EVENTS ===== */
-document.querySelectorAll('#onlineTable th').forEach(th => {
-  th.style.cursor = 'pointer';
-
-  th.addEventListener('click', () => {
-    sortBy(
-      th.dataset.key,
-      th.dataset.type
-    );
-  });
-});
-
-/* ===== INIT ===== */
-loadOnlinePlayers();
-setInterval(loadOnlinePlayers, 5000);
-</script>
+<script src="/admin/js/online_players_admin.js" defer></script>
 
 <script>
 fetch('/admin/partials/admin_header.html')
   .then(r => r.text())
   .then(html => {
     document.getElementById('adminHeader').innerHTML = html;
-
-    // 🔥 zvýraznění aktivní stránky
-   const links = document.querySelectorAll('.admin-nav a');
-const currentFile = window.location.pathname.split("/").pop();
-
-links.forEach(link => {
-  const linkFile = link.getAttribute('href').split("/").pop();
-
-  if (currentFile === linkFile) {
-    link.classList.add('active');
-  }
-});
+    const links = document.querySelectorAll('.admin-nav a');
+    const currentFile = window.location.pathname.split("/").pop();
+    links.forEach(link => {
+      const linkFile = link.getAttribute('href').split("/").pop();
+      if (currentFile === linkFile) link.classList.add('active');
+    });
   });
 </script>
-
 
 </body>
 </html>

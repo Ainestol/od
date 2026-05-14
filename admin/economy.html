@@ -4,8 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin – Economy</title>
-      <link rel="stylesheet" href="/css/admin.css">
-      <link rel="stylesheet" href="/css/mobile.css">
+
+  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="stylesheet" href="/css/mobile.css">
+
+  <script src="/api/js/api.js" defer></script>
+  <script src="/admin/js/economy.js" defer></script>
 </head>
 <body class="admin-page">
 
@@ -13,63 +17,113 @@
 
 <main class="auth-container">
 
-    <section class="admin-card">
-        <h2>Economy Panel</h2>
+  <!-- Stats bar -->
+  <section class="admin-card">
+    <h2>Economy přehled</h2>
+    <div class="econ-stats" id="econStats">
+      <div class="econ-stat-card">
+        <span class="econ-stat-label">Vote Coiny v oběhu</span>
+        <span class="econ-stat-num" id="econTotalVc">–</span>
+        <span class="econ-stat-sub"><span id="econHoldersVc">–</span> hráčů</span>
+      </div>
+      <div class="econ-stat-card">
+        <span class="econ-stat-label">Dragon Coiny v oběhu</span>
+        <span class="econ-stat-num econ-stat-dc" id="econTotalDc">–</span>
+        <span class="econ-stat-sub"><span id="econHoldersDc">–</span> hráčů</span>
+      </div>
+    </div>
+  </section>
 
-        <label>Email uživatele</label>
-        <div style="display:flex; gap:10px;">
-            <input type="text" id="searchEmail">
-            <button id="searchUser" class="btn btn-primary">Hledat</button>
+  <!-- Picker -->
+  <section class="admin-card">
+    <h2>Najít hráče</h2>
+    <div class="econ-picker">
+      <input id="econSearch" type="text" autocomplete="off"
+             placeholder="Začni psát e-mail nebo web ID hráče…">
+      <div class="vip-autocomplete" id="econAutocomplete"></div>
+    </div>
+    <div class="vip-target-chip hidden" id="econSelectedChip">
+      <span class="chip-label"></span>
+      <button class="chip-clear" type="button" title="Zrušit výběr">✕</button>
+    </div>
+  </section>
+
+  <!-- Detail -->
+  <section class="admin-card hidden" id="econDetail">
+    <h2 id="econUserEmail">–</h2>
+
+    <div class="econ-wallet">
+      <div class="econ-wallet-pill econ-pill-vc">
+        <span class="pill-label">Vote Coin</span>
+        <strong id="econUserVc">0</strong>
+      </div>
+      <div class="econ-wallet-pill econ-pill-dc">
+        <span class="pill-label">Dragon Coin</span>
+        <strong id="econUserDc">0</strong>
+      </div>
+    </div>
+
+    <h3 class="econ-section-h">Upravit zůstatek</h3>
+
+    <div class="econ-form">
+      <div class="vip-field">
+        <label>Měna</label>
+        <div class="seg-control" id="econCurrencySeg">
+          <button type="button" data-cur="VOTE_COIN" class="active">Vote Coin</button>
+          <button type="button" data-cur="DC">Dragon Coin</button>
         </div>
-    </section>
+      </div>
 
-    <section id="userResult" class="admin-card hidden">
-
-        <h3 id="userEmail"></h3>
-
-        <div style="margin-bottom:15px;">
-            Vote Coin: <strong id="adminVC">0</strong><br>
-            Dragon Coin: <strong id="adminDC">0</strong>
+      <div class="vip-field">
+        <label>Rychlé částky</label>
+        <div class="day-presets econ-quick" id="econQuickAdjust">
+          <button type="button" data-amt="5">+5</button>
+          <button type="button" data-amt="10">+10</button>
+          <button type="button" data-amt="20">+20</button>
+          <button type="button" data-amt="50">+50</button>
+          <button type="button" data-amt="-5">−5</button>
+          <button type="button" data-amt="-10">−10</button>
+          <button type="button" data-amt="custom" class="active">Vlastní…</button>
         </div>
+        <input id="econAmount" type="number" placeholder="Částka (může být i záporná)">
+      </div>
 
-        <hr>
+      <div class="vip-field">
+        <label>Poznámka (volitelně)</label>
+        <input id="econNote" type="text" maxlength="255"
+               placeholder="např. kompenzace bug v shopu, vrácení donate, …">
+      </div>
 
-        <h4>Upravit měnu</h4>
+      <div class="vip-form-actions">
+        <button id="econAdjustBtn" class="btn btn-primary" disabled>Provést změnu</button>
+      </div>
+    </div>
 
-        <div style="display:flex; gap:10px; align-items:center;">
-            <select id="currencySelect">
-                <option value="VOTE_COIN">Vote Coin</option>
-                <option value="DC">Dragon Coin</option>
-            </select>
+    <h3 class="econ-section-h">Historie transakcí</h3>
 
-            <input type="number" id="amountInput" placeholder="částka">
+    <div class="econ-ledger-filters" id="econLedgerFilters">
+      <button class="chip active" data-cur-filter="all">Vše</button>
+      <button class="chip" data-cur-filter="VOTE_COIN">Vote Coin</button>
+      <button class="chip" data-cur-filter="DC">Dragon Coin</button>
+    </div>
 
-            <button id="adjustBalance" class="btn btn-primary">
-                Provést změnu
-            </button>
-        </div>
-
-        <hr>
-
-        <h4>Ledger historie</h4>
-        <div id="ledgerList"></div>
-
-    </section>
+    <div class="econ-ledger" id="econLedger">
+      <div class="muted">Vyber hráče výše.</div>
+    </div>
+  </section>
 
 </main>
-<script src="/api/js/api.js"></script>
-<script src="/admin/js/economy.js"></script>
+
+<!-- Toast -->
+<div class="vip-toast" id="econToast"></div>
 
 <script>
 fetch('/admin/partials/admin_header.html')
   .then(r => r.text())
   .then(html => {
     document.getElementById('adminHeader').innerHTML = html;
-
-    // 🔥 zvýraznění aktivní stránky
     const links = document.querySelectorAll('.admin-nav a');
     const currentPath = window.location.pathname;
-
     links.forEach(link => {
       if (currentPath.includes(link.getAttribute('href'))) {
         link.classList.add('active');
@@ -78,7 +132,5 @@ fetch('/admin/partials/admin_header.html')
   });
 </script>
 
-
 </body>
-
 </html>
