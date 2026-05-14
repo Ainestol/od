@@ -86,7 +86,8 @@ try {
     }
 
     // Datum platby — formát YYYY-MM-DD, nesmí být v budoucnu, ne víc než 30 dní zpět
-    $dt = DateTime::createFromFormat('Y-m-d', $paidAt);
+    // !Y-m-d → zeroes out time (00:00:00) so comparison against `today` works
+    $dt = DateTime::createFromFormat('!Y-m-d', $paidAt);
     if (!$dt || $dt->format('Y-m-d') !== $paidAt) {
         http_response_code(400);
         echo json_encode(['ok' => false, 'error' => 'INVALID_DATE']);
@@ -146,11 +147,24 @@ try {
         }
     }
 
-    // === 7) generate variabilní symbol = padded user_id + rok platby ===
+    // === 7) generate variabilní symbol = userId + rok + pořadí (per user/year) ===
+    // Příklad: user #1, 1. platba v 2026 → "120261", 2. → "120262", …
+    //          user #12, 1. platba v 2026 → "1220261"
+    // Bere se YEAR(paid_at), tedy rok dle data převodu (ne data odeslání).
     $year = (int)$dt->format('Y');
-    $vs   = sprintf('%04d%d', $userId, $year);
+
+    $seqStmt = $pdo->prepare("
+        SELECT COUNT(*) FROM donations
+        WHERE web_user_id = ?
+          AND YEAR(paid_at) = ?
+    ");
+    $seqStmt->execute([$userId, $year]);
+    $seq = (int)$seqStmt->fetchColumn() + 1;
+
+    $vs = $userId . $year . $seq;
+
+    // VS pro bankovní převod má být numeric do 10 znaků; rezerva 20.
     if (strlen($vs) > 20) {
-        // safety guard — VS musí být max 10 znaků v praxi, my máme rezervu
         $vs = substr($vs, 0, 20);
     }
 
