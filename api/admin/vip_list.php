@@ -160,7 +160,22 @@ try {
         'expired'       => 0,
         'expiring_soon' => 0,
         'by_scope'      => ['WEB' => 0, 'GAME' => 0, 'CHAR' => 0],
+        // derived from game DB — how many game accounts actually have Premium in-game
+        'game_accounts_with_premium' => 0,
     ];
+
+    // Effective premium accounts (Premium 24h, GAME, or WEB cascade — anything in account_premium)
+    try {
+        $cStmt = $pdoPremium->query("
+            SELECT COUNT(*) AS cnt
+            FROM account_premium
+            WHERE enddate > UNIX_TIMESTAMP() * 1000
+        ");
+        $stats['game_accounts_with_premium'] = (int)$cStmt->fetchColumn();
+    } catch (Throwable $e) {
+        // not critical — just leave it at 0
+        error_log('[admin/vip_list] effective count failed: ' . $e->getMessage());
+    }
 
     foreach ($rows as &$r) {
         $r['id']            = (int)$r['id'];

@@ -671,19 +671,79 @@ text-decoration:underline;
    VIP PANEL
    ===================================== */
 
+/* Headline — big effective premium accounts count */
+.vip-stats-headline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 18px;
+  padding: 14px 16px;
+  background: linear-gradient(180deg, rgba(212,175,55,0.08), rgba(212,175,55,0.02));
+  border: 1px solid rgba(212,175,55,0.2);
+  border-radius: 6px;
+  margin-bottom: 14px;
+}
+.vip-stats-big { display: flex; flex-direction: column; }
+.vip-stats-big-num {
+  font-size: 42px;
+  font-weight: 700;
+  color: #ffd36a;
+  line-height: 1;
+}
+.vip-stats-big-label {
+  color: #bfb8a0;
+  font-size: 13px;
+  margin-top: 4px;
+}
+.vip-stats-hint {
+  flex: 1;
+  min-width: 220px;
+  font-size: 12px;
+  color: #8f876b;
+  line-height: 1.5;
+}
+.vip-stats-hint code {
+  background: rgba(255,255,255,0.05);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 11px;
+  color: #d4af37;
+}
+
 .vip-stats {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 16px;
   font-size: 13px;
   color: #bfb8a0;
+  padding-top: 4px;
 }
-.vip-stat { display: inline-flex; align-items: baseline; gap: 8px; }
-.vip-stat b { color: #ffd36a; font-size: 20px; font-weight: 600; }
+.vip-stats-prefix { color: #6f6a58; font-size: 12px; align-self: center; }
+.vip-stats-prefix code {
+  background: rgba(255,255,255,0.05);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 11px;
+  color: #d4af37;
+}
+.vip-stat { display: inline-flex; align-items: baseline; gap: 8px; cursor: help; }
+.vip-stat b { color: #ffd36a; font-size: 18px; font-weight: 600; }
 .vip-stat.scope-web b  { color: #ffd36a; }
 .vip-stat.scope-game b { color: #6ca0c8; }
 .vip-stat.scope-char b { color: #88b070; }
 .vip-stat-soon b { color: #e8a73c; }
+
+.vip-preview-badge {
+  display: inline-block;
+  background: #d4af37;
+  color: #1a1408;
+  font-weight: 700;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  margin-right: 6px;
+  vertical-align: 1px;
+}
 
 .vip-form {
   display: flex;
@@ -727,6 +787,34 @@ text-decoration:underline;
 }
 
 .vip-level-hint { font-size: 11px; color: #6f6a58; padding: 0; }
+
+/* Cascade context bar — "Filtruji game účty hráče X" */
+.vip-context-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: rgba(108,160,200,0.08);
+  border: 1px solid rgba(108,160,200,0.4);
+  border-radius: 6px;
+  color: #bfb8a0;
+  font-size: 12px;
+  max-width: 560px;
+}
+.vip-context-bar.hidden { display: none; }
+.vip-context-icon { font-size: 14px; }
+.vip-context-text b { color: #6ca0c8; font-weight: 600; }
+.vip-context-clear {
+  background: transparent;
+  border: none;
+  color: #8f876b;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+  margin-left: auto;
+}
+.vip-context-clear:hover { color: #c2554a; }
 
 /* Target picker */
 .vip-picker { position: relative; max-width: 560px; }

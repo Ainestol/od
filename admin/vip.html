@@ -20,12 +20,25 @@
     <!-- Stats bar -->
     <section class="admin-card vip-stats-card">
         <h2>VIP přehled</h2>
+
+        <div class="vip-stats-headline">
+            <div class="vip-stats-big">
+                <span class="vip-stats-big-num" id="statEffective">–</span>
+                <span class="vip-stats-big-label">game účtů má aktivní Premium ve hře</span>
+            </div>
+            <div class="vip-stats-hint">
+                Počítá se přímo z <code>l2game.account_premium</code> — zahrnuje vše:
+                WEB cascade, GAME granty, Premium 24h.
+            </div>
+        </div>
+
         <div class="vip-stats">
-            <span class="vip-stat">Aktivní<b id="statActive">–</b></span>
-            <span class="vip-stat scope-web">WEB<b id="statWeb">–</b></span>
-            <span class="vip-stat scope-game">GAME<b id="statGame">–</b></span>
-            <span class="vip-stat scope-char">CHAR<b id="statChar">–</b></span>
-            <span class="vip-stat vip-stat-soon">Brzy končí (&lt; 5 d)<b id="statSoon">–</b></span>
+            <span class="vip-stats-prefix">Záznamů v <code>vip_grants</code>:</span>
+            <span class="vip-stat" title="Celkem aktivních grantů v DB tabulce vip_grants">Aktivní<b id="statActive">–</b></span>
+            <span class="vip-stat scope-web"  title="Granty se scope=WEB (cascade na všechny game účty hráče)">WEB<b id="statWeb">–</b></span>
+            <span class="vip-stat scope-game" title="Granty se scope=GAME (jen konkrétní game účet)">GAME<b id="statGame">–</b></span>
+            <span class="vip-stat scope-char" title="Granty se scope=CHAR (legacy, deprecated)">CHAR<b id="statChar">–</b></span>
+            <span class="vip-stat vip-stat-soon" title="Granty které končí v příštích 5 dnech">Brzy končí<b id="statSoon">–</b></span>
         </div>
     </section>
 
@@ -40,12 +53,21 @@
                 <div class="seg-control" id="scopeSeg">
                     <button type="button" data-scope="WEB"  class="active">WEB · web account</button>
                     <button type="button" data-scope="GAME">GAME · game účet</button>
-                    <button type="button" data-scope="CHAR">CHAR · postava</button>
+                </div>
+                <div class="vip-level-hint muted">
+                    CHAR scope je legacy a byl odstraněn z přidávání. Pro Premium 24h použij <b>GAME + VIP I + 1 den</b>.
                 </div>
             </div>
 
             <div class="vip-field">
                 <label id="targetLabel">Pro koho (e-mail)</label>
+
+                <div class="vip-context-bar hidden" id="vipContextBar">
+                    <span class="vip-context-icon">🔗</span>
+                    <span class="vip-context-text">Filtruji game účty hráče: <b id="vipContextEmail"></b></span>
+                    <button class="vip-context-clear" type="button" title="Zrušit filtr — hledat napříč všemi hráči">✕</button>
+                </div>
+
                 <div class="vip-picker">
                     <input id="vipTargetSearch" type="text" autocomplete="off"
                            placeholder="Začni psát e-mail nebo web ID…">

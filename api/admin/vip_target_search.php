@@ -3,9 +3,11 @@
  * Admin: autocomplete picker for VIP target.
  *
  * GET params:
- *   scope  — WEB | GAME | CHAR (required)
- *   q      — search query (min 1 char)
- *   limit  — max results (default 10, max 30)
+ *   scope      — WEB | GAME | CHAR (required)
+ *   q          — search query (min 1 char, or empty when webUserId is set for browse mode)
+ *   webUserId  — optional, filters GAME and CHAR results to those owned by this web user.
+ *                When set with empty q, returns all of that user's accounts (browse mode).
+ *   limit      — max results (default 10, max 30)
  *
  * Response shape (scope-aware fields, plus existing_grant if any):
  *   {
@@ -35,11 +37,13 @@ try {
         exit;
     }
 
-    $q     = trim((string)($_GET['q'] ?? ''));
-    $qint  = ($q !== '' && ctype_digit($q)) ? (int)$q : 0;
-    $limit = max(1, min(30, (int)($_GET['limit'] ?? 10)));
+    $q         = trim((string)($_GET['q'] ?? ''));
+    $qint      = ($q !== '' && ctype_digit($q)) ? (int)$q : 0;
+    $webUserId = max(0, (int)($_GET['webUserId'] ?? 0));
+    $limit     = max(1, min(30, (int)($_GET['limit'] ?? 10)));
 
-    if ($q === '') {
+    // Empty q is allowed only when browsing by webUserId (cascade mode for GAME/CHAR)
+    if ($q === '' && $webUserId <= 0) {
         echo json_encode(['ok' => true, 'scope' => $scope, 'results' => []]);
         exit;
     }
@@ -67,17 +71,36 @@ try {
             ];
         }
     } elseif ($scope === 'GAME') {
-        $stmt = $pdo->prepare("
+        // Build query conditionally based on cascade mode
+        $where = [];
+        $params = [];
+
+        if ($q === '') {
+            // Browse mode: webUserId is required (already validated above)
+            $where[] = 'ga.web_user_id = ?';
+            $params[] = $webUserId;
+        } else {
+            $where[] = '(ga.login LIKE ? OR (? > 0 AND ga.id = ?))';
+            $params[] = '%' . $q . '%';
+            $params[] = $qint;
+            $params[] = $qint;
+            if ($webUserId > 0) {
+                $where[] = 'ga.web_user_id = ?';
+                $params[] = $webUserId;
+            }
+        }
+
+        $sql = "
             SELECT
                 ga.id, ga.login, ga.web_user_id, u.email AS web_email
             FROM game_accounts ga
             LEFT JOIN users u ON u.id = ga.web_user_id
-            WHERE ga.login LIKE ?
-               OR (? > 0 AND ga.id = ?)
-            ORDER BY ga.login ASC
+            WHERE " . implode(' AND ', $where) . "
+            ORDER BY ga.is_primary DESC, ga.login ASC
             LIMIT $limit
-        ");
-        $stmt->execute(['%' . $q . '%', $qint, $qint]);
+        ";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
         $gameAccs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // batch char_count from game DB

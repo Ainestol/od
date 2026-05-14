@@ -13,6 +13,10 @@
     days: 30,
     customDays: false,
 
+    // Cascade picker: when admin picks a WEB user, we remember them
+    // so that switching to GAME shows only their accounts.
+    webContext: null,       // null | { id, email }
+
     levels: [],             // [{level_id, name, is_active}]
     prices: { WEB: {}, GAME: {}, CHAR: {} },
 
@@ -67,10 +71,17 @@
     const params = new URLSearchParams(window.location.search);
     const urlScope = params.get('scope');
     const urlId    = params.get('targetId');
-    if (urlScope && urlId && ['WEB','GAME','CHAR'].includes(urlScope.toUpperCase())) {
-      state.scope = urlScope.toUpperCase();
-      applyScopeUI();
-      await prefillTarget(state.scope, urlId);
+    if (urlScope && urlId) {
+      const upper = urlScope.toUpperCase();
+      if (upper === 'CHAR') {
+        // Legacy URL (users.html → "VIP postavy" button). CHAR scope is deprecated;
+        // explain and leave form on default WEB scope.
+        toast('CHAR scope je legacy. Pro Premium 24h použij GAME + VIP I + 1 den.', 'err');
+      } else if (upper === 'WEB' || upper === 'GAME') {
+        state.scope = upper;
+        applyScopeUI();
+        await prefillTarget(state.scope, urlId);
+      }
     }
 
     updatePreview();
@@ -138,9 +149,13 @@
     document.getElementById('scopeSeg').addEventListener('click', e => {
       const btn = e.target.closest('button[data-scope]');
       if (!btn || btn.dataset.scope === state.scope) return;
-      state.scope = btn.dataset.scope;
+      const newScope = btn.dataset.scope;
+      // If switching back to WEB, the cascade context no longer makes sense
+      if (newScope === 'WEB') state.webContext = null;
+      state.scope = newScope;
       state.target = null;
       applyScopeUI();
+      applyContextBar();
       hideTargetChip();
       document.getElementById('vipTargetSearch').value = '';
       hideAutocomplete();
@@ -174,13 +189,28 @@
     input.addEventListener('input', () => {
       clearTimeout(state.debounceTimer);
       const q = input.value.trim();
-      if (q.length < 1) { hideAutocomplete(); return; }
-      state.debounceTimer = setTimeout(() => searchTarget(q), 250);
+      const ctxId = cascadeWebUserId();
+      if (q.length < 1) {
+        // No query: if cascade context active for GAME, show browse-mode dropdown
+        if (ctxId > 0 && state.scope === 'GAME') {
+          state.debounceTimer = setTimeout(() => searchTarget('', ctxId), 100);
+        } else {
+          hideAutocomplete();
+        }
+        return;
+      }
+      state.debounceTimer = setTimeout(() => searchTarget(q, ctxId), 250);
     });
 
     input.addEventListener('focus', () => {
       const q = input.value.trim();
-      if (q) searchTarget(q);
+      const ctxId = cascadeWebUserId();
+      if (q) {
+        searchTarget(q, ctxId);
+      } else if (ctxId > 0 && state.scope === 'GAME') {
+        // Cascade: focus on empty field opens browse list of this user's accounts
+        searchTarget('', ctxId);
+      }
     });
 
     document.addEventListener('click', e => {
@@ -201,20 +231,50 @@
       document.getElementById('vipTargetSearch').focus();
       updatePreview();
     });
+
+    // Clear cascade context filter
+    document.querySelector('#vipContextBar .vip-context-clear').addEventListener('click', () => {
+      state.webContext = null;
+      applyContextBar();
+      // If the autocomplete is currently open in browse mode, hide it
+      hideAutocomplete();
+      document.getElementById('vipTargetSearch').focus();
+    });
   }
 
-  async function searchTarget(q) {
+  function cascadeWebUserId() {
+    // Cascade only applies to GAME scope picker
+    if (state.scope === 'GAME' && state.webContext) return state.webContext.id;
+    return 0;
+  }
+
+  function applyContextBar() {
+    const bar = document.getElementById('vipContextBar');
+    const show = state.scope === 'GAME' && state.webContext;
+    if (show) {
+      document.getElementById('vipContextEmail').textContent =
+        state.webContext.email || ('web #' + state.webContext.id);
+      bar.classList.remove('hidden');
+    } else {
+      bar.classList.add('hidden');
+    }
+  }
+
+  async function searchTarget(q, webUserId = 0) {
     const ac = document.getElementById('vipAutocomplete');
     ac.innerHTML = '<div class="vip-autocomplete-loading">Hledám…</div>';
     ac.classList.add('open');
     try {
-      const res = await apiFetch(
-        '/api/admin/vip_target_search.php?scope=' + encodeURIComponent(state.scope)
-        + '&q=' + encodeURIComponent(q)
-      );
+      let url = '/api/admin/vip_target_search.php?scope=' + encodeURIComponent(state.scope)
+              + '&q=' + encodeURIComponent(q);
+      if (webUserId > 0) url += '&webUserId=' + webUserId;
+      const res = await apiFetch(url);
       state.searchResults = res.results || [];
       if (!state.searchResults.length) {
-        ac.innerHTML = '<div class="vip-autocomplete-empty">Nic nenalezeno</div>';
+        const msg = (q === '' && webUserId > 0)
+          ? 'Tento hráč nemá žádný game účet'
+          : 'Nic nenalezeno';
+        ac.innerHTML = '<div class="vip-autocomplete-empty">' + msg + '</div>';
         return;
       }
       ac.innerHTML = state.searchResults.map((r, i) => acItemHtml(r, i)).join('');
@@ -253,6 +313,13 @@
 
   function selectTarget(r) {
     state.target = r;
+    // Remember web context so we can cascade-filter game accounts when scope switches
+    if (state.scope === 'WEB') {
+      state.webContext = { id: r.id, email: r.label };
+    } else if (state.scope === 'GAME' && r.extra && r.extra.web_user_id) {
+      state.webContext = { id: r.extra.web_user_id, email: r.context || null };
+    }
+    applyContextBar();
     hideAutocomplete();
     showTargetChip(r);
     document.getElementById('vipTargetSearch').value = '';
@@ -339,6 +406,12 @@
       CHAR: `pro postavu <b>${esc(state.target.label)}</b>`,
     }[state.scope];
 
+    // Special-case: Premium 24h preset (GAME + VIP I + 1 den)
+    let badge = '';
+    if (state.scope === 'GAME' && state.levelId === 1 && state.days === 1) {
+      badge = '<span class="vip-preview-badge">⏱ Premium 24h</span> ';
+    }
+
     let warn = '';
     if (state.scope === 'WEB' && state.target.extra) {
       const n = state.target.extra.game_account_count || 0;
@@ -351,7 +424,7 @@
       exi = `<br><span class="preview-info">ℹ Aktuálně má <b>${esc(g.level_name)}</b> do ${esc(fmtDate(g.end_at))} (zbývá ${g.days_remaining} d) — nové dny se přičtou.</span>`;
     }
 
-    box.innerHTML = `Aktivuje <b>${esc(lvlName)}</b> na <b>${state.days} dní</b> ${scopeWord}.${warn}${exi}`;
+    box.innerHTML = `${badge}Aktivuje <b>${esc(lvlName)}</b> na <b>${state.days} dní</b> ${scopeWord}.${warn}${exi}`;
     box.classList.remove('hidden');
     btn.disabled = false;
   }
@@ -406,6 +479,7 @@
   }
 
   function renderStats(s) {
+    document.getElementById('statEffective').textContent = s.game_accounts_with_premium ?? '–';
     document.getElementById('statActive').textContent = s.active ?? '–';
     document.getElementById('statWeb').textContent    = (s.by_scope && s.by_scope.WEB)  ?? '–';
     document.getElementById('statGame').textContent   = (s.by_scope && s.by_scope.GAME) ?? '–';
