@@ -1337,3 +1337,261 @@ text-decoration:underline;
 .trade-type-badge.type-3 { background: rgba(108,160,200,0.15); color: #6ca0c8; border: 1px solid rgba(108,160,200,0.4); }
 .trade-type-badge.type-8 { background: rgba(136,176,112,0.15); color: #88b070; border: 1px solid rgba(136,176,112,0.4); }
 .trade-title { color: #e5c46a; font-style: italic; }
+
+/* =====================================
+   SECURITY (Anti-Cheat) PANEL
+   ===================================== */
+
+/* Subtabs */
+.sec-subtabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+.sec-subtab {
+  background: rgba(255,255,255,0.03);
+  color: #bfb8a0;
+  border: 1px solid #3a3322;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.sec-subtab:hover { border-color: #d4af37; color: #ffd36a; }
+.sec-subtab.active {
+  background: #d4af37; color: #1a1408; border-color: #d4af37; font-weight: 600;
+}
+
+.sec-pane.hidden { display: none; }
+
+.sec-section-h {
+  color: #d4af37;
+  font-size: 14px;
+  margin: 18px 0 10px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(212,175,55,0.12);
+  letter-spacing: 0.3px;
+}
+
+/* Stat cards */
+.sec-stats {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 8px 0 6px;
+}
+.sec-stat-card {
+  display: flex; flex-direction: column;
+  padding: 14px 18px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(212,175,55,0.15);
+  border-radius: 6px;
+  min-width: 160px;
+}
+.sec-stat-card.sec-stat-mini { padding: 8px 14px; min-width: 140px; }
+.sec-stat-card.sec-stat-mini .sec-stat-num { font-size: 22px; }
+.sec-stat-card.sec-stat-danger { border-color: rgba(194,85,74,0.45); background: rgba(194,85,74,0.05); }
+.sec-stat-card.sec-stat-danger .sec-stat-num { color: #c2554a; }
+.sec-stat-card.sec-stat-warn   { border-color: rgba(232,167,60,0.45); background: rgba(232,167,60,0.05); }
+.sec-stat-card.sec-stat-warn   .sec-stat-num { color: #e8a73c; }
+.sec-stat-num { color: #ffd36a; font-size: 30px; font-weight: 700; line-height: 1; }
+.sec-stat-label { color: #8f876b; font-size: 12px; margin-top: 4px; }
+
+/* Breakdown pills */
+.sec-breakdown {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.bd-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid #3a3322;
+  border-radius: 999px;
+  font-size: 12px;
+  color: #bfb8a0;
+}
+.bd-pill b { color: #ffd36a; font-weight: 700; }
+.bd-teleport { border-color: rgba(108,160,200,0.4); }
+.bd-teleport b { color: #6ca0c8; }
+.bd-speed    { border-color: rgba(232,167,60,0.4); }
+.bd-speed    b { color: #e8a73c; }
+.bd-range    { border-color: rgba(212,175,55,0.4); }
+.bd-economy  { border-color: rgba(136,176,112,0.4); }
+.bd-economy  b { color: #88b070; }
+
+/* Toolbar (Players + Events) */
+.sec-toolbar {
+  display: flex; gap: 12px; flex-wrap: wrap; align-items: center;
+  margin-bottom: 14px;
+}
+.sec-search {
+  flex: 1; min-width: 200px; max-width: 360px;
+  padding: 8px 12px;
+  background: #0b0b0b;
+  color: #e5c46a;
+  border: 1px solid #3a3322;
+  border-radius: 6px;
+  font: inherit;
+  outline: none;
+}
+.sec-search:focus { border-color: #d4af37; }
+.sec-search::placeholder { color: #6f6a58; }
+
+.sec-filters { display: flex; gap: 6px; flex-wrap: wrap; }
+.sec-filters .chip {
+  background: rgba(255,255,255,0.03);
+  color: #bfb8a0;
+  border: 1px solid #3a3322;
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.sec-filters .chip:hover { border-color: #d4af37; color: #ffd36a; }
+.sec-filters .chip.active { background: #d4af37; color: #1a1408; border-color: #d4af37; font-weight: 600; }
+
+.sec-select {
+  background: #0b0b0b;
+  color: #e5c46a;
+  border: 1px solid #3a3322;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.sec-sort {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+}
+.sec-sort select {
+  background: #0b0b0b;
+  color: #e5c46a;
+  border: 1px solid #3a3322;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font: inherit;
+  font-size: 13px;
+}
+#playersSortDir, #eventsSortDir {
+  background: rgba(255,255,255,0.03);
+  color: #d4af37;
+  border: 1px solid #3a3322;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 13px;
+  cursor: pointer;
+  min-width: 30px;
+}
+#playersSortDir:hover, #eventsSortDir:hover { border-color: #d4af37; }
+
+/* Flags */
+.flag-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  margin-right: 4px;
+}
+.flag-ban   { background: rgba(194,85,74,0.15);   color: #c2554a; border: 1px solid rgba(194,85,74,0.5); }
+.flag-high  { background: rgba(232,167,60,0.15);  color: #e8a73c; border: 1px solid rgba(232,167,60,0.5); }
+.flag-watch { background: rgba(108,160,200,0.15); color: #6ca0c8; border: 1px solid rgba(108,160,200,0.5); }
+
+.score-num { color: #c2554a; font-weight: 700; font-size: 14px; }
+
+/* Event type badges */
+.ev-type {
+  display: inline-block; padding: 2px 8px; border-radius: 3px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.3px;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15);
+}
+.ev-type.ev-teleport { color: #6ca0c8; border-color: rgba(108,160,200,0.5); }
+.ev-type.ev-speed    { color: #e8a73c; border-color: rgba(232,167,60,0.5); }
+.ev-type.ev-range    { color: #ffd36a; border-color: rgba(212,175,55,0.5); }
+.ev-type.ev-economy  { color: #88b070; border-color: rgba(136,176,112,0.5); }
+
+/* Severity badges */
+.sev-badge {
+  display: inline-block; padding: 2px 8px; border-radius: 3px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.3px;
+}
+.sev-critical { background: #c2554a; color: #fff; }
+.sev-high     { background: rgba(194,85,74,0.2);   color: #c2554a; border: 1px solid rgba(194,85,74,0.55); }
+.sev-medium   { background: rgba(232,167,60,0.15); color: #e8a73c; border: 1px solid rgba(232,167,60,0.5); }
+.sev-low      { background: rgba(136,176,112,0.15); color: #88b070; border: 1px solid rgba(136,176,112,0.5); }
+.sev-unknown  { background: rgba(255,255,255,0.05); color: #8f876b; }
+
+/* Review status badges */
+.status-badge.st-new       { background: rgba(232,167,60,0.15);  color: #e8a73c; border: 1px solid rgba(232,167,60,0.5); padding:2px 8px; border-radius:3px; font-size:11px; font-weight:600; }
+.status-badge.st-reviewed  { background: rgba(108,160,200,0.15); color: #6ca0c8; border: 1px solid rgba(108,160,200,0.5); padding:2px 8px; border-radius:3px; font-size:11px; font-weight:600; }
+.status-badge.st-confirmed { background: rgba(194,85,74,0.15);   color: #c2554a; border: 1px solid rgba(194,85,74,0.5); padding:2px 8px; border-radius:3px; font-size:11px; font-weight:600; }
+.status-badge.st-ignored   { background: rgba(120,110,90,0.15);  color: #8f876b; border: 1px solid rgba(120,110,90,0.3); padding:2px 8px; border-radius:3px; font-size:11px; font-weight:600; }
+
+/* Event modal detail */
+.sec-event-modal { max-width: 720px; }
+.ev-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px 16px;
+  margin-bottom: 12px;
+}
+.ev-detail-grid > div {
+  display: flex; flex-direction: column;
+  padding: 6px 0;
+  border-bottom: 1px dashed rgba(255,255,255,0.05);
+}
+.ev-detail-grid > div .muted-text { font-size: 11px; }
+.ev-detail-grid > div b { color: #e5c46a; font-size: 13px; }
+
+.ev-context summary {
+  cursor: pointer;
+  color: #8f876b;
+  margin-top: 12px;
+  padding: 6px 0;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+.ev-context pre {
+  background: #0b0b0b;
+  border: 1px solid #3a3322;
+  padding: 10px;
+  border-radius: 4px;
+  color: #bfb8a0;
+  font-size: 12px;
+  font-family: "SF Mono", Consolas, monospace;
+  max-height: 200px;
+  overflow: auto;
+  margin-top: 8px;
+}
+
+.sec-review-form {
+  margin: 14px 0 6px;
+  padding: 12px;
+  background: rgba(212,175,55,0.05);
+  border: 1px solid rgba(212,175,55,0.2);
+  border-radius: 6px;
+}
+.sec-review-form .sort-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+}
+.sec-review-form textarea {
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px 10px;
+  background: #0b0b0b;
+  color: #e5c46a;
+  border: 1px solid #3a3322;
+  border-radius: 4px;
+  font: inherit;
+  resize: vertical;
+  min-height: 60px;
+  box-sizing: border-box;
+}

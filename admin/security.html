@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin – Bezpečnost</title>
+
+  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="stylesheet" href="/css/mobile.css">
+
+  <script src="/api/js/api.js" defer></script>
+  <script src="/admin/js/security_admin.js" defer></script>
+</head>
+<body class="admin-page">
+
+<div id="adminHeader"></div>
+
+<main class="auth-container">
+
+  <section class="admin-card">
+    <h2>🛡 Bezpečnost · Anti-Cheat</h2>
+
+    <div class="sec-subtabs" id="secSubtabs">
+      <button class="sec-subtab active" data-sub="overview">Přehled</button>
+      <button class="sec-subtab" data-sub="players">Hráči s risk</button>
+      <button class="sec-subtab" data-sub="events">Události</button>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       OVERVIEW
+       ========================================================= -->
+  <section class="admin-card sec-pane" id="paneOverview">
+    <h3>Přehled</h3>
+
+    <div class="sec-stats">
+      <div class="sec-stat-card sec-stat-danger">
+        <span class="sec-stat-num"  id="statBanRec">–</span>
+        <span class="sec-stat-label">doporučeno na ban</span>
+      </div>
+      <div class="sec-stat-card sec-stat-warn">
+        <span class="sec-stat-num"  id="statHighRisk">–</span>
+        <span class="sec-stat-label">vysoké riziko</span>
+      </div>
+      <div class="sec-stat-card">
+        <span class="sec-stat-num"  id="statWatch">–</span>
+        <span class="sec-stat-label">na watch listu</span>
+      </div>
+      <div class="sec-stat-card">
+        <span class="sec-stat-num"  id="statScored">–</span>
+        <span class="sec-stat-label">hráčů se score &gt; 0</span>
+      </div>
+    </div>
+
+    <div class="sec-stats">
+      <div class="sec-stat-card sec-stat-mini">
+        <span class="sec-stat-num"  id="statEvNew">–</span>
+        <span class="sec-stat-label">událostí NEW celkem</span>
+      </div>
+      <div class="sec-stat-card sec-stat-mini">
+        <span class="sec-stat-num"  id="statEv24h">–</span>
+        <span class="sec-stat-label">posledních 24 h</span>
+      </div>
+      <div class="sec-stat-card sec-stat-mini">
+        <span class="sec-stat-num"  id="statEv1h">–</span>
+        <span class="sec-stat-label">poslední hodina</span>
+      </div>
+    </div>
+
+    <h3 class="sec-section-h">Rozdělení událostí (posledních 7 dní)</h3>
+    <div class="sec-breakdown" id="breakdownType"></div>
+
+    <h3 class="sec-section-h">Podle severity</h3>
+    <div class="sec-breakdown" id="breakdownSeverity"></div>
+
+    <h3 class="sec-section-h">Top hráči podle aktuálního score</h3>
+    <table class="admin-table" id="topPlayersTable">
+      <thead>
+        <tr>
+          <th>POSTAVA</th>
+          <th>GAME ÚČET</th>
+          <th>WEB HRÁČ</th>
+          <th class="ta-right">SCORE</th>
+          <th class="ta-right">24h</th>
+          <th class="ta-right">UDÁLOSTÍ</th>
+          <th>FLAGY</th>
+          <th>AKCE</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <!-- =========================================================
+       PLAYERS
+       ========================================================= -->
+  <section class="admin-card sec-pane hidden" id="panePlayers">
+    <h3>Hráči s rizikovým skóre</h3>
+
+    <div class="sec-toolbar">
+      <input id="playersSearch" type="search" class="sec-search"
+             placeholder="Hledat postavu nebo game účet…" autocomplete="off">
+
+      <div class="sec-filters" id="playersFilters">
+        <button class="chip" data-filter="ban_recommended">🔴 Ban rec.</button>
+        <button class="chip" data-filter="high_risk">⚠ Vysoké riziko</button>
+        <button class="chip" data-filter="manual_watch">👁 Watch list</button>
+        <button class="chip" data-filter="active_24h">📅 Aktivní 24h</button>
+      </div>
+
+      <div class="sec-sort">
+        <span class="sort-label">Seřadit:</span>
+        <select id="playersSort">
+          <option value="current_score">Score</option>
+          <option value="score_24h">Score 24h</option>
+          <option value="total_events">Událostí celkem</option>
+          <option value="last_event_time">Poslední událost</option>
+          <option value="teleport_events">Teleport</option>
+          <option value="speed_events">Speed</option>
+          <option value="range_events">Range</option>
+          <option value="economy_events">Economy</option>
+        </select>
+        <button id="playersSortDir" type="button">↓</button>
+      </div>
+    </div>
+
+    <table class="admin-table" id="playersTable">
+      <thead>
+        <tr>
+          <th>POSTAVA</th>
+          <th>ACCOUNT</th>
+          <th>WEB HRÁČ</th>
+          <th class="ta-right">SCORE</th>
+          <th class="ta-right">24h</th>
+          <th class="ta-right">CELKEM</th>
+          <th class="ta-right">TP</th>
+          <th class="ta-right">SPD</th>
+          <th class="ta-right">RNG</th>
+          <th class="ta-right">ECO</th>
+          <th>POSLEDNÍ</th>
+          <th>FLAGY</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <!-- =========================================================
+       EVENTS
+       ========================================================= -->
+  <section class="admin-card sec-pane hidden" id="paneEvents">
+    <h3>Podezřelé události</h3>
+
+    <div class="sec-toolbar">
+      <input id="eventsSearch" type="search" class="sec-search"
+             placeholder="Hledat postavu nebo game účet…" autocomplete="off">
+
+      <select id="eventsType" class="sec-select">
+        <option value="">Všechny typy</option>
+        <option value="TELEPORT">TELEPORT</option>
+        <option value="SPEED">SPEED</option>
+        <option value="RANGE">RANGE</option>
+        <option value="ECONOMY">ECONOMY</option>
+      </select>
+
+      <select id="eventsSeverity" class="sec-select">
+        <option value="">Vše severities</option>
+        <option value="LOW">LOW</option>
+        <option value="MEDIUM">MEDIUM</option>
+        <option value="HIGH">HIGH</option>
+        <option value="CRITICAL">CRITICAL</option>
+      </select>
+
+      <div class="sec-filters" id="eventsReviewFilters">
+        <button class="chip active" data-review="NEW">🟡 NEW</button>
+        <button class="chip" data-review="REVIEWED">👁 Reviewed</button>
+        <button class="chip" data-review="CONFIRMED">🔴 Confirmed</button>
+        <button class="chip" data-review="IGNORED">🚫 Ignored</button>
+      </div>
+    </div>
+
+    <table class="admin-table" id="eventsTable">
+      <thead>
+        <tr>
+          <th>ČAS</th>
+          <th>POSTAVA</th>
+          <th>ACCOUNT</th>
+          <th>WEB HRÁČ</th>
+          <th>TYP</th>
+          <th>SEVERITY</th>
+          <th class="ta-right">+SCORE</th>
+          <th>DETAIL</th>
+          <th>STATUS</th>
+          <th>AKCE</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+</main>
+
+<!-- Event detail modal -->
+<div class="vip-modal-backdrop hidden" id="evModalBackdrop">
+  <div class="vip-modal sec-event-modal" role="dialog" aria-modal="true">
+    <h3>Detail události <span id="evModalId" class="muted-text"></span></h3>
+    <div class="vip-modal-body" id="evModalBody"></div>
+
+    <div class="sec-review-form">
+      <label class="sort-label">Označit jako:</label>
+      <div class="seg-control" id="evModalStatusSeg">
+        <button type="button" data-st="NEW">NEW</button>
+        <button type="button" data-st="REVIEWED">Reviewed</button>
+        <button type="button" data-st="CONFIRMED">Confirmed</button>
+        <button type="button" data-st="IGNORED">Ignored</button>
+      </div>
+      <textarea id="evModalNote" maxlength="512"
+                placeholder="Poznámka (volitelná, max 512 znaků)…"></textarea>
+    </div>
+
+    <div class="vip-modal-actions">
+      <button class="btn" id="evModalCancel" type="button">Zavřít</button>
+      <button class="btn btn-primary" id="evModalSave" type="button">Uložit</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="vip-toast" id="secToast"></div>
+
+<script>
+fetch('/admin/partials/admin_header.html')
+  .then(r => r.text())
+  .then(html => {
+    document.getElementById('adminHeader').innerHTML = html;
+    const links = document.querySelectorAll('.admin-nav a, .auth a');
+    const currentPath = window.location.pathname;
+    links.forEach(link => {
+      const href = link.getAttribute('href');
+      if (href && currentPath.includes(href.replace(/^\//, ''))) {
+        link.classList.add('active');
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
