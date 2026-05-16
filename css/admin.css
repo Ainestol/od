@@ -1773,6 +1773,20 @@ table.sortable thead th.sort-desc::after { content: ' ▼'; color: #d4af37; font
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: auto;
+  scrollbar-color: rgba(212,175,55,0.5) rgba(0,0,0,0.3);
+}
+.table-scroll::-webkit-scrollbar { height: 10px; }
+.table-scroll::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.3);
+  border-radius: 5px;
+}
+.table-scroll::-webkit-scrollbar-thumb {
+  background: rgba(212,175,55,0.5);
+  border-radius: 5px;
+}
+.table-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(212,175,55,0.8);
 }
 .table-scroll table {
   min-width: 100%;
@@ -1828,24 +1842,45 @@ table.sortable thead th.sort-desc::after { content: ' ▼'; color: #d4af37; font
     font-size: 15px;
     letter-spacing: 2px;
   }
+  /* AUTH bar — viditelný scrollbar + gradient hint vpravo */
   .main-header .auth {
     display: flex;
-    gap: 6px;
+    gap: 5px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    padding-bottom: 4px;
-    /* skryje horizontální scrollbar pro pěknější vzhled */
-    scrollbar-width: thin;
+    padding: 4px 30px 10px 0;     /* vpravo padding pro gradient */
+    scrollbar-width: auto;          /* normální tloušťka v Firefoxu */
+    scrollbar-color: rgba(212,175,55,0.6) rgba(0,0,0,0.3);
+    position: relative;
+    /* gradient hint — naznačí že je tam další obsah */
+    mask-image: linear-gradient(to right, black calc(100% - 24px), transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, black calc(100% - 24px), transparent 100%);
   }
+  /* Custom scrollbar pro WebKit (Chrome/Safari/iOS) — tlustý a zlatý */
+  .main-header .auth::-webkit-scrollbar {
+    height: 8px;
+  }
+  .main-header .auth::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.3);
+    border-radius: 4px;
+  }
+  .main-header .auth::-webkit-scrollbar-thumb {
+    background: rgba(212,175,55,0.55);
+    border-radius: 4px;
+  }
+  .main-header .auth::-webkit-scrollbar-thumb:hover {
+    background: rgba(212,175,55,0.85);
+  }
+
   .main-header .auth .btn {
     flex-shrink: 0;
-    padding: 6px 12px;
-    font-size: 12px;
+    padding: 5px 10px;
+    font-size: 11.5px;
     white-space: nowrap;
   }
   .main-header .auth .divider,
   .main-header .auth > span[style] {
-    display: none;   /* vertikální separator se zbytečně bere */
+    display: none;
   }
 
   /* ── MAIN container ──────────────────────────────────────── */
@@ -1874,12 +1909,21 @@ table.sortable thead th.sort-desc::after { content: ' ▼'; color: #d4af37; font
     padding: 6px 8px;
   }
   /* Tabulky bez explicitního scroll wrapperu — povol horizontal scroll na úrovni
-     samotné tabulky jako fallback. */
+     samotné tabulky jako fallback s viditelným scrollbarem. */
   table.admin-table {
     display: block;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     white-space: nowrap;
+    scrollbar-width: auto;
+    scrollbar-color: rgba(212,175,55,0.5) rgba(0,0,0,0.3);
+  }
+  table.admin-table::-webkit-scrollbar { height: 10px; }
+  table.admin-table::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.3); border-radius: 5px;
+  }
+  table.admin-table::-webkit-scrollbar-thumb {
+    background: rgba(212,175,55,0.5); border-radius: 5px;
   }
   /* … ale uvnitř .table-scroll už ji nemusíme rozbít */
   .table-scroll table.admin-table {

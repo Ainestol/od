@@ -250,3 +250,191 @@
     flex-wrap: wrap;
   }
 }
+
+/* =====================================
+   MAIN HEADER (admin + profile + auth)
+   Globální mobile fix pro hlavní header
+   se scrollovatelnou auth lištou.
+   ===================================== */
+@media (max-width: 768px) {
+  .main-header {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    padding: 12px 14px !important;
+    gap: 10px !important;
+  }
+  .main-header .logo {
+    text-align: left;
+  }
+  .main-header .logo a {
+    font-size: 15px !important;
+    letter-spacing: 2px !important;
+  }
+
+  .main-header .auth {
+    display: flex !important;
+    gap: 5px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 4px 24px 10px 0;
+    flex-wrap: nowrap !important;
+    /* viditelný scrollbar */
+    scrollbar-width: auto;
+    scrollbar-color: rgba(212,175,55,0.55) rgba(0,0,0,0.3);
+    /* gradient hint vpravo */
+    -webkit-mask-image: linear-gradient(to right, black calc(100% - 20px), transparent 100%);
+            mask-image: linear-gradient(to right, black calc(100% - 20px), transparent 100%);
+  }
+  .main-header .auth::-webkit-scrollbar {
+    height: 8px;
+  }
+  .main-header .auth::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.3);
+    border-radius: 4px;
+  }
+  .main-header .auth::-webkit-scrollbar-thumb {
+    background: rgba(212,175,55,0.55);
+    border-radius: 4px;
+  }
+
+  .main-header .auth .btn {
+    flex-shrink: 0 !important;
+    padding: 5px 10px !important;
+    font-size: 11.5px !important;
+    white-space: nowrap !important;
+  }
+  .main-header .auth .lang {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0 6px;
+    font-size: 11px;
+  }
+  .main-header .auth .twofa-indicator {
+    flex-shrink: 0;
+  }
+
+  /* =====================================
+     PROFILE page mobile pass
+     ===================================== */
+  .profile-shell.auth-container,
+  .profile-page .auth-container,
+  .profile-shell {
+    padding: 14px 12px !important;
+    max-width: 100% !important;
+  }
+
+  .profile-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px;
+  }
+  .profile-header h1 {
+    font-size: 22px !important;
+    line-height: 1.2;
+  }
+
+  /* Wallet pills — 2 sloupce */
+  .wallet-top {
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 8px !important;
+    width: 100%;
+  }
+  .wallet-pill {
+    flex: 1 1 calc(50% - 4px) !important;
+    min-width: 0 !important;
+    padding: 8px 10px !important;
+    font-size: 14px !important;
+  }
+  .wallet-pill strong { font-size: 14px !important; }
+  .coin-icon--top { width: 24px !important; height: 24px !important; }
+
+  /* Profile tabs — wrap, menší padding */
+  .profile-tabs {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    margin: 14px 0 18px !important;
+  }
+  .profile-tabs .tab {
+    flex: 1 1 calc(50% - 4px) !important;
+    text-align: center !important;
+    padding: 7px 10px !important;
+    font-size: 12px !important;
+    min-width: 0 !important;
+  }
+
+  /* Rewards sub-tabs (Hlasování / Tržiště / Donate) */
+  .rewards-subtabs {
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+  }
+  .rewards-subtabs .tab {
+    flex: 1 1 calc(33.333% - 4px) !important;
+    min-width: 0;
+    padding: 6px 8px !important;
+    font-size: 12px !important;
+    text-align: center;
+  }
+
+  /* Shop subtabs */
+  .shop-subtabs {
+    gap: 6px !important;
+  }
+  .shop-subtabs .tab {
+    padding: 5px 10px !important;
+    font-size: 12px !important;
+  }
+
+  /* Profile cards / panels */
+  .profile-card,
+  .profile-panels .panel {
+    padding: 14px 12px !important;
+  }
+  .profile-card h2 { font-size: 17px !important; }
+  .profile-card h3 { font-size: 14px !important; }
+
+  /* Account row — povolit zalomení */
+  .account-row {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+  .account-row .actions {
+    flex: 1 1 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    justify-content: flex-end;
+  }
+  .account-row .actions .btn {
+    padding: 4px 10px !important;
+    font-size: 11px !important;
+  }
+
+  /* VIP box — kompaktní */
+  .profile-vip-box {
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center;
+    gap: 10px !important;
+  }
+
+  /* Long emails — word-break */
+  .profile-welcome {
+    word-break: break-word;
+  }
+
+  /* Donate id box already má @media 600px — funguje */
+}
+
+/* Extra-small */
+@media (max-width: 420px) {
+  .main-header { padding: 10px !important; }
+  .main-header .logo a { font-size: 13px !important; letter-spacing: 1px !important; }
+  .profile-header h1 { font-size: 20px !important; }
+  .wallet-pill { flex: 1 1 100% !important; }
+  .profile-tabs .tab { flex: 1 1 100% !important; }
+  .rewards-subtabs .tab { flex: 1 1 100% !important; }
+}
