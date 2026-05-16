@@ -1725,3 +1725,63 @@ table.sortable thead th.sort-desc::after { content: ' ▼'; color: #d4af37; font
   line-height: 1.5;
 }
 .ev-audit-reason b { color: #e8a73c; }
+
+/* =====================================
+   LOGS panel — types, meta cell, pre
+   ===================================== */
+.log-type-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #bfb8a0;
+}
+.log-type-badge.lt-vote     { color: #6ca0c8; border-color: rgba(108,160,200,0.5); background: rgba(108,160,200,0.12); }
+.log-type-badge.lt-admin    { color: #ffd36a; border-color: rgba(212,175,55,0.5);  background: rgba(212,175,55,0.12); }
+.log-type-badge.lt-auth     { color: #c2554a; border-color: rgba(194,85,74,0.5);   background: rgba(194,85,74,0.10); }
+.log-type-badge.lt-economy  { color: #88b070; border-color: rgba(136,176,112,0.5); background: rgba(136,176,112,0.12); }
+.log-type-badge.lt-vip      { color: #e8a73c; border-color: rgba(232,167,60,0.5);  background: rgba(232,167,60,0.12); }
+.log-type-badge.lt-donation { color: #d4af37; border-color: rgba(212,175,55,0.5);  background: rgba(212,175,55,0.08); }
+
+.log-meta-cell {
+  max-width: 360px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  color: #6f6a58;
+}
+
+.log-meta-pre {
+  background: #0b0b0b;
+  border: 1px solid #3a3322;
+  padding: 12px;
+  border-radius: 6px;
+  color: #bfb8a0;
+  font-size: 12px;
+  font-family: "SF Mono", Consolas, monospace;
+  max-height: 320px;
+  overflow: auto;
+  margin: 8px 0 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Admin actions row (security days buttons) */
+.admin-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 8px 0 14px;
+}
+.sec-days-btn.active {
+  background: #d4af37;
+  color: #1a1408;
+  border-color: #d4af37;
+  font-weight: 600;
+}

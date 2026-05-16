@@ -18,6 +18,24 @@ require_once __DIR__ . '/../../api/admin/_bootstrap.php';
 require_once __DIR__ . '/../../config/db_game.php';     // $pdoGame
 require_once __DIR__ . '/../../lib/skill_names.php';    // skill_name()
 
+/**
+ * Walks an associative array, finds any string value matching "SKILL:<id>"
+ * and appends "(<skill_name>)" if the skill name is known.
+ * Mutates the array in place.
+ */
+function _enrich_skill_refs(array &$data): void {
+    foreach ($data as $k => &$v) {
+        if (is_array($v)) {
+            _enrich_skill_refs($v);
+        } elseif (is_string($v) && preg_match('/^SKILL:(\d+)$/', $v, $m)) {
+            $name = skill_name((int)$m[1]);
+            if ($name) {
+                $v = $v . ' (' . $name . ')';
+            }
+        }
+    }
+}
+
 try {
     assert_admin();
 
@@ -58,8 +76,29 @@ try {
         if (is_array($tmp)) $parsedContext = $tmp;
     }
 
+    // ─── Enrich any "SKILL:<id>" string in parsed_context with skill name ──
+    //     např. context.action = "SKILL:1148" → "SKILL:1148 (Wind Strike)"
+    if (is_array($parsedContext)) {
+        _enrich_skill_refs($parsedContext);
+    }
+
     // ─── Skill name (from cached XML index) ───────
     $event['skill_name'] = $event['skill_id'] ? skill_name((int)$event['skill_id']) : null;
+
+    // Pokud event.skill_id je NULL, ale v context_json byl SKILL:NNNN, vytáhneme první
+    // a doplníme do event.skill_id + event.skill_name (užitečné pro buildEventSummary)
+    if (!$event['skill_id'] && is_array($parsedContext)) {
+        foreach ($parsedContext as $v) {
+            if (is_string($v) && preg_match('/^SKILL:(\d+)/', $v, $m)) {
+                $id = (int)$m[1];
+                if ($id > 0) {
+                    $event['skill_id']   = $id;
+                    $event['skill_name'] = skill_name($id);
+                    break;
+                }
+            }
+        }
+    }
 
     // ─── Web user resolve via account_name ────────
     $event['web_email']   = null;

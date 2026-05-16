@@ -1,196 +1,160 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin – Přehled všech akcí</title>
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin – System Logs</title>
+  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="stylesheet" href="/css/mobile.css">
 
-<link rel="stylesheet" href="/css/admin.css">
-<link rel="stylesheet" href="/css/mobile.css">
-
-<!-- DataTables -->
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
-
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-
-<script src="/api/js/api.js" defer></script>
-<script src="/admin/js/logs_admin.js" defer></script>
-
+  <script src="/api/js/api.js" defer></script>
+  <script src="/admin/js/logs_admin.js" defer></script>
 </head>
-
 <body class="admin-page">
 
 <div id="adminHeader"></div>
 
 <main class="auth-container">
 
-<section class="admin-card">
+  <section class="admin-card">
+    <h2>📋 Přehled všech akcí</h2>
 
-<h2>System Logs</h2>
+    <div class="sec-subtabs" id="logsSubtabs">
+      <button class="sec-subtab active" data-sub="logs">System Logs</button>
+      <button class="sec-subtab" data-sub="security">Security</button>
+    </div>
+  </section>
 
-<div class="admin-tabs">
+  <!-- =========================================================
+       SYSTEM LOGS
+       ========================================================= -->
+  <section class="admin-card sec-pane" id="paneLogs">
 
-<button class="tab-btn active" onclick="openTab('logsTab')">
-System Logs
-</button>
+    <div class="sec-toolbar">
+      <input id="logsSearch" type="search" class="sec-search"
+             placeholder="Hledat akci / IP / obsah meta…" autocomplete="off">
 
-<button class="tab-btn" onclick="openTab('securityTab')">
-Security
-</button>
+      <div class="sec-filters" id="logsTypeFilters">
+        <span class="muted-text" style="font-size:11px; align-self:center;">Typ:</span>
+        <!-- chips dynamicky z facets -->
+      </div>
 
-</div>
+      <div class="sec-filters" id="logsStatusFilters">
+        <span class="muted-text" style="font-size:11px; align-self:center;">Status:</span>
+        <!-- chips dynamicky z facets -->
+      </div>
 
-<div class="admin-actions">
-<button class="btn" onclick="loadLogs()">🔄 Obnovit</button>
-<a href="/admin/index.php" class="btn">⬅ Zpět</a>
-</div>
-<div id="logsTab" class="tab-content">
+      <div class="sec-sort">
+        <span class="sort-label">Datum od/do:</span>
+        <input id="logsFrom" type="datetime-local" class="sec-select">
+        <input id="logsTo"   type="datetime-local" class="sec-select">
+      </div>
 
-<table id="logsTable" class="admin-table">
-<thead>
-<tr>
-<th>Time</th>
-<th>Action</th>
-<th>User</th>
-<th>Target</th>
-<th>Status</th>
-<th>Meta</th>
-</tr>
-</thead>
+      <button id="logsReset" class="btn-small" type="button" title="Vymazat filtry">⟲ Reset</button>
+    </div>
 
-<tbody id="logs">
-</tbody>
+    <div class="sec-events-meta">
+      <span class="muted-text" id="logsCount">–</span>
+      <span class="sec-pagination" id="logsPaginationTop"></span>
+    </div>
 
-</table>
+    <table class="admin-table sortable" id="logsTable">
+      <thead>
+        <tr>
+          <th data-key="created_at">ČAS</th>
+          <th data-key="log_type">TYP</th>
+          <th data-key="action">AKCE</th>
+          <th>USER</th>
+          <th>TARGET</th>
+          <th data-key="status">STATUS</th>
+          <th>IP</th>
+          <th>META</th>
+          <th>AKCE</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
 
-</div>
-<div id="securityTab" class="tab-content" style="display:none">
+    <div class="sec-pagination" id="logsPaginationBottom"></div>
+  </section>
 
-<div class="admin-actions">
+  <!-- =========================================================
+       SECURITY (preserved)
+       ========================================================= -->
+  <section class="admin-card sec-pane hidden" id="paneSecurity">
 
-<label>Časové okno:</label>
+    <div class="admin-actions">
+      <span class="muted-text" style="margin-right:6px;">Časové okno:</span>
+      <button class="btn-small sec-days-btn" data-days="1">1d</button>
+      <button class="btn-small sec-days-btn active" data-days="7">7d</button>
+      <button class="btn-small sec-days-btn" data-days="30">30d</button>
+      <button class="btn-small sec-days-btn" data-days="90">90d</button>
+      <button class="btn-small sec-days-btn" data-days="360">360d</button>
+      <span class="muted-text" style="margin-left:12px;">aktuálně: <b id="securityDaysLabel">7</b> dní</span>
+    </div>
 
-<button class="btn" onclick="setSecurityDays(1)">1d</button>
-<button class="btn" onclick="setSecurityDays(7)">7d</button>
-<button class="btn" onclick="setSecurityDays(30)">30d</button>
-<button class="btn" onclick="setSecurityDays(90)">90d</button>
-<button class="btn" onclick="setSecurityDays(360)">360d</button>
+    <h3 class="sec-section-h">Top brute-force IP</h3>
+    <table class="admin-table">
+      <thead><tr><th>IP</th><th>Login fails</th></tr></thead>
+      <tbody id="securityBrute"></tbody>
+    </table>
 
-<span style="margin-left:15px;color:#888;">
-aktuálně: <span id="securityDaysLabel">7</span> dní
-</span>
+    <h3 class="sec-section-h">⚠ Live login fails (posledních 10 minut)</h3>
+    <table class="admin-table">
+      <thead><tr><th>IP</th><th>Fails</th></tr></thead>
+      <tbody id="securityRecent"></tbody>
+    </table>
 
-</div>
-<h3>Top brute-force IP</h3>
-<table class="admin-table">
-<thead>
-<tr>
-<th>IP</th>
-<th>Login fails</th>
-</tr>
-</thead>
-<tbody id="securityBrute"></tbody>
-</table>
+    <h3 class="sec-section-h">Rate limit blocks</h3>
+    <table class="admin-table">
+      <thead><tr><th>IP</th><th>Blocks</th></tr></thead>
+      <tbody id="securityRate"></tbody>
+    </table>
 
+    <h3 class="sec-section-h">Top attacked accounts</h3>
+    <table class="admin-table">
+      <thead><tr><th>Email</th><th>Fails</th></tr></thead>
+      <tbody id="securityAccounts"></tbody>
+    </table>
 
-<h3>⚠ Live login fails (last 10 minutes)</h3>
-<table class="admin-table">
-<thead>
-<tr>
-<th>IP</th>
-<th>Fails</th>
-</tr>
-</thead>
-<tbody id="securityRecent"></tbody>
-</table>
-
-
-<h3>Rate limit blocks</h3>
-<table class="admin-table">
-<thead>
-<tr>
-<th>IP</th>
-<th>Blocks</th>
-</tr>
-</thead>
-<tbody id="securityRate"></tbody>
-</table>
-
-
-<h3>Top attacked accounts</h3>
-<table class="admin-table">
-<thead>
-<tr>
-<th>Email</th>
-<th>Fails</th>
-</tr>
-</thead>
-<tbody id="securityAccounts"></tbody>
-</table>
-
-
-<h3>Economy abuse</h3>
-<table class="admin-table">
-<thead>
-<tr>
-<th>User</th>
-<th>Action</th>
-<th>Count</th>
-</tr>
-</thead>
-<tbody id="securityEconomy"></tbody>
-</table>
-
-
-</div>
-</section>
+    <h3 class="sec-section-h">Economy abuse</h3>
+    <table class="admin-table">
+      <thead><tr><th>User</th><th>Action</th><th>Count</th></tr></thead>
+      <tbody id="securityEconomy"></tbody>
+    </table>
+  </section>
 
 </main>
 
+<!-- Meta detail modal -->
+<div class="vip-modal-backdrop hidden" id="logsModalBackdrop">
+  <div class="vip-modal sec-event-modal" role="dialog" aria-modal="true">
+    <h3>Detail log záznamu <span id="logsModalId" class="muted-text"></span></h3>
+    <div class="vip-modal-body" id="logsModalBody"></div>
+    <div class="vip-modal-actions">
+      <button class="btn" id="logsModalClose" type="button">Zavřít</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="vip-toast" id="logsToast"></div>
+
 <script>
-
 fetch('/admin/partials/admin_header.html')
-.then(r => r.text())
-.then(html => {
-
- document.getElementById('adminHeader').innerHTML = html;
-
- const links = document.querySelectorAll('.admin-nav a');
- const currentFile = window.location.pathname.split("/").pop();
-
- links.forEach(link => {
-
-   const linkFile = link.getAttribute('href').split("/").pop();
-
-   if (currentFile === linkFile) {
-     link.classList.add('active');
-   }
-
- });
-
-});
-function openTab(tabId){
-
- document.querySelectorAll('.tab-content').forEach(t=>{
-  t.style.display="none";
- });
-
- document.getElementById(tabId).style.display="block";
-
- document.querySelectorAll('.tab-btn').forEach(b=>{
-  b.classList.remove("active");
- });
-
- const btns = document.querySelectorAll('.tab-btn');
- btns.forEach(btn=>{
-  if(btn.getAttribute("onclick").includes(tabId)){
-   btn.classList.add("active");
-  }
- });
-
-}
+  .then(r => r.text())
+  .then(html => {
+    document.getElementById('adminHeader').innerHTML = html;
+    const links = document.querySelectorAll('.admin-nav a, .auth a');
+    const currentPath = window.location.pathname;
+    links.forEach(link => {
+      const href = link.getAttribute('href');
+      if (href && currentPath.includes(href.replace(/^\//, ''))) {
+        link.classList.add('active');
+      }
+    });
+  });
 </script>
 
 </body>
