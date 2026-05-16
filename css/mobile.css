@@ -274,29 +274,12 @@
   .main-header .auth,
   .main-header .auth.auth-center {
     display: flex !important;
-    justify-content: flex-start !important;   /* override .auth-center na mobilu */
-    gap: 5px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    padding: 4px 24px 10px 0;
-    flex-wrap: nowrap !important;
-    /* viditelný scrollbar */
-    scrollbar-width: auto;
-    scrollbar-color: rgba(212,175,55,0.55) rgba(0,0,0,0.3);
-    /* gradient hint vpravo */
-    -webkit-mask-image: linear-gradient(to right, black calc(100% - 20px), transparent 100%);
-            mask-image: linear-gradient(to right, black calc(100% - 20px), transparent 100%);
-  }
-  .main-header .auth::-webkit-scrollbar {
-    height: 8px;
-  }
-  .main-header .auth::-webkit-scrollbar-track {
-    background: rgba(0,0,0,0.3);
-    border-radius: 4px;
-  }
-  .main-header .auth::-webkit-scrollbar-thumb {
-    background: rgba(212,175,55,0.55);
-    border-radius: 4px;
+    justify-content: flex-start !important;
+    flex-wrap: wrap !important;       /* MOBIL: wrap místo scrollu — vidíš všechno */
+    gap: 5px !important;
+    overflow: visible !important;
+    padding: 4px 0 8px 0;
+    /* žádný mask-image, žádný scroll — všechno visible */
   }
 
   .main-header .auth .btn {
