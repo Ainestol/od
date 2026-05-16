@@ -1810,3 +1810,319 @@ table.sortable thead th.sort-desc::after { content: ' ▼'; color: #d4af37; font
   border-color: #d4af37;
   font-weight: 600;
 }
+
+/* =====================================
+   MOBILE / TABLET ADJUSTMENTS (≤ 768px)
+   Konzistentní pravidla pro všechny admin stránky
+   ===================================== */
+@media (max-width: 768px) {
+
+  /* ── HEADER & NAV ──────────────────────────────────────────── */
+  .main-header {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 12px 14px;
+    gap: 10px;
+  }
+  .main-header .logo a {
+    font-size: 15px;
+    letter-spacing: 2px;
+  }
+  .main-header .auth {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+    /* skryje horizontální scrollbar pro pěknější vzhled */
+    scrollbar-width: thin;
+  }
+  .main-header .auth .btn {
+    flex-shrink: 0;
+    padding: 6px 12px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .main-header .auth .divider,
+  .main-header .auth > span[style] {
+    display: none;   /* vertikální separator se zbytečně bere */
+  }
+
+  /* ── MAIN container ──────────────────────────────────────── */
+  .auth-container {
+    padding: 14px 10px;
+    max-width: 100%;
+  }
+
+  /* ── ADMIN CARD ──────────────────────────────────────────── */
+  .admin-card {
+    padding: 14px 12px;
+    margin-bottom: 14px;
+    border-radius: 6px;
+  }
+  .admin-card h2 { font-size: 17px; margin-bottom: 8px; }
+  .admin-card h3 { font-size: 14px; }
+  .admin-card h4 { font-size: 13px; }
+
+  /* ── TABLES ──────────────────────────────────────────────── */
+  /* Tabulky obalit do scroll wrapperu (.table-scroll) kde to dává smysl.
+     Tady jen kompaktnější písmo + povolíme nowrap aby se nelámaly buňky. */
+  .admin-table {
+    font-size: 12px;
+  }
+  .admin-table th, .admin-table td {
+    padding: 6px 8px;
+  }
+  /* Tabulky bez explicitního scroll wrapperu — povol horizontal scroll na úrovni
+     samotné tabulky jako fallback. */
+  table.admin-table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+  }
+  /* … ale uvnitř .table-scroll už ji nemusíme rozbít */
+  .table-scroll table.admin-table {
+    display: table;
+  }
+
+  /* ── TOOLBARS — všude wrap ───────────────────────────────── */
+  .sec-toolbar,
+  .users-toolbar,
+  .vip-list-toolbar,
+  .donations-toolbar,
+  .vip-form-actions {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+  .vip-list-toolbar h2 { margin-right: 0; }
+
+  /* ── SEARCH inputs do plné šířky ─────────────────────────── */
+  .sec-search,
+  #usersSearch,
+  #econSearch,
+  #vipTargetSearch {
+    width: 100% !important;
+    max-width: none !important;
+    flex: 1 1 100%;
+  }
+  .users-search,
+  .vip-picker,
+  .econ-picker {
+    max-width: none !important;
+    width: 100%;
+  }
+
+  /* ── FILTER CHIPS menší ──────────────────────────────────── */
+  .chip,
+  .users-filters .chip,
+  .vip-list-filters .chip,
+  .sec-filters .chip,
+  .econ-ledger-filters .chip,
+  .day-presets button,
+  .users-filters .chip-online {
+    padding: 4px 10px !important;
+    font-size: 11px !important;
+  }
+  .users-filters,
+  .vip-list-filters,
+  .sec-filters,
+  .day-presets {
+    gap: 4px !important;
+  }
+
+  /* ── SEG CONTROL (scope, level, currency) ─────────────────── */
+  .seg-control {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+  .seg-control button {
+    flex: 1 1 calc(50% - 1px);
+    padding: 7px 10px;
+    font-size: 12px;
+    min-width: 0;
+  }
+
+  /* ── SORT control ─────────────────────────────────────────── */
+  .users-sort,
+  .sec-sort {
+    flex-wrap: wrap;
+    width: 100%;
+    gap: 6px;
+  }
+  .users-sort select,
+  .sec-sort select,
+  .sec-select {
+    flex: 1 1 auto;
+    min-width: 140px;
+    font-size: 12px;
+  }
+  #usersSortDir { width: 100%; text-align: center; min-width: 0; }
+
+  /* ── PAGINATION wrap ─────────────────────────────────────── */
+  .sec-pagination {
+    gap: 4px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .sec-pagination .page-btn {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+  .sec-pagination .page-info { font-size: 11px; padding: 0 6px; }
+
+  /* ── MODALS ──────────────────────────────────────────────── */
+  .vip-modal,
+  .donmodal,
+  .clmodal,
+  .sec-event-modal {
+    max-width: 95vw !important;
+    width: 95vw !important;
+    padding: 16px !important;
+    max-height: 92vh;
+    overflow-y: auto;
+  }
+  .vip-modal h3 { font-size: 16px; }
+  .vip-modal-body, .donmodal-body { font-size: 13px; }
+  .ev-detail-grid {
+    grid-template-columns: 1fr !important;
+    gap: 6px !important;
+  }
+  .vip-modal-actions { flex-direction: column-reverse; gap: 8px; }
+  .vip-modal-actions button { width: 100%; padding: 8px; }
+
+  /* ── TOAST ───────────────────────────────────────────────── */
+  .vip-toast {
+    right: 10px;
+    left: 10px;
+    bottom: 12px;
+    max-width: none;
+  }
+
+  /* ── DASHBOARD stat boxes ────────────────────────────────── */
+  .admin-stats-bar {
+    gap: 8px;
+  }
+  .stat-box {
+    flex: 1 1 calc(50% - 6px);
+    min-width: 0;
+    padding: 10px 12px;
+  }
+  .stat-box b { font-size: 16px; }
+
+  /* ── VIP panel ───────────────────────────────────────────── */
+  .vip-stats { gap: 10px; }
+  .vip-stat b { font-size: 16px; }
+  .vip-stats-headline { flex-direction: column; gap: 8px; padding: 12px; }
+  .vip-stats-big-num { font-size: 32px; }
+  .vip-stats-prefix { display: block; width: 100%; margin-bottom: 4px; }
+
+  .vip-grant-list {
+    grid-template-columns: 1fr !important;
+  }
+  .vip-target-chip {
+    max-width: 100%;
+    flex-wrap: wrap;
+  }
+  .vip-context-bar { max-width: 100%; flex-wrap: wrap; }
+  .vip-autocomplete-item { flex-wrap: wrap; }
+
+  /* ── ECONOMY panel ──────────────────────────────────────── */
+  .econ-stats { gap: 10px; }
+  .econ-stat-card { flex: 1 1 calc(50% - 6px); min-width: 0; padding: 12px; }
+  .econ-stat-num { font-size: 26px; }
+  .econ-wallet { flex-direction: column; gap: 8px; }
+  .econ-wallet-pill { width: 100%; }
+  .econ-form { max-width: none; }
+  #econAmount, #econNote { max-width: none; width: 100%; }
+  .econ-ledger-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    font-size: 11px;
+  }
+
+  /* ── USERS panel (tree) ─────────────────────────────────── */
+  .tree-children { margin-left: 16px; }
+  .tree-header {
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 8px 10px;
+  }
+  .tree-title { font-size: 13px; flex: 1 1 100%; }
+  .tree-meta {
+    margin: 6px 0 4px 28px;
+    font-size: 11px;
+    line-height: 1.5;
+  }
+  .tree-meta-inline {
+    display: block;
+    margin-top: 4px;
+    margin-left: 0;
+    width: 100%;
+  }
+  .vip-btn { margin-left: 0; }
+
+  /* ── SECURITY panel ─────────────────────────────────────── */
+  .sec-stats { gap: 8px; }
+  .sec-stat-card {
+    flex: 1 1 calc(50% - 5px);
+    min-width: 0;
+    padding: 10px 12px;
+  }
+  .sec-stat-num { font-size: 22px; }
+  .sec-stat-card.sec-stat-mini { padding: 8px 10px; }
+  .sec-stat-card.sec-stat-mini .sec-stat-num { font-size: 18px; }
+  .sec-breakdown { gap: 5px; }
+  .bd-pill { padding: 3px 8px; font-size: 11px; }
+  .sec-subtabs { gap: 4px; }
+  .sec-subtab { padding: 6px 10px; font-size: 12px; flex: 1 1 auto; text-align: center; }
+
+  /* ── ONLINE players ─────────────────────────────────────── */
+  .online-stats { gap: 8px; }
+  .online-stat-card {
+    flex: 1 1 calc(50% - 5px);
+    min-width: 0;
+    padding: 10px 12px;
+  }
+  .online-stat-num { font-size: 22px; }
+  .online-level-bars { gap: 5px; }
+  .online-level-pill { font-size: 11px; padding: 3px 9px; }
+
+  /* ── LOGS — log_type badges menší ──────────────────────── */
+  .log-type-badge { font-size: 10px; padding: 1px 6px; }
+  .log-summary-cell { font-size: 11px; max-width: 280px; }
+
+  /* ── Bug reports (pokud existuje) ───────────────────────── */
+  .bug-row { flex-wrap: wrap; }
+
+  /* ── Donations tabulka ──────────────────────────────────── */
+  .donations-summary { flex-direction: column; gap: 8px; }
+
+  /* Field labels v auth/forms */
+  .vip-field label,
+  .vip-field > label { font-size: 12px; }
+  #vipDaysCustom { max-width: none; width: 100%; }
+
+  /* ── RB filter pills v worlds ───────────────────────────── */
+  /* (už ošetřeno v mobile.css, jen pro jistotu — bez kolize) */
+}
+
+/* ── EXTRA-SMALL phones (≤ 420px) ───────────────────────────── */
+@media (max-width: 420px) {
+  .main-header { padding: 10px; }
+  .main-header .logo a { font-size: 13px; letter-spacing: 1px; }
+  .auth-container { padding: 10px 6px; }
+  .admin-card { padding: 10px 8px; }
+  .admin-card h2 { font-size: 15px; }
+  .stat-box,
+  .sec-stat-card,
+  .econ-stat-card,
+  .online-stat-card {
+    flex: 1 1 100% !important;
+  }
+  .vip-stats-big-num { font-size: 28px; }
+  .seg-control button { flex: 1 1 100%; }
+  .sec-stat-num { font-size: 20px; }
+  .vip-toast { font-size: 12px; padding: 10px 14px; }
+}
