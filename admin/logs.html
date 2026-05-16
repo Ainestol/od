@@ -59,22 +59,23 @@
       <span class="sec-pagination" id="logsPaginationTop"></span>
     </div>
 
-    <table class="admin-table sortable" id="logsTable">
-      <thead>
-        <tr>
-          <th data-key="created_at">ČAS</th>
-          <th data-key="log_type">TYP</th>
-          <th data-key="action">AKCE</th>
-          <th>USER</th>
-          <th>TARGET</th>
-          <th data-key="status">STATUS</th>
-          <th>IP</th>
-          <th>META</th>
-          <th>AKCE</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+    <div class="table-scroll">
+      <table class="admin-table sortable" id="logsTable">
+        <thead>
+          <tr>
+            <th data-key="created_at">ČAS</th>
+            <th data-key="log_type">TYP</th>
+            <th data-key="action">AKCE</th>
+            <th>KDO</th>
+            <th>CÍL</th>
+            <th data-key="status">STATUS</th>
+            <th>SHRNUTÍ</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
 
     <div class="sec-pagination" id="logsPaginationBottom"></div>
   </section>

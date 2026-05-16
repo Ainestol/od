@@ -98,29 +98,44 @@ try {
     $stmt->execute($params);
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Resolve user emails for user_id + target_id
-    $ids = [];
+    // target_id má různý význam podle log_type:
+    //   ADMIN_*, AUTH_* → web user ID  (resolvujeme na email)
+    //   VOTE_*          → vote_site_id (NEresolvujeme — labelujeme zvlášť)
+    //   Ostatní         → nejasné, neresolvujeme
+    $userTargetKinds  = ['ADMIN','AUTH'];
+
+    // Sbírej user_id z všech řádků + target_id jen u relevantních log_types
+    $userIds   = [];
+    $targetUserIds = [];
     foreach ($rows as $r) {
-        if (!empty($r['user_id']))   $ids[(int)$r['user_id']]   = true;
-        if (!empty($r['target_id'])) $ids[(int)$r['target_id']] = true;
+        if (!empty($r['user_id'])) $userIds[(int)$r['user_id']] = true;
+        if (!empty($r['target_id']) && in_array($r['log_type'], $userTargetKinds, true)) {
+            $targetUserIds[(int)$r['target_id']] = true;
+        }
     }
+    $idsToResolve = array_keys($userIds + $targetUserIds);
+
     $emailMap = [];
-    if (!empty($ids)) {
-        $idList = array_keys($ids);
-        $ph = implode(',', array_fill(0, count($idList), '?'));
+    if (!empty($idsToResolve)) {
+        $ph = implode(',', array_fill(0, count($idsToResolve), '?'));
         $eStmt = $pdo->prepare("SELECT id, email FROM users WHERE id IN ($ph)");
-        $eStmt->execute($idList);
+        $eStmt->execute($idsToResolve);
         foreach ($eStmt->fetchAll(PDO::FETCH_ASSOC) as $u) {
             $emailMap[(int)$u['id']] = $u['email'];
         }
     }
 
     foreach ($rows as &$r) {
-        $r['id']           = (int)$r['id'];
-        $r['user_id']      = $r['user_id']   !== null ? (int)$r['user_id']   : null;
-        $r['target_id']    = $r['target_id'] !== null ? (int)$r['target_id'] : null;
-        $r['user_email']   = $r['user_id']   ? ($emailMap[$r['user_id']]   ?? null) : null;
-        $r['target_email'] = $r['target_id'] ? ($emailMap[$r['target_id']] ?? null) : null;
+        $r['id']        = (int)$r['id'];
+        $r['user_id']   = $r['user_id']   !== null ? (int)$r['user_id']   : null;
+        $r['target_id'] = $r['target_id'] !== null ? (int)$r['target_id'] : null;
+        $r['user_email']   = $r['user_id'] ? ($emailMap[$r['user_id']] ?? null) : null;
+        // Target — jen pro user-related log types
+        $isUserTarget = in_array($r['log_type'], $userTargetKinds, true);
+        $r['target_email'] = ($isUserTarget && $r['target_id'])
+            ? ($emailMap[$r['target_id']] ?? null) : null;
+        $r['target_kind']  = $isUserTarget ? 'user'
+            : (str_starts_with((string)$r['log_type'], 'VOTE') ? 'vote_site' : 'other');
     }
     unset($r);
 
