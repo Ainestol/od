@@ -259,6 +259,7 @@ const tab = btn.dataset.subtab;
 
 document.getElementById("subtab-" + tab).classList.add("active");
 
+updateBracketVisibility();
 });
 
 });
@@ -299,6 +300,43 @@ return `
 
 }
 /*=========================
+    RB LEVEL BRACKET FILTER
+==========================*/
+
+let rbLevelBracket = 'all';   // 'all' | '20-29' | … | '80+'
+
+function bossLevelInBracket(level, bracket){
+  if (bracket === 'all') return true;
+  const lv = Number(level) || 0;
+  if (bracket === '80+') return lv >= 80;
+  const [lo, hi] = bracket.split('-').map(n => parseInt(n, 10));
+  return lv >= lo && lv <= hi;
+}
+
+function bindBracketChips(){
+  const wrap = document.getElementById('rbLevelFilter');
+  if (!wrap) return;
+  wrap.addEventListener('click', e => {
+    const btn = e.target.closest('.rb-lvl-chip');
+    if (!btn) return;
+    rbLevelBracket = btn.dataset.lvl;
+    wrap.querySelectorAll('.rb-lvl-chip').forEach(b => b.classList.toggle('active', b === btn));
+    loadBoss('RAID');
+  });
+}
+
+function updateBracketVisibility(){
+  // Filtr ukazujeme jen v Raid Boss sub-tabu (Grand Boss jich má málo, nemá smysl)
+  const wrap = document.getElementById('rbLevelFilter');
+  if (!wrap) return;
+  const raidActive = document.querySelector('.subtab-btn[data-subtab="raid"]')?.classList.contains('active');
+  wrap.style.display = raidActive ? '' : 'none';
+}
+
+bindBracketChips();
+updateBracketVisibility();
+
+/*=========================
     SJEDNOCENÉ FUNKCE
 ==========================*/
 
@@ -322,6 +360,9 @@ let info = "";
 
 /* filtr typu */
 if((b.boss_type || "").toLowerCase() !== type.toLowerCase()) return;
+
+/* level bracket filtr (pouze pro RAID) */
+if(type === "RAID" && !bossLevelInBracket(b.level, rbLevelBracket)) return;
 
 const killTime = Number(b.kill_time) || 0;
 const delay = Number(b.respawn_delay) || 0;

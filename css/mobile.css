@@ -188,4 +188,65 @@
   .server-status .status-players {
     padding-left: 18px !important;
   }
+
+  /* ============================
+     WORLD page mobile tweaks
+     ============================ */
+
+  /* Leaderboards (Top Level/PvP/PK/Adena/Playtime) — stack single column */
+  .leaderboards {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+  .leaderboard-box {
+    padding: 12px 14px !important;
+  }
+
+  /* World tabs — pevně menší padding, zalamovat */
+  .world-tabs {
+    flex-wrap: wrap;
+    gap: 6px !important;
+  }
+  .tab-btn {
+    padding: 7px 12px !important;
+    font-size: 13px !important;
+    flex: 1 1 calc(50% - 6px);
+    min-width: 0;
+    text-align: center;
+  }
+
+  /* Sub-tabs */
+  .sub-tabs {
+    flex-wrap: wrap;
+    gap: 6px !important;
+    margin-bottom: 14px !important;
+  }
+  .subtab-btn {
+    padding: 6px 12px !important;
+    font-size: 13px !important;
+  }
+
+  /* RB level filter chips — zalamovat ať pasují */
+  .rb-level-filter {
+    gap: 5px !important;
+  }
+  .rb-lvl-chip {
+    padding: 4px 10px !important;
+    font-size: 11px !important;
+  }
+
+  /* Raid row — kompaktnější padding na mobilu */
+  .raid-row {
+    padding: 6px 4px !important;
+    font-size: 13px !important;
+    gap: 6px !important;
+  }
+  .raid-extra {
+    font-size: 11px !important;
+  }
+
+  /* Clan row — povolit zalomení dlouhých řádků */
+  .clan-row {
+    flex-wrap: wrap;
+  }
 }
