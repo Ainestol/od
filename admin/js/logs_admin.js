@@ -56,8 +56,9 @@
     t = (t || '').toUpperCase();
     if (t === 'VOTE')      return 'lt-vote';
     if (t === 'ADMIN')     return 'lt-admin';
-    if (t === 'AUTH')      return 'lt-auth';
-    if (t === 'ECONOMY' || t === 'SHOP' || t === 'WALLET') return 'lt-economy';
+    if (t === 'AUTH'     || t === 'SECURITY') return 'lt-security';
+    if (t === 'ECONOMY' || t === 'WALLET')    return 'lt-economy';
+    if (t === 'SHOP')      return 'lt-shop';
     if (t === 'VIP')       return 'lt-vip';
     if (t === 'DONATION')  return 'lt-donation';
     return 'lt-other';
@@ -187,27 +188,35 @@
     const tbody = document.querySelector('#logsTable tbody');
     const rows = state.logs.data;
     if (!rows.length) {
-      tbody.innerHTML = '<tr><td colspan="9" class="muted ta-center">Žádné záznamy.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="8" class="muted ta-center">Žádné záznamy.</td></tr>';
       return;
     }
     tbody.innerHTML = rows.map(r => {
       const userTxt = r.user_email
-        ? `${esc(r.user_email)} <span class="muted">#${r.user_id}</span>`
+        ? `<span title="Web user ID #${r.user_id}">${esc(r.user_email)}</span>`
         : (r.user_id ? '<span class="muted">#' + r.user_id + '</span>' : '<span class="muted">–</span>');
-      const targetTxt = r.target_email
-        ? `${esc(r.target_email)} <span class="muted">#${r.target_id}</span>`
-        : (r.target_id ? '<span class="muted">#' + r.target_id + '</span>' : '<span class="muted">–</span>');
-      const metaPreview = r.meta ? truncate(r.meta, 80) : '–';
+
+      // Target — různý význam podle log_type (vrací backend přes target_kind)
+      let targetTxt;
+      if (r.target_email) {
+        targetTxt = `<span title="Web user ID #${r.target_id}">${esc(r.target_email)}</span>`;
+      } else if (r.target_kind === 'vote_site' && r.target_id) {
+        targetTxt = `<span class="muted-text">Vote site #${r.target_id}</span>`;
+      } else if (r.target_id) {
+        targetTxt = `<span class="muted">#${r.target_id}</span>`;
+      } else {
+        targetTxt = '<span class="muted">–</span>';
+      }
+
       return `
         <tr data-id="${r.id}">
-          <td class="ta-mono">${esc(fmtDate(r.created_at))}</td>
+          <td class="ta-mono ta-nowrap">${esc(fmtDate(r.created_at))}</td>
           <td><span class="log-type-badge ${logTypeClass(r.log_type)} cell-clickable" data-filter-logtype="${esc(r.log_type)}">${esc(r.log_type)}</span></td>
           <td><b>${esc(r.action)}</b></td>
           <td>${userTxt}</td>
           <td>${targetTxt}</td>
           <td><span class="status-badge ${statusClass(r.status)} cell-clickable" data-filter-status="${esc(r.status)}">${esc(r.status)}</span></td>
-          <td class="ta-mono muted-text">${esc(r.ip_address || '–')}</td>
-          <td class="log-meta-cell ta-mono">${esc(metaPreview)}</td>
+          <td class="log-summary-cell">${humanizeMeta(r)}</td>
           <td><button class="btn-small" data-act="open-detail" data-id="${r.id}">Detail</button></td>
         </tr>
       `;
@@ -217,6 +226,118 @@
   function truncate(s, n) {
     s = String(s);
     return s.length > n ? s.substring(0, n) + '…' : s;
+  }
+
+  /**
+   * Humanizovaný popis akce pro list (z meta JSON).
+   * Pro neznámé akce vrací zkrácený JSON.
+   */
+  function humanizeMeta(r) {
+    let m;
+    try { m = typeof r.meta === 'string' ? JSON.parse(r.meta) : r.meta; }
+    catch (_) { return esc(truncate(r.meta || '', 80)); }
+    if (!m || typeof m !== 'object') return '<span class="muted">–</span>';
+
+    const a = (r.action || '').toUpperCase();
+
+    // ─── VOTE ─────────────────────────────────────────────────────
+    if (a === 'VOTE_REWARD') {
+      const provider = m.provider ? `<b>${esc(m.provider)}</b>` : '';
+      const amt      = m.amount   ? `<span class="amt-pos">+${m.amount} ${esc(m.currency || '')}</span>` : '';
+      const streakBit = m.streak && m.streak.awarded
+        ? ` · <span class="amt-pos">🔥 streak ${m.streak.days || ''}</span>` : '';
+      return `${provider} ${amt}${streakBit}<span class="muted-text"> · attempt #${m.attempt_id ?? '?'}</span>`;
+    }
+    if (a === 'VOTE_PENDING') {
+      return `<span class="muted-text">Čeká na ověření hlasu · attempt #${m.attempt_id ?? '?'}</span>`;
+    }
+    if (a.startsWith('VOTE_')) {
+      const provider = m.provider ? `<b>${esc(m.provider)}</b>` : '';
+      return `${provider}<span class="muted-text"> · attempt #${m.attempt_id ?? '?'}</span>`;
+    }
+
+    // ─── ADMIN ────────────────────────────────────────────────────
+    if (a === 'ADMIN_ADD_VIP') {
+      const scope = m.scope ? esc(m.scope) : '?';
+      const days  = m.days  ?? '?';
+      const lvl   = m.levelId ?? '?';
+      return `${scope} <b>VIP ${lvl}</b> +${days} dní · target #${m.target_user_id ?? '?'}`;
+    }
+    if (a === 'ADMIN_ADD_DC' || a === 'ADMIN_REMOVE_DC' || a === 'ADMIN_ADD_VC' || a === 'ADMIN_REMOVE_VC') {
+      const amt  = m.amount;
+      const cur  = esc(m.currency || '');
+      const cls  = amt > 0 ? 'amt-pos' : 'amt-neg';
+      const note = m.note ? ` · <i>${esc(m.note)}</i>` : '';
+      return `<span class="${cls}">${amt > 0 ? '+' : ''}${amt} ${cur}</span>${note}`;
+    }
+    if (a === 'ADMIN_ADJUST_BALANCE') {
+      const amt  = m.amount;
+      const cls  = amt > 0 ? 'amt-pos' : 'amt-neg';
+      const note = m.note ? ` · <i>${esc(m.note)}</i>` : '';
+      return `<span class="${cls}">${amt > 0 ? '+' : ''}${amt} ${esc(m.currency || '')}</span>${note}`;
+    }
+
+    // ─── ECONOMY — Premium/VIP 24h aktivace hráčem ───────────────
+    if (a === 'PREMIUM_24H_ACTIVATE' || a === 'VIP_24H_ACTIVATE') {
+      const label = a === 'PREMIUM_24H_ACTIVATE' ? 'Premium 24h' : 'VIP 24h (legacy)';
+      const cost  = m.price != null
+        ? ` · <span class="amt-neg">−${m.price} ${esc(m.currency || 'DC')}</span>`
+        : '';
+      const acc   = m.game_account_id ? ` · game acc #${m.game_account_id}` : '';
+      return `<b>${label}</b>${cost}${acc}`;
+    }
+
+    // ─── SHOP — nákup v tržišti ──────────────────────────────────
+    if (a === 'SHOP_PURCHASE') {
+      const prod = m.product_name
+        ? `<b>${esc(m.product_name)}</b>`
+        : (m.product_id ? `Produkt #${m.product_id}` : 'Nákup');
+      const qty  = m.quantity && m.quantity > 1 ? ` × ${m.quantity}` : '';
+      const cost = m.price != null
+        ? ` · <span class="amt-neg">−${m.price} ${esc(m.currency || 'DC')}</span>`
+        : '';
+      const tgt  = m.target_char ? ` → ${esc(m.target_char)}` : '';
+      return `${prod}${qty}${cost}${tgt}`;
+    }
+
+    // ─── SECURITY — login události ───────────────────────────────
+    if (a === 'LOGIN_SUCCESS') {
+      const email = m.email || m.username || '';
+      const remember = m.remember ? ' (remember me)' : '';
+      return email
+        ? `✓ Úspěšné přihlášení · <b>${esc(email)}</b>${remember}`
+        : `✓ Úspěšné přihlášení${remember}`;
+    }
+    if (a === 'LOGIN_FAIL') {
+      const email = m.email || m.username || m.attempted || '';
+      const reason = m.reason || m.error || '';
+      const reasonTxt = reason ? ` · <i>${esc(reason)}</i>` : '';
+      return email
+        ? `✗ Neúspěšné přihlášení · <b>${esc(email)}</b>${reasonTxt}`
+        : `✗ Neúspěšné přihlášení${reasonTxt}`;
+    }
+    if (a === 'LOGIN_RATE_LIMIT') {
+      const ip   = m.ip || '';
+      const cnt  = m.attempts ?? m.count ?? '';
+      return `⛔ Rate-limit překročen${ip ? ' · IP ' + esc(ip) : ''}${cnt ? ' · ' + cnt + ' pokusů' : ''}`;
+    }
+    if (a === 'PASSWORD_RESET_SUCCESS') {
+      const email = m.email || '';
+      return email
+        ? `🔑 Heslo resetováno · <b>${esc(email)}</b>`
+        : '🔑 Heslo resetováno';
+    }
+
+    // ─── Generic — vytahej "zajímavé" klíče ──────────────────────
+    const interesting = ['amount','currency','provider','reason','days','scope','levelId','note','target_user_id'];
+    const parts = [];
+    interesting.forEach(k => {
+      if (m[k] != null && m[k] !== '') parts.push(`<span class="muted-text">${esc(k)}:</span> ${esc(String(m[k]))}`);
+    });
+    if (parts.length) return parts.join(' · ');
+
+    // Fallback — zkrácený JSON
+    return `<span class="muted-text">${esc(truncate(JSON.stringify(m), 80))}</span>`;
   }
 
   function renderPagination() {

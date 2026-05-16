@@ -1742,8 +1742,9 @@ table.sortable thead th.sort-desc::after { content: ' ▼'; color: #d4af37; font
 }
 .log-type-badge.lt-vote     { color: #6ca0c8; border-color: rgba(108,160,200,0.5); background: rgba(108,160,200,0.12); }
 .log-type-badge.lt-admin    { color: #ffd36a; border-color: rgba(212,175,55,0.5);  background: rgba(212,175,55,0.12); }
-.log-type-badge.lt-auth     { color: #c2554a; border-color: rgba(194,85,74,0.5);   background: rgba(194,85,74,0.10); }
+.log-type-badge.lt-security { color: #c2554a; border-color: rgba(194,85,74,0.5);   background: rgba(194,85,74,0.10); }
 .log-type-badge.lt-economy  { color: #88b070; border-color: rgba(136,176,112,0.5); background: rgba(136,176,112,0.12); }
+.log-type-badge.lt-shop     { color: #b687d4; border-color: rgba(182,135,212,0.5); background: rgba(182,135,212,0.12); }
 .log-type-badge.lt-vip      { color: #e8a73c; border-color: rgba(232,167,60,0.5);  background: rgba(232,167,60,0.12); }
 .log-type-badge.lt-donation { color: #d4af37; border-color: rgba(212,175,55,0.5);  background: rgba(212,175,55,0.08); }
 
@@ -1755,6 +1756,30 @@ table.sortable thead th.sort-desc::after { content: ' ▼'; color: #d4af37; font
   font-size: 11px;
   color: #6f6a58;
 }
+
+/* Humanizované shrnutí akce v listu */
+.log-summary-cell {
+  font-size: 12px;
+  color: #bfb8a0;
+  max-width: 400px;
+  line-height: 1.5;
+}
+.log-summary-cell b { color: #e5c46a; }
+.log-summary-cell i { color: #8f876b; font-style: italic; }
+.log-summary-cell .muted-text { color: #6f6a58; font-size: 11px; }
+
+/* Horizontální scroll wrapper pro široké tabulky */
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.table-scroll table {
+  min-width: 100%;
+}
+
+/* Nowrap hint pro krátké sloupce (čas) */
+.ta-nowrap { white-space: nowrap; }
 
 .log-meta-pre {
   background: #0b0b0b;
