@@ -612,22 +612,46 @@
   }
 
   // ----- Event modal ------------------------------------------------
-  function openEventModal(r) {
+  async function openEventModal(r) {
     state.events.currentRowId = r.id;
     state.events.currentNewStatus = r.review_status;
 
     document.getElementById('evModalId').textContent = '#' + r.id;
     document.getElementById('evModalNote').value = r.review_note || '';
-
     document.querySelectorAll('#evModalStatusSeg button').forEach(b => {
       b.classList.toggle('active', b.dataset.st === (r.review_status || 'NEW'));
     });
 
-    let ctx = '';
-    try { ctx = r.context_json ? JSON.stringify(JSON.parse(r.context_json), null, 2) : ''; }
-    catch (_) { ctx = r.context_json || ''; }
+    // Show modal immediately with basic info, then enrich
+    document.getElementById('evModalBody').innerHTML =
+      '<div class="muted ta-center" style="padding:20px;">Načítám detail…</div>';
+    document.getElementById('evModalBackdrop').classList.remove('hidden');
+
+    let details;
+    try {
+      details = await apiFetch('/admin/api/ac_event_details.php?id=' + encodeURIComponent(r.id));
+    } catch (e) {
+      document.getElementById('evModalBody').innerHTML =
+        '<div class="muted ta-center" style="padding:20px;">Chyba načtení: ' + esc(e.message) + '</div>';
+      return;
+    }
+
+    renderEventModalBody(details);
+  }
+
+  function renderEventModalBody(details) {
+    const r   = details.event || {};
+    const aud = details.economy_audit;
+    const ctx = details.parsed_context;
+
+    // Build context-aware "What happened" summary line per event_type
+    const summary = buildEventSummary(r, aud, ctx);
+
+    const econHtml = aud ? renderEconomyAuditSection(aud) : '';
+    const ctxHtml  = ctx ? renderParsedContextSection(ctx) : '';
 
     document.getElementById('evModalBody').innerHTML = `
+      ${summary ? `<div class="ev-summary">${summary}</div>` : ''}
       <div class="ev-detail-grid">
         <div><span class="muted-text">Čas</span><b>${esc(fmtDate(r.event_time))}</b></div>
         <div><span class="muted-text">Postava</span><b>${esc(r.char_name)}</b> <span class="muted">#${r.char_object_id}</span></div>
@@ -643,16 +667,92 @@
         ${r.time_delta_ms != null ? `<div><span class="muted-text">Δt</span><b>${r.time_delta_ms} ms</b></div>` : ''}
         ${r.expected_speed != null ? `<div><span class="muted-text">Expected speed</span><b>${Math.round(r.expected_speed)}</b></div>` : ''}
         ${r.effective_speed != null ? `<div><span class="muted-text">Effective speed</span><b>${Math.round(r.effective_speed)}</b></div>` : ''}
-        ${r.skill_id ? `<div><span class="muted-text">Skill ID</span><b>${r.skill_id}</b></div>` : ''}
+        ${r.skill_id ? `<div><span class="muted-text">Skill</span><b>${r.skill_name ? esc(r.skill_name) + ' ' : ''}<span class="muted">#${r.skill_id}</span></b></div>` : ''}
         ${r.item_id ? `<div><span class="muted-text">Item ID</span><b>${r.item_id}</b></div>` : ''}
-        ${r.target_object_id ? `<div><span class="muted-text">Target</span><b>#${r.target_object_id}</b></div>` : ''}
-        ${(r.x_from != null) ? `<div><span class="muted-text">Z</span><span class="ta-mono">${r.x_from}, ${r.y_from}, ${r.z_from}</span></div>` : ''}
-        ${(r.x_to != null) ? `<div><span class="muted-text">Na</span><span class="ta-mono">${r.x_to}, ${r.y_to}, ${r.z_to}</span></div>` : ''}
+        ${r.target_object_id ? `<div><span class="muted-text">Target obj</span><b>#${r.target_object_id}</b></div>` : ''}
+        ${(r.x_from != null) ? `<div><span class="muted-text">Z (x,y,z)</span><span class="ta-mono">${r.x_from}, ${r.y_from}, ${r.z_from}</span></div>` : ''}
+        ${(r.x_to   != null) ? `<div><span class="muted-text">Na (x,y,z)</span><span class="ta-mono">${r.x_to}, ${r.y_to}, ${r.z_to}</span></div>` : ''}
       </div>
-      ${ctx ? `<details class="ev-context"><summary>context_json</summary><pre>${esc(ctx)}</pre></details>` : ''}
+      ${econHtml}
+      ${ctxHtml}
     `;
+  }
 
-    document.getElementById('evModalBackdrop').classList.remove('hidden');
+  function buildEventSummary(r, aud, ctx) {
+    const t = (r.event_type || '').toUpperCase();
+    if (t === 'SUSPICIOUS_ECONOMY_GAIN' && aud) {
+      const parts = [];
+      if (aud.source_type) parts.push(`<b>${esc(aud.source_type)}</b>`);
+      if (aud.reference_name) parts.push(esc(aud.reference_name));
+      if (aud.item_id) {
+        const cnt = aud.item_count ? ` × ${aud.item_count.toLocaleString()}` : '';
+        parts.push(`item #${aud.item_id}${cnt}`);
+      }
+      if (aud.adena_delta != null && aud.adena_delta !== 0) {
+        const sign = aud.adena_delta > 0 ? '+' : '';
+        parts.push(`<span class="amt-${aud.adena_delta > 0 ? 'pos' : 'neg'}">${sign}${aud.adena_delta.toLocaleString()} adena</span>`);
+      }
+      if (aud.map_region) parts.push(`📍 ${esc(aud.map_region)}`);
+      if (aud.npc_id)     parts.push(`NPC #${aud.npc_id}`);
+      if (aud.target_char) parts.push(`→ ${esc(aud.target_char)}`);
+      if (aud.reason)     parts.push(`<i>${esc(aud.reason)}</i>`);
+      return parts.length ? '💰 ' + parts.join(' · ') : '';
+    }
+    if (t === 'IMPOSSIBLE_ACTION_RATE' && ctx) {
+      const what = ctx.action_type || ctx.action || ctx.type || '?';
+      const rate = ctx.rate ?? ctx.actions_per_sec ?? ctx.per_sec;
+      const thr  = ctx.threshold ?? ctx.limit;
+      const span = [`<b>${esc(what)}</b>`];
+      if (rate != null) span.push(`${rate}/s`);
+      if (thr  != null) span.push(`(limit ${thr})`);
+      return '⚡ ' + span.join(' · ');
+    }
+    if ((t === 'SPEED_ANOMALY' || t === 'ILLEGAL_TELEPORT') && r.distance != null) {
+      return `🏃 dist ${Math.round(r.distance)}`
+        + (r.effective_speed != null ? ` · ${Math.round(r.effective_speed)} units/s` : '')
+        + (r.expected_speed  != null ? ` (max ${Math.round(r.expected_speed)})` : '');
+    }
+    if (t === 'SKILL_OUT_OF_RANGE' && r.distance != null) {
+      const sk = r.skill_name ? `${esc(r.skill_name)} (#${r.skill_id})` : `skill #${r.skill_id ?? '?'}`;
+      return `🎯 dist ${Math.round(r.distance)} · ${sk}`;
+    }
+    return '';
+  }
+
+  function renderEconomyAuditSection(a) {
+    return `
+      <h4 class="ev-section-h">Economy audit (z <code>ac_economy_audit</code>)</h4>
+      <div class="ev-detail-grid">
+        <div><span class="muted-text">Source type</span><b>${esc(a.source_type || '–')}</b></div>
+        <div><span class="muted-text">Reference name</span><b>${esc(a.reference_name || '–')}</b></div>
+        <div><span class="muted-text">Reference ID</span><span class="ta-mono">${esc(a.reference_id || '–')}</span></div>
+        ${a.item_id    ? `<div><span class="muted-text">Item</span><b>#${a.item_id}${a.item_count ? ' × ' + a.item_count.toLocaleString() : ''}</b></div>` : ''}
+        ${a.adena_delta != null ? `<div><span class="muted-text">Adena Δ</span><b class="amt-${a.adena_delta > 0 ? 'pos' : 'neg'}">${a.adena_delta > 0 ? '+' : ''}${a.adena_delta.toLocaleString()}</b></div>` : ''}
+        ${a.npc_id      ? `<div><span class="muted-text">NPC ID</span><b>#${a.npc_id}</b></div>` : ''}
+        ${a.target_char ? `<div><span class="muted-text">Target char</span><b>${esc(a.target_char)}</b></div>` : ''}
+        ${a.map_region  ? `<div><span class="muted-text">Mapa</span><b>${esc(a.map_region)}</b></div>` : ''}
+        ${a.process_tag ? `<div><span class="muted-text">Process tag</span><span class="ta-mono">${esc(a.process_tag)}</span></div>` : ''}
+        ${(a.x != null) ? `<div><span class="muted-text">Souřadnice</span><span class="ta-mono">${a.x}, ${a.y}, ${a.z}</span></div>` : ''}
+        <div><span class="muted-text">is_suspicious</span><b>${a.is_suspicious ? '✓ ano' : 'ne'}</b></div>
+      </div>
+      ${a.reason ? `<div class="ev-audit-reason"><b>Důvod:</b> ${esc(a.reason)}</div>` : ''}
+    `;
+  }
+
+  function renderParsedContextSection(ctx) {
+    const entries = Object.entries(ctx);
+    if (!entries.length) return '';
+    return `
+      <h4 class="ev-section-h">Context</h4>
+      <div class="ev-detail-grid">
+        ${entries.map(([k, v]) => `
+          <div>
+            <span class="muted-text">${esc(k)}</span>
+            <span class="ta-mono">${esc(typeof v === 'object' ? JSON.stringify(v) : String(v))}</span>
+          </div>
+        `).join('')}
+      </div>
+    `;
   }
 
   function bindEventModal() {

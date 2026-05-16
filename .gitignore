@@ -7,3 +7,6 @@ server_changes.patch
 
 # Interní dokumentace — nesdílet veřejně přes git
 *.md
+
+# Vygenerované servery (build_skill_index.php)
+data/skill_names.json

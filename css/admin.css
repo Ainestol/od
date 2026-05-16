@@ -1676,3 +1676,52 @@ table.sortable thead th.sort-desc::after { content: ' ▼'; color: #d4af37; font
   min-height: 60px;
   box-sizing: border-box;
 }
+
+/* Event modal — summary line "co se vlastně stalo" */
+.ev-summary {
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  background: linear-gradient(180deg, rgba(212,175,55,0.10), rgba(212,175,55,0.03));
+  border: 1px solid rgba(212,175,55,0.35);
+  border-radius: 6px;
+  color: #e5c46a;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.ev-summary b { color: #ffd36a; }
+.ev-summary code {
+  background: rgba(255,255,255,0.05);
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 11px;
+}
+
+/* Section headers inside modal */
+.ev-section-h {
+  color: #d4af37;
+  font-size: 13px;
+  margin: 16px 0 8px;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(212,175,55,0.2);
+  letter-spacing: 0.3px;
+}
+.ev-section-h code {
+  background: rgba(255,255,255,0.04);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 11px;
+  color: #bfb8a0;
+  margin-left: 6px;
+  font-weight: normal;
+}
+
+.ev-audit-reason {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: rgba(232,167,60,0.08);
+  border-left: 3px solid #e8a73c;
+  color: #bfb8a0;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.ev-audit-reason b { color: #e8a73c; }
