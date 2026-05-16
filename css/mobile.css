@@ -271,8 +271,10 @@
     letter-spacing: 2px !important;
   }
 
-  .main-header .auth {
+  .main-header .auth,
+  .main-header .auth.auth-center {
     display: flex !important;
+    justify-content: flex-start !important;   /* override .auth-center na mobilu */
     gap: 5px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;

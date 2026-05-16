@@ -2045,14 +2045,19 @@ table.sortable thead th.sort-desc::after { content: ' ▼'; color: #d4af37; font
 
   /* ── DASHBOARD stat boxes ────────────────────────────────── */
   .admin-stats-bar {
-    gap: 8px;
+    gap: 8px !important;
+    justify-content: stretch !important;
   }
   .stat-box {
-    flex: 1 1 calc(50% - 6px);
-    min-width: 0;
-    padding: 10px 12px;
+    flex: 1 1 calc(50% - 6px) !important;
+    min-width: 0 !important;          /* override base min-width:140 */
+    max-width: calc(50% - 4px) !important;
+    height: auto !important;          /* override fixed 70px */
+    padding: 10px 12px !important;
+    box-sizing: border-box;
   }
-  .stat-box b { font-size: 16px; }
+  .stat-box span { font-size: 12px !important; }
+  .stat-box b { font-size: 18px !important; margin-top: 2px !important; }
 
   /* ── VIP panel ───────────────────────────────────────────── */
   .vip-stats { gap: 10px; }
