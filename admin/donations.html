@@ -211,7 +211,6 @@
         <input type="number" id="fUserId" min="1" placeholder="—">
       </div>
 
-      <button id="btnApply" class="btn">Aplikovat</button>
       <button id="btnPrint" class="btn">Tisk pro daně</button>
     </div>
 
@@ -371,8 +370,12 @@
 
   function renderSummary(s) {
     document.getElementById('sumCount').textContent = s.approved_count ?? '0';
-    document.getElementById('sumCzk').textContent   = (s.approved_czk   ?? 0) + ' Kč';
-    document.getElementById('sumDc').textContent    = (s.approved_dc    ?? 0) + ' DC';
+    const czk = s.approved_czk ?? 0;
+    const eur = s.approved_eur ?? 0;
+    let amountText = czk + ' Kč';
+    if (eur > 0) amountText += ' · ' + eur + ' €';
+    document.getElementById('sumCzk').textContent = amountText;
+    document.getElementById('sumDc').textContent  = (s.approved_dc ?? 0) + ' DC';
   }
 
   function renderTable(rows) {
@@ -575,10 +578,21 @@
   });
 
   // === Init ===
+  let userIdDebounce = null;
   document.addEventListener('DOMContentLoaded', async () => {
     await loadCsrf();
     await loadDonations();
-    document.getElementById('btnApply').addEventListener('click', loadDonations);
+
+    // Live filtry — žádné "Aplikovat", auto-reload na změně
+    ['fStatus','fRange','fFrom','fTo'].forEach(id => {
+      document.getElementById(id).addEventListener('change', loadDonations);
+    });
+    // User ID — debounce, aby se neposílalo na každý klik šipky
+    document.getElementById('fUserId').addEventListener('input', () => {
+      clearTimeout(userIdDebounce);
+      userIdDebounce = setTimeout(loadDonations, 300);
+    });
+
     document.getElementById('btnPrint').addEventListener('click', () => window.print());
   });
 })();

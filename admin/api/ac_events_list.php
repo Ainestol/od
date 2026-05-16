@@ -13,10 +13,11 @@
  *   to             — datetime               (event_time <=)
  *   sort           — event_time | severity | score_added (default event_time)
  *   dir            — asc | desc (default desc)
- *   limit          — default 200, max 1000
+ *   page           — 1-based page number (default 1)
+ *   per_page       — page size (default 50, min 10, max 200)
  *
  * Response:
- *   { ok: true, data: [...], total: int }
+ *   { ok: true, data: [...], total: int, page: int, per_page: int, pages: int }
  */
 header('Content-Type: application/json; charset=utf-8');
 require_once __DIR__ . '/../../api/admin/_bootstrap.php';
@@ -35,10 +36,12 @@ try {
     $from          = trim((string)($_GET['from'] ?? ''));
     $to            = trim((string)($_GET['to'] ?? ''));
 
-    $sortWl = ['event_time','severity','score_added'];
+    $sortWl = ['event_time','severity','score_added','event_type','char_name','account_name'];
     $sort   = in_array(($_GET['sort'] ?? ''), $sortWl, true) ? $_GET['sort'] : 'event_time';
     $dir    = (($_GET['dir'] ?? '') === 'asc') ? 'ASC' : 'DESC';
-    $limit  = max(1, min(1000, (int)($_GET['limit'] ?? 200)));
+    $page   = max(1, (int)($_GET['page']     ?? 1));
+    $perPage = max(10, min(200, (int)($_GET['per_page'] ?? 50)));
+    $offset = ($page - 1) * $perPage;
 
     $where  = [];
     $params = [];
@@ -80,6 +83,14 @@ try {
 
     $whereSql = $where ? ('WHERE ' . implode(' AND ', $where)) : '';
 
+    // Count first — pro pagination UI
+    $countSql  = "SELECT COUNT(*) FROM ac_suspicious_events $whereSql";
+    $countStmt = $pdoGame->prepare($countSql);
+    $countStmt->execute($params);
+    $total = (int)$countStmt->fetchColumn();
+    $pages = $total > 0 ? (int)ceil($total / $perPage) : 1;
+
+    // Stránka samotná
     $sql = "
         SELECT
             id, event_time, account_name, char_name, char_object_id,
@@ -91,7 +102,7 @@ try {
         FROM ac_suspicious_events
         $whereSql
         ORDER BY $sort $dir
-        LIMIT $limit
+        LIMIT $perPage OFFSET $offset
     ";
     $stmt = $pdoGame->prepare($sql);
     $stmt->execute($params);
@@ -134,9 +145,14 @@ try {
     }
 
     echo json_encode([
-        'ok'    => true,
-        'data'  => $rows,
-        'total' => count($rows),
+        'ok'       => true,
+        'data'     => $rows,
+        'total'    => $total,
+        'page'     => $page,
+        'per_page' => $perPage,
+        'pages'    => $pages,
+        'sort'     => $sort,
+        'dir'      => strtolower($dir),
     ]);
 
 } catch (Throwable $e) {

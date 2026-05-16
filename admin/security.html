@@ -194,18 +194,32 @@
         <button class="chip" data-review="CONFIRMED">🔴 Confirmed</button>
         <button class="chip" data-review="IGNORED">🚫 Ignored</button>
       </div>
+
+      <button id="bulkIgnoreBtn" class="btn-danger sec-bulk-btn" type="button" disabled
+              title="Označí všechny NEW události odpovídající aktivním filtrům jako IGNORED">
+        🚫 Bulk ignore filtru
+      </button>
+
+      <button id="eventsReset" class="btn-small" type="button" title="Vymazat všechny filtry">
+        ⟲ Reset filtrů
+      </button>
     </div>
 
-    <table class="admin-table" id="eventsTable">
+    <div class="sec-events-meta">
+      <span class="muted-text" id="eventsCount">–</span>
+      <span class="sec-pagination" id="eventsPaginationTop"></span>
+    </div>
+
+    <table class="admin-table sortable" id="eventsTable">
       <thead>
         <tr>
-          <th>ČAS</th>
-          <th>POSTAVA</th>
-          <th>ACCOUNT</th>
+          <th data-key="event_time">ČAS</th>
+          <th data-key="char_name">POSTAVA</th>
+          <th data-key="account_name">ACCOUNT</th>
           <th>WEB HRÁČ</th>
-          <th>TYP</th>
-          <th>SEVERITY</th>
-          <th class="ta-right">+SCORE</th>
+          <th data-key="event_type">TYP</th>
+          <th data-key="severity">SEVERITY</th>
+          <th class="ta-right" data-key="score_added">+SCORE</th>
           <th>DETAIL</th>
           <th>STATUS</th>
           <th>AKCE</th>
@@ -213,6 +227,8 @@
       </thead>
       <tbody></tbody>
     </table>
+
+    <div class="sec-pagination" id="eventsPaginationBottom"></div>
   </section>
 
 </main>

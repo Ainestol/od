@@ -88,26 +88,49 @@ try {
     }
     unset($r);
 
-    $approvedTotal = 0;
-    $approvedCount = 0;
-    $approvedDc    = 0;
-    foreach ($rows as $r) {
-        if ($r['status'] === 'approved') {
-            $approvedCount++;
-            if ($r['currency'] === 'CZK') {
-                $approvedTotal += $r['amount'];
-            }
-            $approvedDc += $r['dc_credited'];
-        }
+    // ─── Summary — vždy přes všechny APPROVED v rámci date/user filtrů ──
+    //     (nezávisle na statusu, který filtruje listu nahoře)
+    $sumWhere  = ["d.status = 'approved'"];
+    $sumParams = [];
+    if ($userId) {
+        $sumWhere[]  = "d.web_user_id = ?";
+        $sumParams[] = $userId;
     }
+    if ($from) {
+        $sumWhere[]  = "d.paid_at >= ?";
+        $sumParams[] = $from;
+    }
+    if ($to) {
+        $sumWhere[]  = "d.paid_at <= ?";
+        $sumParams[] = $to;
+    }
+    if ($range === 'last30') {
+        $sumWhere[]  = "d.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)";
+    }
+    $sumSql = "
+        SELECT
+            COUNT(*) AS approved_count,
+            COALESCE(SUM(CASE WHEN d.currency = 'CZK' THEN d.amount ELSE 0 END), 0) AS approved_czk,
+            COALESCE(SUM(CASE WHEN d.currency = 'EUR' THEN d.amount ELSE 0 END), 0) AS approved_eur,
+            COALESCE(SUM(d.dc_credited), 0) AS approved_dc
+        FROM donations d
+        WHERE " . implode(' AND ', $sumWhere);
+    $sumStmt = $pdo->prepare($sumSql);
+    $sumStmt->execute($sumParams);
+    $sumRow = $sumStmt->fetch(PDO::FETCH_ASSOC) ?: [];
+    $approvedCount = (int)($sumRow['approved_count'] ?? 0);
+    $approvedTotal = (int)($sumRow['approved_czk']   ?? 0);
+    $approvedEur   = (int)($sumRow['approved_eur']   ?? 0);
+    $approvedDc    = (int)($sumRow['approved_dc']    ?? 0);
 
     echo json_encode([
         'ok'        => true,
         'donations' => $rows,
         'summary'   => [
-            'approved_count'  => $approvedCount,
-            'approved_czk'    => $approvedTotal,
-            'approved_dc'     => $approvedDc
+            'approved_count' => $approvedCount,
+            'approved_czk'   => $approvedTotal,
+            'approved_eur'   => $approvedEur,
+            'approved_dc'    => $approvedDc,
         ],
         'filter' => [
             'status'  => $status,

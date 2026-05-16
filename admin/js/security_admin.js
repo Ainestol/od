@@ -16,6 +16,10 @@
       q: '', eventType: '', severity: '',
       reviewStatuses: new Set(['NEW']),
       debounce: null, data: [],
+      sort: 'event_time', dir: 'desc',
+      page: 1, perPage: 50,
+      total: 0, pages: 1,
+      charId: 0,                              // optional filter from "Top players → Události"
       currentRowId: null,
       currentNewStatus: null,
     },
@@ -274,13 +278,19 @@
   // ----- EVENTS -----------------------------------------------------
   async function loadEvents(extra) {
     extra = extra || {};
+    if (typeof extra.char_id === 'number') state.events.charId = extra.char_id;
+
     const p = new URLSearchParams();
     if (state.events.q)          p.set('q', state.events.q);
     if (state.events.eventType)  p.set('event_type', state.events.eventType);
     if (state.events.severity)   p.set('severity', state.events.severity);
     if (state.events.reviewStatuses.size)
       p.set('review_status', [...state.events.reviewStatuses].join(','));
-    if (extra.char_id)           p.set('char_id', extra.char_id);
+    if (state.events.charId)     p.set('char_id', state.events.charId);
+    p.set('sort', state.events.sort);
+    p.set('dir',  state.events.dir);
+    p.set('page', state.events.page);
+    p.set('per_page', state.events.perPage);
 
     const tbody = document.querySelector('#eventsTable tbody');
     tbody.innerHTML = '<tr><td colspan="10" class="muted ta-center">Načítám…</td></tr>';
@@ -288,31 +298,98 @@
     try {
       const res = await apiFetch('/admin/api/ac_events_list.php?' + p.toString());
       const rows = res.data || [];
-      state.events.data = rows;
+      state.events.data    = rows;
+      state.events.total   = res.total ?? rows.length;
+      state.events.pages   = res.pages ?? 1;
+      state.events.page    = res.page  ?? state.events.page;
+
+      // Pokud server vrátil prázdnou stranu (např. po smazání) a existují předchozí, jdi o stranu zpět
+      if (!rows.length && state.events.page > 1) {
+        state.events.page--;
+        return loadEvents();
+      }
+
+      renderEventsMeta();
+      renderEventsSortIndicators();
+
       if (!rows.length) {
-        tbody.innerHTML = '<tr><td colspan="10" class="muted ta-center">Žádné události.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" class="muted ta-center">Žádné události neodpovídají filtru.</td></tr>';
+        renderPagination();
         return;
       }
       tbody.innerHTML = rows.map(r => `
         <tr data-id="${r.id}">
           <td class="ta-mono">${esc(fmtDate(r.event_time))}</td>
-          <td><b>${esc(r.char_name)}</b> <span class="muted">#${r.char_object_id}</span></td>
-          <td>${esc(r.account_name || '')}</td>
+          <td>
+            <b class="cell-clickable" data-filter-char="${r.char_object_id}" title="Filtrovat na tuto postavu">${esc(r.char_name)}</b>
+            <span class="muted">#${r.char_object_id}</span>
+          </td>
+          <td>
+            <span class="cell-clickable" data-filter-account="${esc(r.account_name || '')}" title="Filtrovat na tento account">${esc(r.account_name || '')}</span>
+          </td>
           <td>${webEmailCell(r)}</td>
-          <td><span class="ev-type ev-${(r.event_type||'').toLowerCase()}">${esc(r.event_type)}</span></td>
-          <td><span class="sev-badge ${severityClass(r.severity)}">${esc(r.severity)}</span></td>
+          <td>
+            <span class="ev-type ev-${(r.event_type||'').toLowerCase()} cell-clickable"
+                  data-filter-type="${esc(r.event_type)}" title="Filtrovat na tento typ">${esc(r.event_type)}</span>
+          </td>
+          <td>
+            <span class="sev-badge ${severityClass(r.severity)} cell-clickable"
+                  data-filter-sev="${esc(r.severity)}" title="Filtrovat na tuto severity">${esc(r.severity)}</span>
+          </td>
           <td class="ta-right">+${r.score_added}</td>
           <td class="muted-text">${eventQuickDetail(r)}</td>
-          <td><span class="status-badge ${statusClass(r.review_status)}">${esc(r.review_status)}</span></td>
+          <td>
+            <span class="status-badge ${statusClass(r.review_status)} cell-clickable"
+                  data-filter-status="${esc(r.review_status)}" title="Filtrovat na tento status">${esc(r.review_status)}</span>
+          </td>
           <td>
             <button class="btn-small" data-act="open-detail" data-id="${r.id}">Detail</button>
           </td>
         </tr>
       `).join('');
+
+      renderPagination();
     } catch (e) {
       console.error(e);
       tbody.innerHTML = '<tr><td colspan="10" class="muted ta-center">Chyba: ' + esc(e.message) + '</td></tr>';
     }
+  }
+
+  function renderEventsMeta() {
+    const el = document.getElementById('eventsCount');
+    if (!el) return;
+    const start = state.events.total === 0 ? 0 : (state.events.page - 1) * state.events.perPage + 1;
+    const end   = Math.min(state.events.page * state.events.perPage, state.events.total);
+    const charSuffix = state.events.charId ? ` · filter: char #${state.events.charId}` : '';
+    el.textContent = `Zobrazeno ${start}–${end} z ${state.events.total}${charSuffix}`;
+  }
+
+  function renderEventsSortIndicators() {
+    document.querySelectorAll('#eventsTable thead th').forEach(th => {
+      th.classList.remove('sort-asc', 'sort-desc');
+      if (th.dataset.key === state.events.sort) {
+        th.classList.add(state.events.dir === 'asc' ? 'sort-asc' : 'sort-desc');
+      }
+    });
+  }
+
+  function renderPagination() {
+    const cur = state.events.page;
+    const tot = state.events.pages;
+    const html = paginationHtml(cur, tot);
+    document.getElementById('eventsPaginationTop').innerHTML    = html;
+    document.getElementById('eventsPaginationBottom').innerHTML = html;
+  }
+
+  function paginationHtml(cur, tot) {
+    if (tot <= 1) return '';
+    const btns = [];
+    btns.push(`<button class="page-btn" data-page="1"     ${cur===1 ? 'disabled':''}>« 1</button>`);
+    btns.push(`<button class="page-btn" data-page="${cur-1}" ${cur===1 ? 'disabled':''}>‹ Předchozí</button>`);
+    btns.push(`<span class="page-info">Strana <b>${cur}</b> / ${tot}</span>`);
+    btns.push(`<button class="page-btn" data-page="${cur+1}" ${cur===tot ? 'disabled':''}>Další ›</button>`);
+    btns.push(`<button class="page-btn" data-page="${tot}"   ${cur===tot ? 'disabled':''}>${tot} »</button>`);
+    return btns.join('');
   }
 
   function eventQuickDetail(r) {
@@ -338,15 +415,20 @@
       clearTimeout(state.events.debounce);
       state.events.debounce = setTimeout(() => {
         state.events.q = e.target.value.trim();
+        state.events.page = 1;
         loadEvents();
       }, 250);
     });
     document.getElementById('eventsType').addEventListener('change', e => {
       state.events.eventType = e.target.value;
+      state.events.page = 1;
+      updateBulkBtnState();
       loadEvents();
     });
     document.getElementById('eventsSeverity').addEventListener('change', e => {
       state.events.severity = e.target.value;
+      state.events.page = 1;
+      updateBulkBtnState();
       loadEvents();
     });
     document.getElementById('eventsReviewFilters').addEventListener('click', e => {
@@ -360,16 +442,173 @@
         state.events.reviewStatuses.add(k);
         chip.classList.add('active');
       }
+      state.events.page = 1;
       loadEvents();
     });
 
     document.querySelector('#eventsTable tbody').addEventListener('click', e => {
-      const btn = e.target.closest('button[data-act="open-detail"]');
-      if (!btn) return;
-      const id = parseInt(btn.dataset.id, 10);
-      const row = state.events.data.find(r => r.id === id);
-      if (row) openEventModal(row);
+      // Detail button
+      const detailBtn = e.target.closest('button[data-act="open-detail"]');
+      if (detailBtn) {
+        const id = parseInt(detailBtn.dataset.id, 10);
+        const row = state.events.data.find(r => r.id === id);
+        if (row) openEventModal(row);
+        return;
+      }
+      // Clickable badges → quick filter
+      const t = e.target.closest('[data-filter-type]');
+      if (t) {
+        state.events.eventType = t.dataset.filterType;
+        document.getElementById('eventsType').value = state.events.eventType;
+        updateBulkBtnState();
+        state.events.page = 1;
+        loadEvents();
+        return;
+      }
+      const sev = e.target.closest('[data-filter-sev]');
+      if (sev) {
+        state.events.severity = sev.dataset.filterSev;
+        document.getElementById('eventsSeverity').value = state.events.severity;
+        updateBulkBtnState();
+        state.events.page = 1;
+        loadEvents();
+        return;
+      }
+      const st = e.target.closest('[data-filter-status]');
+      if (st) {
+        state.events.reviewStatuses = new Set([st.dataset.filterStatus]);
+        document.querySelectorAll('#eventsReviewFilters .chip').forEach(c => {
+          c.classList.toggle('active', c.dataset.review === st.dataset.filterStatus);
+        });
+        state.events.page = 1;
+        loadEvents();
+        return;
+      }
+      const ch = e.target.closest('[data-filter-char]');
+      if (ch) {
+        state.events.charId = parseInt(ch.dataset.filterChar, 10);
+        state.events.page = 1;
+        loadEvents();
+        return;
+      }
+      const acc = e.target.closest('[data-filter-account]');
+      if (acc) {
+        state.events.q = acc.dataset.filterAccount;
+        document.getElementById('eventsSearch').value = state.events.q;
+        state.events.page = 1;
+        loadEvents();
+        return;
+      }
     });
+
+    // Sortable column headers
+    document.querySelectorAll('#eventsTable thead th[data-key]').forEach(th => {
+      th.style.cursor = 'pointer';
+      th.addEventListener('click', () => {
+        const key = th.dataset.key;
+        if (state.events.sort === key) {
+          state.events.dir = state.events.dir === 'asc' ? 'desc' : 'asc';
+        } else {
+          state.events.sort = key;
+          state.events.dir  = 'desc';
+        }
+        state.events.page = 1;
+        loadEvents();
+      });
+    });
+
+    // Pagination clicks (top + bottom)
+    ['eventsPaginationTop','eventsPaginationBottom'].forEach(elId => {
+      const el = document.getElementById(elId);
+      if (!el) return;
+      el.addEventListener('click', e => {
+        const btn = e.target.closest('button[data-page]');
+        if (!btn || btn.disabled) return;
+        const p = parseInt(btn.dataset.page, 10);
+        if (!p || p < 1 || p > state.events.pages) return;
+        state.events.page = p;
+        loadEvents();
+        // Scroll to top of events table
+        document.getElementById('eventsTable').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+
+    // Reset filters
+    document.getElementById('eventsReset').addEventListener('click', () => {
+      state.events.q              = '';
+      state.events.eventType      = '';
+      state.events.severity       = '';
+      state.events.reviewStatuses = new Set(['NEW']);
+      state.events.charId         = 0;
+      state.events.page           = 1;
+      state.events.sort           = 'event_time';
+      state.events.dir            = 'desc';
+      document.getElementById('eventsSearch').value   = '';
+      document.getElementById('eventsType').value     = '';
+      document.getElementById('eventsSeverity').value = '';
+      document.querySelectorAll('#eventsReviewFilters .chip').forEach(c => {
+        c.classList.toggle('active', c.dataset.review === 'NEW');
+      });
+      updateBulkBtnState();
+      loadEvents();
+    });
+
+    // Bulk ignore button
+    document.getElementById('bulkIgnoreBtn').addEventListener('click', async () => {
+      // Vyžaduj aspoň jeden filtr — backend to chrání taky, ale UX si to ohlídá
+      const hasFilter = state.events.eventType || state.events.severity || state.events.q;
+      if (!hasFilter) {
+        toast('Aktivuj nejdřív filtr (typ / severity / search)', 'err');
+        return;
+      }
+
+      // Spočítáme NEW events v aktuálním listu pro confirm message
+      const newCount = state.events.data.filter(r => r.review_status === 'NEW').length;
+      const filterLabel =
+        (state.events.eventType ? 'typ=' + state.events.eventType : '') +
+        (state.events.severity  ? ' severity=' + state.events.severity : '') +
+        (state.events.q         ? ' search="' + state.events.q + '"' : '');
+
+      if (!confirm(`Bulk-označit jako IGNORED všechny NEW události odpovídající: ${filterLabel}?\n\nNa této straně cca ${newCount} viditelných (backend označí všechny vyhovující v DB).`)) {
+        return;
+      }
+
+      const body = {};
+      if (state.events.eventType) body.event_type = state.events.eventType;
+      if (state.events.severity)  body.severity   = state.events.severity;
+      // search → ne; backend nezpracovává LIKE, jen exact filtry. Pokud je search, varuj.
+      if (state.events.q && !state.events.eventType && !state.events.severity) {
+        toast('Pro bulk ignore nutný filtr na event_type nebo severity (search bulk nepokrývá)', 'err');
+        return;
+      }
+
+      const btn = document.getElementById('bulkIgnoreBtn');
+      btn.disabled = true;
+      const orig = btn.textContent;
+      btn.textContent = 'Pracuje se…';
+      try {
+        const res = await apiFetch('/admin/api/ac_bulk_ignore.php', {
+          method: 'POST',
+          body: JSON.stringify(body),
+        });
+        toast(`✓ Označeno ${res.updated} událostí jako IGNORED`, 'ok');
+        await loadEvents();
+        // Refresh i overview, ať se update propíše do statů
+        if (typeof loadOverview === 'function') loadOverview();
+      } catch (e) {
+        toast('Chyba: ' + e.message, 'err');
+      } finally {
+        btn.textContent = orig;
+        updateBulkBtnState();
+      }
+    });
+  }
+
+  function updateBulkBtnState() {
+    const btn = document.getElementById('bulkIgnoreBtn');
+    if (!btn) return;
+    const hasFilter = !!(state.events.eventType || state.events.severity);
+    btn.disabled = !hasFilter;
   }
 
   // ----- Event modal ------------------------------------------------
