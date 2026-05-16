@@ -423,3 +423,41 @@
   .profile-tabs .tab { flex: 1 1 100% !important; }
   .rewards-subtabs .tab { flex: 1 1 100% !important; }
 }
+
+/* =====================================
+   MODALS (profile + auth + shop) na mobilu
+   ===================================== */
+@media (max-width: 600px) {
+  .modal-box {
+    max-width: 95vw !important;
+    width: 95vw !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+    padding: 18px 16px !important;
+    box-sizing: border-box;
+  }
+  .modal-box h3 { font-size: 16px; margin-top: 0; }
+  .modal-actions {
+    flex-direction: column-reverse !important;
+    gap: 8px !important;
+  }
+  .modal-actions .btn {
+    width: 100%;
+    min-width: 0 !important;
+    padding: 9px 12px;
+  }
+  /* QR a tipy v 2FA modalu */
+  #twofaQr img {
+    max-width: 100%;
+    height: auto;
+  }
+  .twofa-qr-download {
+    display: inline-block;
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+  .twofa-qr-help {
+    font-size: 11px !important;
+    text-align: center;
+  }
+}

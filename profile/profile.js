@@ -373,16 +373,24 @@ if (btn.dataset.mode === 'disable') {
     const data = await res.json();
 
     if (data.ok && qrBox) {
-      qrBox.innerHTML = '';
-
-      if (data.ok && qrBox) {
-  qrBox.innerHTML = `
-    <img 
-      src="https://quickchart.io/qr?text=${encodeURIComponent(data.qr_url)}&size=260&margin=2"
-      style="background:#fff;padding:10px;border-radius:8px;"
-    >
-  `;
-}
+      const qrSrc = `https://quickchart.io/qr?text=${encodeURIComponent(data.qr_url)}&size=260&margin=2`;
+      qrBox.innerHTML = `
+        <img id="twofaQrImg"
+          src="${qrSrc}"
+          alt="2FA QR kód"
+          style="background:#fff;padding:10px;border-radius:8px;max-width:100%;height:auto;">
+        <div class="twofa-qr-actions" style="margin-top:10px;">
+          <a href="${qrSrc}" download="ordo-draconis-2fa.png" target="_blank"
+             class="btn btn-small twofa-qr-download">
+            📥 ${isEn ? 'Save QR to gallery' : 'Uložit QR do galerie'}
+          </a>
+        </div>
+        <p class="muted twofa-qr-help" style="font-size:11px; margin:8px 0 0; line-height:1.4;">
+          ${isEn
+            ? 'Tip: long-press the QR on your phone to save it, then open it in your Authenticator app via "Scan from gallery".'
+            : 'Tip: na telefonu <b>podrž prst na QR</b> a ulož ho do galerie. Pak v aplikaci Authenticator vyber „Naskenovat z galerie".'}
+        </p>
+      `;
     } else {
       qrBox.innerHTML = 'Chyba QR';
     }
