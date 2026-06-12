@@ -396,6 +396,36 @@ elseif ($provider === 'L2TOP') {
   }
 }
 
+elseif ($provider === 'L2VOTES') {
+  // L2Votes.com — IP-check API
+  // Endpoint: GET https://l2votes.com/public/api/servers/vote-check.php?api_key=KEY&ip=IP
+  // Response: {"has_voted":true|false, "cooldown_seconds":..., "cooldown_remaining_seconds":...}
+  if (!$ipForCheck) throw new Exception('IPCHECK_NOT_CONFIGURED');
+
+  $url = "https://l2votes.com/public/api/servers/vote-check.php"
+       . "?api_key=" . urlencode($apiKey)
+       . "&ip="      . urlencode($ipForCheck);
+
+  $j = http_get_json($url, 8);
+  if (!$j) {
+    $pdo->commit();
+    system_log(
+      $pdo, 'VOTE', 'VOTE_PENDING',
+      $userId, (int)$a['vote_site_id'], 'INFO',
+      [
+        'attempt_id' => $attemptId,
+        'reason'     => 'POSTBACK_WAITING_VERIFICATION'
+      ]
+    );
+    echo json_encode(['ok' => true, 'status' => 'PENDING']);
+    exit;
+  }
+
+  // L2Votes vrací has_voted=true pokud hráč hlasoval v rámci cooldown_seconds.
+  // Nemá vote_time → nemůžeme porovnávat s attemptTs jako u L2TOP, věříme API.
+  $voted = !empty($j['has_voted']) && $j['has_voted'] === true;
+}
+
     else {
       throw new Exception('IPCHECK_PROVIDER_UNSUPPORTED');
     }
